@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function SignupPage() {
   const [state, formAction, isPending] = useActionState(signup, undefined);
@@ -54,9 +55,17 @@ export default function SignupPage() {
             </div>
 
             {state?.error && (
-              <div className="text-sm font-medium text-destructive">
-                {state.error}
-              </div>
+              <Alert variant="destructive">
+                <AlertTitle>Account could not be created</AlertTitle>
+                <AlertDescription>{state.error}</AlertDescription>
+              </Alert>
+            )}
+
+            {state?.success && (
+              <Alert>
+                <AlertTitle>Check your email</AlertTitle>
+                <AlertDescription>{state.success}</AlertDescription>
+              </Alert>
             )}
 
             <Button type="submit" className="w-full" disabled={isPending}>

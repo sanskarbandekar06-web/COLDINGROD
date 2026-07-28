@@ -4,7 +4,19 @@ import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-export async function login(prevState: { error: string } | null | undefined, formData: FormData) {
+export type AuthActionState = {
+  error?: string;
+  success?: string;
+  email?: string;
+  emailNotConfirmed?: boolean;
+} | null | undefined;
+
+function getEmailRedirectTo() {
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '');
+  return `${appUrl}/auth/callback?next=/dashboard`;
+}
+
+export async function login(prevState: AuthActionState, formData: FormData): Promise<AuthActionState> {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
 
@@ -20,14 +32,21 @@ export async function login(prevState: { error: string } | null | undefined, for
   });
 
   if (error) {
+    if (error.code === 'email_not_confirmed' || /email not confirmed/i.test(error.message)) {
+      return {
+        error: 'Confirm your email address before signing in. Check your inbox and spam folder, or resend the confirmation email below.',
+        email,
+        emailNotConfirmed: true,
+      };
+    }
+
     return { error: error.message };
   }
 
-  // Next steps will be handled by middleware or client side redirect
   redirect('/dashboard');
 }
 
-export async function signup(prevState: { error: string } | null | undefined, formData: FormData) {
+export async function signup(prevState: AuthActionState, formData: FormData): Promise<AuthActionState> {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
   const fullName = formData.get('fullName') as string;
@@ -38,10 +57,11 @@ export async function signup(prevState: { error: string } | null | undefined, fo
 
   const supabase = await createClient();
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
+      emailRedirectTo: getEmailRedirectTo(),
       data: {
         full_name: fullName,
       },
@@ -52,7 +72,42 @@ export async function signup(prevState: { error: string } | null | undefined, fo
     return { error: error.message };
   }
 
+  if (!data.session) {
+    return {
+      success: 'Account created. Open the confirmation email we sent you, click “Confirm your email”, and then sign in.',
+    };
+  }
+
   redirect('/dashboard');
+}
+
+export async function resendSignupConfirmation(
+  prevState: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
+  const email = formData.get('email') as string;
+
+  if (!email) {
+    return { error: 'Enter your email address first.' };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resend({
+    type: 'signup',
+    email,
+    options: {
+      emailRedirectTo: getEmailRedirectTo(),
+    },
+  });
+
+  if (error) {
+    return { error: error.message, email };
+  }
+
+  return {
+    success: 'Confirmation email sent. Check your inbox and spam folder.',
+    email,
+  };
 }
 
 export async function logout() {
