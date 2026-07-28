@@ -9,7 +9,7 @@ CREATE TYPE activity_actor_type AS ENUM ('human', 'ai_agent', 'system');
 
 -- PROJECTS
 CREATE TABLE public.projects (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
     client_id UUID REFERENCES public.clients(id) ON DELETE SET NULL,
     name TEXT NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE public.projects (
 
 -- TASKS
 CREATE TABLE public.tasks (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
     project_id UUID NOT NULL REFERENCES public.projects(id) ON DELETE CASCADE,
     assigned_to UUID REFERENCES public.users(id) ON DELETE SET NULL,
@@ -42,7 +42,7 @@ ALTER TABLE public.projects ADD CONSTRAINT projects_id_workspace_id_key UNIQUE (
 
 -- MEETINGS
 CREATE TABLE public.meetings (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
     organizer_id UUID REFERENCES public.workspace_members(id) ON DELETE SET NULL,
     title TEXT NOT NULL,
@@ -97,7 +97,7 @@ CREATE TABLE public.meeting_participants (
 
 -- AVAILABILITY SLOTS
 CREATE TABLE public.availability_slots (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     workspace_id UUID NOT NULL,
     workspace_member_id UUID NOT NULL,
     start_time TIMESTAMPTZ NOT NULL,
@@ -117,7 +117,7 @@ CREATE TYPE public.asset_upload_source AS ENUM ('client', 'lead', 'project', 'po
 
 -- ASSETS
 CREATE TABLE public.assets (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
     file_path TEXT NOT NULL,
@@ -133,7 +133,7 @@ CREATE TABLE public.assets (
 
 -- ACTIVITIES
 CREATE TABLE public.activities (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
     entity_type TEXT NOT NULL,
     entity_id UUID NOT NULL,

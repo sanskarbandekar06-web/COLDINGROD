@@ -9,7 +9,7 @@ CREATE TYPE integration_provider AS ENUM ('google', 'stripe', 'quickbooks', 'hub
 
 -- AI AGENTS
 CREATE TABLE public.ai_agents (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     workspace_id UUID REFERENCES public.workspaces(id) ON DELETE CASCADE, -- Nullable for system-wide agents (e.g. Ralph)
     name TEXT NOT NULL,
     description TEXT,
@@ -24,7 +24,7 @@ CREATE TYPE public.ai_action_priority AS ENUM ('low', 'normal', 'high', 'critica
 
 -- AI ACTIONS
 CREATE TABLE public.ai_actions (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
     entity_type TEXT NOT NULL,
     entity_id UUID,
@@ -45,7 +45,7 @@ CREATE TABLE public.ai_actions (
 
 -- AI APPROVALS
 CREATE TABLE public.ai_approvals (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     ai_action_id UUID NOT NULL UNIQUE REFERENCES public.ai_actions(id) ON DELETE CASCADE,
     workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
     approver_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
@@ -57,7 +57,7 @@ CREATE TABLE public.ai_approvals (
 
 -- INTEGRATIONS
 CREATE TABLE public.integrations (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
     provider integration_provider NOT NULL,
     status TEXT NOT NULL,

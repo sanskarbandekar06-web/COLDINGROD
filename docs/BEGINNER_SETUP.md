@@ -129,112 +129,53 @@ Official references:
 - [Supabase redirect URLs](https://supabase.com/docs/guides/auth/redirect-urls)
 - [Supabase password authentication](https://supabase.com/docs/guides/auth/passwords)
 
-## Part 5 — Create the GitHub repository
+## Part 5 — GitHub repository
 
-The application folder is not currently a Git repository. Git is installed on this computer, but GitHub CLI is not installed. The simplest first step is to create an empty repository on GitHub's website.
+This part is complete.
 
-1. Open [GitHub](https://github.com) and sign in.
-2. Click the **+** button in the upper-right corner.
-3. Click **New repository**.
-4. Set **Owner** to your personal GitHub account.
-5. Set **Repository name** to `coldingrod`.
-6. Add a short description such as `Agency business operating system`.
-7. Select **Private**.
-8. Do not select:
-   - Add a README
-   - Add `.gitignore`
-   - Choose a license
-9. Click **Create repository**.
-10. Copy the HTTPS repository URL:
+- Repository: [sanskarbandekar06-web/COLDINGROD](https://github.com/sanskarbandekar06-web/COLDINGROD)
+- Branch: `main`
+- Local `main` tracks `origin/main`.
+- The existing empty remote history was preserved.
+- `.env.local`, `node_modules`, `.next`, Supabase link metadata, and build caches are not tracked.
+- `.env.local.example` is safely tracked.
 
-    ```text
-    https://github.com/YOUR_USERNAME/coldingrod.git
-    ```
+## Part 6 — Supabase CLI
 
-11. Send Codex only this repository URL. It is not a secret.
+This part is complete.
 
-The repository must be empty because the local project already has a README and `.gitignore`. GitHub also recommends not pre-populating those files when pushing an existing project.
+- Supabase CLI `2.110.0` is installed as a development dependency.
+- `supabase/config.toml` is initialized.
+- The CLI login is stored locally, not in the repository.
+- Docker is not required for linked hosted migrations. It is required only for a full local Supabase stack and local migration-catalog caching.
 
-### Local Git commands
-
-Codex can safely run these after the empty repository exists:
+Useful verification command:
 
 ```powershell
 Set-Location 'C:\Users\SANSKAR\COLDINGROD IMPLEMENTATION\coldingrod'
-git init
-git branch -M main
-git status
-git add .
-git status
-git commit -m "Initial Coldingrod Phase 2.8"
-git remote add origin https://github.com/YOUR_USERNAME/coldingrod.git
-git push -u origin main
+npx supabase projects list
 ```
 
-Before the commit, confirm that these are not listed:
+## Part 7 — Linked Supabase project
 
-- `.env.local`
-- `node_modules`
-- `.next`
-- database passwords
-- Supabase secret or `service_role` keys
+This part is complete.
 
-GitHub may open a browser sign-in through Git Credential Manager during the first push.
+- Project name: `COLDINGROD`
+- Project reference: `mspfxgxduehikohdsomg`
+- Region: `ap-south-1`
+- Status at setup: `ACTIVE_HEALTHY`
 
-## Part 6 — Prepare the Supabase CLI
-
-The recommended migration method is the CLI, not pasting schema migrations into the remote SQL Editor. CLI deployment records every applied migration in `supabase_migrations.schema_migrations`.
-
-Node.js 24 is already installed and meets the CLI's Node.js 20-or-newer requirement.
-
-From PowerShell:
+The linking command was:
 
 ```powershell
-Set-Location 'C:\Users\SANSKAR\COLDINGROD IMPLEMENTATION\coldingrod'
-npm install --save-dev supabase
-npx supabase init
-npx supabase login
+npx supabase link --project-ref mspfxgxduehikohdsomg
 ```
 
-What happens:
+Do not run `supabase db reset --linked`; that command is destructive to the hosted database.
 
-1. Installation adds the Supabase CLI as a development dependency.
-2. `supabase init` creates `supabase/config.toml`. It must preserve the existing `supabase/migrations` folder.
-3. `supabase login` opens a browser so you can authorize the CLI.
+## Part 8 — Applied migrations 001–008
 
-Do not paste an access token into source files.
-
-Docker is not required just to link and push to the hosted project. Docker is required later if we want a full disposable Supabase stack on this computer.
-
-## Part 7 — Link the clean Supabase project
-
-Run:
-
-```powershell
-npx supabase link --project-ref YOUR_PROJECT_REF
-```
-
-The CLI may ask for the database password created in Part 1. Type it only into the local prompt.
-
-Because this is a clean project, do not run `supabase db pull` before the initial push. A pull is for preserving schema that already exists remotely.
-
-Check the migration status:
-
-```powershell
-npx supabase migration list --linked
-```
-
-The local side should show versions `001` through `006`; the remote side should initially be empty.
-
-## Part 8 — Preview and apply migrations 001–006
-
-First run a dry run:
-
-```powershell
-npx supabase db push --linked --dry-run
-```
-
-Expected order:
+The initial feature migrations `001`–`006` and validation fixes `007`–`008` are applied.
 
 1. `001_core_tenancy.sql`
 2. `002_ai_engine_and_integrations.sql`
@@ -242,24 +183,21 @@ Expected order:
 4. `004_work_system_and_assets.sql`
 5. `005_functions_and_triggers.sql`
 6. `006_rls_policies.sql`
+7. `007_authenticated_grants_and_rls_hardening.sql`
+8. `008_security_advisor_hardening.sql`
 
-If the dry run does not show all six in this order, stop and send the complete terminal output to Codex.
+Migration `007` adds the required authenticated table grants and permission-scoped write policies. Migration `008` resolves actionable security-advisor warnings for trigger functions and moves `btree_gist` to the `extensions` schema.
 
-If the preview is correct:
-
-```powershell
-npx supabase db push --linked
-```
-
-After success:
+Verification commands:
 
 ```powershell
 npx supabase migration list --linked
+npx supabase db push --linked --dry-run
 ```
 
-Every local migration should have a matching remote version.
+The local and remote history should match through `008`, and the dry run should report that the remote database is up to date.
 
-Do not paste the six files into the remote SQL Editor as the normal deployment method. Supabase warns that direct remote schema changes bypass migration history and can cause future `db push` synchronization errors.
+Do not paste migration files into the remote SQL Editor. Direct remote schema changes bypass migration history and can cause future synchronization errors.
 
 ## Part 9 — Verify the migrated database
 
@@ -275,7 +213,7 @@ from supabase_migrations.schema_migrations
 order by version;
 ```
 
-Expected: six rows, versions `001` through `006`.
+Expected: eight rows, versions `001` through `008`.
 
 ### Verify Coldingrod tables
 
@@ -485,25 +423,13 @@ Do not rely only on hidden buttons. A secure result means the server/database re
 
 ## Part 16 — Attached Stitch UI package
 
-The attached UI reference is located outside the application repository:
+The UI reference is copied into the application repository:
 
 ```text
-C:\Users\SANSKAR\COLDINGROD IMPLEMENTATION\Coldingrod_Design_System_v1.md\stitch_coldingrod_design_system\stitch_coldingrod_design_system
+C:\Users\SANSKAR\COLDINGROD IMPLEMENTATION\coldingrod\design-references\stitch
 ```
 
-It contains:
-
-- 21 screen screenshots
-- 21 matching HTML mockups
-- 3 design-system documents
-
-It includes app shell, dashboard, clients, leads, meetings, AI, settings, onboarding, notifications, proposals, and analytics references.
-
-Because it is outside the `coldingrod` application folder, it will not be included in the GitHub repository unless it is deliberately copied into a folder such as:
-
-```text
-design-references/stitch/
-```
+It contains 21 screenshots, 21 matching HTML mockups, and 3 design-system documents. The package is committed under `design-references/stitch/` and is available on GitHub.
 
 The primary Coldingrod design document and the `Executive Precision` document contain slightly different accent palettes. Before implementing the screens, use one canonical token set. The main Coldingrod document is the safest default; the Executive Precision set should be treated as an optional variant unless explicitly selected.
 
@@ -511,23 +437,18 @@ Do not paste the raw Stitch HTML directly over the working Next.js application. 
 
 ## Completion checklist
 
-Setup is complete only when every item is checked:
-
-- [ ] Clean Supabase project exists.
-- [ ] Database password is safely stored and not shared.
-- [ ] Project URL and publishable key are in `.env.local`.
-- [ ] Auth Site URL and Redirect URL are configured.
-- [ ] Empty private GitHub repository exists.
-- [ ] Local project is committed and pushed without secrets.
-- [ ] Supabase CLI is installed and initialized.
-- [ ] Local project is linked to the correct Supabase project.
-- [ ] Dry run shows migrations 001–006 in order.
-- [ ] `db push` succeeds.
-- [ ] Migration history shows six matching versions.
-- [ ] All 24 public tables exist with RLS enabled.
-- [ ] Auth user creation trigger passes.
-- [ ] Company workspace creation passes.
-- [ ] Invitation, removal, and restoration pass.
-- [ ] Meeting and availability tests pass.
-- [ ] Manager, limited member, outsider, removed member, and logged-out RLS tests pass.
-- [ ] Phase 2.8 is approved before Phase 2.9 begins.
+- [x] Supabase project exists and was clean before the initial migration.
+- [x] Project URL and publishable key are correct in the Git-ignored `.env.local`.
+- [ ] Auth Site URL and Redirect URL are configured in the Supabase Dashboard.
+- [x] GitHub repository exists and the project is pushed without secrets.
+- [x] Supabase CLI is installed, authenticated, initialized, and linked.
+- [x] Migrations `001`–`008` are applied with matching local/remote history.
+- [x] All 24 public tables exist with RLS enabled and all expected policies present.
+- [x] Auth-user and updated-at triggers are installed; the auth trigger passed the rollback-only test.
+- [x] Company workspace creation and complete owner permission grants pass.
+- [x] Invitation email rejection, acceptance, removal, and stale-permission restoration pass.
+- [x] Meeting organizer/participant protections and availability overlap rejection pass.
+- [x] Owner, limited member, outsider, removed member, restored member, and anonymous RLS tests pass.
+- [x] Synthetic acceptance-test data is fully rolled back.
+- [ ] Real browser signup, email confirmation, login, and dashboard smoke test pass.
+- [ ] Phase 2.8 receives final approval before Phase 2.9 begins.

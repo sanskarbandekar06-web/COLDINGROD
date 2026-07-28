@@ -18,7 +18,7 @@ CREATE TABLE public.users (
 
 -- WORKSPACES
 CREATE TABLE public.workspaces (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
     industry TEXT,
     timezone TEXT,
@@ -36,7 +36,7 @@ CREATE TABLE public.workspaces (
 
 -- COMPANIES
 CREATE TABLE public.companies (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     workspace_id UUID NOT NULL UNIQUE REFERENCES public.workspaces(id) ON DELETE CASCADE,
     legal_name TEXT,
     tax_id TEXT,
@@ -50,7 +50,7 @@ CREATE TABLE public.companies (
 
 -- WORKSPACE MEMBERS
 CREATE TABLE public.workspace_members (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
     user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
     joined_at TIMESTAMPTZ DEFAULT NOW(),
@@ -60,7 +60,7 @@ CREATE TABLE public.workspace_members (
 
 -- PERMISSIONS CATALOG
 CREATE TABLE public.permissions (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     key TEXT NOT NULL UNIQUE,
     description TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW()
@@ -82,7 +82,7 @@ INSERT INTO public.permissions (key, description) VALUES
 
 -- WORKSPACE PERMISSIONS
 CREATE TABLE public.workspace_permissions (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     workspace_member_id UUID NOT NULL REFERENCES public.workspace_members(id) ON DELETE CASCADE,
     permission_id UUID NOT NULL REFERENCES public.permissions(id) ON DELETE CASCADE,
     assigned_at TIMESTAMPTZ DEFAULT NOW(),
@@ -91,7 +91,7 @@ CREATE TABLE public.workspace_permissions (
 
 -- WORKSPACE INVITES
 CREATE TABLE public.workspace_invites (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
     email TEXT NOT NULL,
     token TEXT NOT NULL UNIQUE,

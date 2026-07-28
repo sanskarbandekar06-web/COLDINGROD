@@ -9,7 +9,7 @@ CREATE TYPE outreach_status AS ENUM ('draft', 'pending_approval', 'scheduled', '
 
 -- CLIENTS
 CREATE TABLE public.clients (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
     website TEXT,
@@ -21,7 +21,7 @@ CREATE TABLE public.clients (
 
 -- LEADS
 CREATE TABLE public.leads (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
     company_name TEXT NOT NULL,
     status lead_status NOT NULL DEFAULT 'new',
@@ -34,7 +34,7 @@ CREATE TABLE public.leads (
 
 -- LEAD SCORES
 CREATE TABLE public.lead_scores (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     lead_id UUID NOT NULL REFERENCES public.leads(id) ON DELETE CASCADE,
     score INTEGER NOT NULL,
     algorithm_version TEXT,
@@ -45,7 +45,7 @@ CREATE TABLE public.lead_scores (
 
 -- LEAD CONTACTS
 CREATE TABLE public.lead_contacts (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     lead_id UUID NOT NULL REFERENCES public.leads(id) ON DELETE CASCADE,
     first_name TEXT NOT NULL,
     last_name TEXT,
@@ -60,7 +60,7 @@ CREATE TABLE public.lead_contacts (
 
 -- OUTREACH MESSAGES
 CREATE TABLE public.outreach_messages (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
     lead_id UUID NOT NULL REFERENCES public.leads(id) ON DELETE CASCADE,
     contact_id UUID REFERENCES public.lead_contacts(id) ON DELETE SET NULL,
@@ -78,7 +78,7 @@ CREATE TABLE public.outreach_messages (
 
 -- MESSAGE VERSIONS
 CREATE TABLE public.message_versions (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     outreach_message_id UUID NOT NULL REFERENCES public.outreach_messages(id) ON DELETE CASCADE,
     content TEXT NOT NULL,
     edited_by UUID REFERENCES public.users(id) ON DELETE SET NULL,

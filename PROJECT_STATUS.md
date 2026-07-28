@@ -1,13 +1,13 @@
 # Coldingrod Project Status
 
-Last verified: 2026-07-28  
+Last verified: 2026-07-28
 Primary implementation workspace: `C:\Users\SANSKAR\COLDINGROD IMPLEMENTATION\coldingrod`
 
 ## Current phase
 
-Phase 2.8 is code-complete and passes the local application validation gate. It is not yet approved as database-complete because no Supabase project is connected and the migrations/RLS policies have not been exercised against a clean live database.
+Phase 2.8 application code and hosted database validation are complete. The database is migrated through `008`, the complete rollback-only acceptance suite passes, and GitHub is synchronized. Final Phase 2.8 approval is waiting only on Supabase Auth URL configuration and a real browser signup/login smoke test.
 
-Do not begin Phase 2.9 until the Phase 2.8 database validation checklist below passes.
+Do not begin Phase 2.9 until that final hosted-auth smoke test passes.
 
 ## Progress estimate
 
@@ -16,66 +16,62 @@ Do not begin Phase 2.9 until the Phase 2.8 database validation checklist below p
 | Phase 1 | 100% | 0% |
 | Phase 2.1–2.7 | 100% | 0% |
 | Phase 2.8 application implementation | 100% | 0% |
-| Phase 2.8 database/runtime approval | 0% | 100% |
+| Phase 2.8 database/runtime validation | 100% | 0% |
+| Phase 2.8 final hosted-auth smoke test | 70% | 30% |
+| Repository handoff and local tooling | 100% | 0% |
 | Phase 2.9 | 0% | 100% |
 | Phase 2 overall | approximately 85% | approximately 15% |
 | Full currently discussed product plan | approximately 65% | approximately 35% |
 
-These are planning estimates, not story-point measurements. The largest remaining uncertainty is real Supabase migration and RLS testing.
+These percentages are planning estimates. Phase 2.9 remains the main unimplemented portion of Phase 2.
 
 ## Verified locally
 
+- `.env.local` has the correct project URL, browser-safe publishable key format, and local app URL; it is ignored by Git.
 - `npx tsc --noEmit` passes.
 - `npm run build` passes on Next.js 16.2.10.
-- The production route manifest includes meetings, member management, AI, outreach, client, lead, project, task, settings, auth, and invite routes.
-- No deprecated Base UI `asChild` usage remains under `src`.
-- No explicit `any`, double-casts, or meeting-status assertion casts remain in the Phase 2.8 meeting/member files.
-- No literal `\n` corruption remains in the SQL migrations.
-- The old `update_rls.py` and `update_schema.js` migration-rewrite helpers were removed after their intended changes were audited directly into the migrations.
+- GitHub `main` tracks the local repository and contains no recognized secrets.
+- Supabase CLI 2.110.0 is installed, authenticated, initialized, and linked to project `mspfxgxduehikohdsomg`.
+- The Stitch UI package is stored under `design-references/stitch/`.
 
-## Phase 2.8 work completed
+## Hosted database verification
 
-- Added strict server-side authorization for meeting and member mutations.
-- Added canonical workspace scoping for meetings, participants, availability, members, and related entities.
-- Completed meeting create/edit/status/archive/restore behavior.
-- Replaced participant UUID entry with active workspace-member selection and added duplicate, organizer, and schedule-conflict checks.
-- Added personal availability create/edit/delete behavior, overlap checks, and a database exclusion constraint for concurrent overlap protection.
-- Added manager-only archived meeting access and restore behavior.
-- Hardened invite acceptance, including email matching, token locking, deleted-membership restoration, and stale-permission clearing.
-- Added atomic database functions for permission replacement and member removal.
-- Corrected initial owner permission grants so workspace creators receive the full permission catalog.
-- Corrected meeting participant foreign-key prerequisites and RLS policies.
-- Made activity rows append-only through RLS.
+- Local and remote migration histories match through `008`; the final dry run reports the remote database is up to date.
+- All 24 expected public tables exist and have RLS enabled.
+- All 90 original policies are installed, with permission-scoped write hardening from migration `007`.
+- All 11 expected functions, 19 triggers, 12 permission rows, and the availability exclusion constraint are present.
+- `authenticated` has the required table privileges; `anon` has no public-table privileges.
+- Actionable security-advisor warnings were fixed in migration `008`.
+- Remaining security-advisor warnings refer to intentionally exposed authenticated `SECURITY DEFINER` RPCs. Their bodies enforce authentication, invitation email matching, active membership, self-protection, and explicit workspace permissions.
+- The missing Docker warning affects only local migration-catalog caching, not hosted deployment or verification.
 
-## Known validation exception
+## Rollback-only acceptance suite
 
-`npm run lint` currently crashes before linting source:
+`supabase/tests/phase_2_8_acceptance.sql` passes and rolls back all synthetic data. It covers:
 
-```text
-Cannot find module 'es-abstract/2024/AddEntriesFromIterable'
-```
+- Auth user trigger, public profile, personal workspace, membership, and all 12 owner permissions.
+- Company workspace creation and owner permission grants.
+- Invitation email mismatch rejection and valid acceptance.
+- Atomic permission replacement and owner self-protection.
+- Member removal and restoration of the same row with stale-permission clearing.
+- Permission-scoped writes for AI, integrations, clients, leads/outreach, projects, tasks, assets, members, meetings, and settings.
+- Active member, limited member, outsider, removed member, restored member, and anonymous access.
+- Meeting organizer workspace validation, organizer participant protection, archived visibility, and update denial.
+- Personal availability and database-level overlap rejection.
+- Cleanup verification confirms zero synthetic auth users, workspaces, or invitations remain.
 
-The failure originates in the installed `object.fromentries` / `eslint-plugin-react` / `eslint-config-next` dependency chain. Per the project plan, dependencies were not modified during this audit. TypeScript and the production build both pass.
+## Known validation exceptions
 
-Next.js also emits a non-blocking warning that the `middleware` file convention is deprecated in favor of `proxy`. Treat this as technical debt, not a Phase 2.8 blocker.
+`npm run lint` currently crashes before inspecting source because the installed ESLint dependency chain cannot resolve `es-abstract/2024/AddEntriesFromIterable`. TypeScript and the production build pass. This dependency/tooling problem remains open.
 
-## Required database validation before approval
+Next.js also emits a non-blocking warning that the `middleware` convention is deprecated in favor of `proxy`.
 
-1. Create the Supabase project.
-2. Copy `.env.local.example` to `.env.local` and supply the project URL and anon key.
-3. Apply migrations `001` through `006` in order on a clean database.
-4. Verify auth-user creation creates a personal workspace, active membership, and the complete permission set.
-5. Verify company-workspace creation and slug uniqueness.
-6. Test invite creation, expiration, email mismatch rejection, acceptance, revoked invites, and restoration of a previously removed member without stale permissions.
-7. Test member permission replacement, self-protection, removal, and RLS denial for unauthorized members.
-8. Test meeting create/edit/status transitions/archive/restore, related-entity workspace validation, participant CRUD, organizer protection, and schedule conflicts.
-9. Test availability CRUD, own-versus-manager authorization, and overlap rejection including concurrent inserts.
-10. Test the full RLS matrix for active members, removed members, managers, unrelated authenticated users, and anonymous users.
-11. Smoke-test the application against Supabase, then mark Phase 2.8 approved.
+Supabase's performance advisor reports RLS initialization-plan and multiple-permissive-policy optimizations. These are performance recommendations, not failed authorization checks; the functional RLS matrix passes.
 
-## Next planned work
+## Remaining before final Phase 2.8 approval
 
-After the database checklist passes:
-
-1. Approve Phase 2.8.
-2. Begin Phase 2.9 only from the agreed project plan.
+1. Configure Supabase Authentication Site URL and localhost redirect URL.
+2. Start the app with `npm run dev`.
+3. Complete one real browser signup, email confirmation, login, company-workspace onboarding, and logout/login cycle.
+4. Confirm the dashboard loads without permission or environment errors.
+5. Mark Phase 2.8 approved and begin Phase 2.9 from the agreed plan.
