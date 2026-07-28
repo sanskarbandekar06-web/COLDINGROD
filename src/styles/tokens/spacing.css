@@ -1,0 +1,23 @@
+/* ============================================
+ * COLDINGROD DESIGN SYSTEM — SPACING TOKENS
+ * Base: 8px grid system
+ * Source: Stitch tailwind.config spacing
+ * ============================================ */
+
+:root {
+  --space-xs:             4px;
+  --space-base:           8px;
+  --space-sm:             12px;
+  --space-md:             24px;
+  --space-lg:             32px;
+  --space-xl:             48px;
+  --space-gutter:         20px;
+  --space-margin-mobile:  16px;
+  --space-margin-desktop: 32px;
+
+  /* Layout-specific */
+  --sidebar-width:           280px;
+  --sidebar-width-collapsed: 72px;
+  --topbar-height:           64px;
+  --content-max-width:       1600px;
+}

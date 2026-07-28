@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Company Setup - Coldingrod</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-fixed-variant": "#3f465c",
+                      "on-secondary-fixed-variant": "#3323cc",
+                      "on-tertiary-fixed": "#191c1e",
+                      "on-primary-fixed": "#131b2e",
+                      "tertiary-fixed-dim": "#c4c7c9",
+                      "error": "#ba1a1a",
+                      "tertiary-fixed": "#e0e3e5",
+                      "tertiary": "#000000",
+                      "secondary": "#4b41e1",
+                      "on-error-container": "#93000a",
+                      "on-tertiary-fixed-variant": "#444749",
+                      "secondary-fixed-dim": "#c3c0ff",
+                      "outline": "#76777d",
+                      "inverse-surface": "#213145",
+                      "on-secondary-container": "#fffbff",
+                      "secondary-fixed": "#e2dfff",
+                      "on-tertiary": "#ffffff",
+                      "inverse-on-surface": "#eaf1ff",
+                      "on-primary-container": "#7c839b",
+                      "surface": "#f8f9ff",
+                      "primary": "#000000",
+                      "surface-container-highest": "#d3e4fe",
+                      "outline-variant": "#c6c6cd",
+                      "on-surface-variant": "#45464d",
+                      "on-secondary-fixed": "#0f0069",
+                      "surface-container": "#e5eeff",
+                      "on-secondary": "#ffffff",
+                      "inverse-primary": "#bec6e0",
+                      "surface-bright": "#f8f9ff",
+                      "on-primary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "primary-fixed": "#dae2fd",
+                      "on-error": "#ffffff",
+                      "surface-tint": "#565e74",
+                      "surface-variant": "#d3e4fe",
+                      "surface-container-high": "#dce9ff",
+                      "on-tertiary-container": "#818486",
+                      "surface-dim": "#cbdbf5",
+                      "background": "#f8f9ff",
+                      "surface-container-lowest": "#ffffff",
+                      "primary-container": "#131b2e",
+                      "on-background": "#0b1c30",
+                      "surface-container-low": "#eff4ff",
+                      "primary-fixed-dim": "#bec6e0",
+                      "on-surface": "#0b1c30",
+                      "secondary-container": "#645efb",
+                      "tertiary-container": "#191c1e"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "sm": "12px",
+                      "margin-desktop": "32px",
+                      "base": "8px",
+                      "xl": "48px",
+                      "xs": "4px",
+                      "margin-mobile": "16px",
+                      "md": "24px",
+                      "lg": "32px",
+                      "gutter": "20px"
+              },
+              "fontFamily": {
+                      "body-md": ["Geist"],
+                      "headline-md": ["Geist"],
+                      "display-lg": ["Geist"],
+                      "headline-lg": ["Geist"],
+                      "code-sm": ["Geist Mono"],
+                      "body-lg": ["Geist"],
+                      "title-lg": ["Geist"],
+                      "label-md": ["Geist"],
+                      "headline-lg-mobile": ["Geist"],
+                      "title-md": ["Geist"]
+              },
+              "fontSize": {
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "code-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "title-md": ["16px", {"lineHeight": "24px", "fontWeight": "500"}]
+              }
+            }
+          }
+        }
+      </script>
+<style>
+        body {
+            background-color: #F8FAFC; /* Layer 0 */
+            color: #0b1c30;
+        }
+        .bento-card {
+            background-color: #ffffff;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 4px 4px -2px rgba(0, 0, 0, 0.02);
+            border-radius: 0.75rem;
+        }
+      </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-margin-mobile md:p-margin-desktop font-body-md text-body-md">
+<!-- Transactional Intent: Suppress Shells (No TopNav/SideNav) -->
+<main class="w-full max-w-2xl bento-card p-md md:p-xl relative overflow-hidden">
+<!-- Progress Indicator -->
+<div class="flex items-center gap-2 mb-lg">
+<div class="h-1 flex-1 bg-primary rounded-full"></div>
+<div class="h-1 flex-1 bg-primary rounded-full"></div>
+<div class="h-1 flex-1 bg-primary rounded-full"></div>
+<div class="h-1 flex-1 bg-primary rounded-full"></div>
+<span class="font-label-md text-label-md text-on-surface-variant ml-sm">Step 4 of 4</span>
+</div>
+<header class="mb-lg">
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-xs">Company Setup</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Let's tailor Coldingrod to your workspace.</p>
+</header>
+<form class="space-y-xl">
+<!-- Company Info Group -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="space-y-sm">
+<label class="block font-label-md text-label-md text-on-surface" for="companyName">Company Name</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-DEFAULT px-sm py-2 font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" id="companyName" placeholder="e.g. Acme Corp" type="text"/>
+</div>
+<div class="space-y-sm">
+<label class="block font-label-md text-label-md text-on-surface" for="industry">Industry</label>
+<div class="relative">
+<select class="w-full bg-surface-container-lowest border border-outline-variant rounded-DEFAULT pl-sm pr-10 py-2 font-body-md text-body-md appearance-none focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" id="industry">
+<option disabled="" selected="" value="">Select Industry</option>
+<option value="tech">Technology</option>
+<option value="finance">Finance</option>
+<option value="healthcare">Healthcare</option>
+<option value="design">Design</option>
+</select>
+<span class="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">arrow_drop_down</span>
+</div>
+</div>
+</div>
+<!-- Company Logo Upload (Bento Style) -->
+<div class="space-y-sm">
+<label class="block font-label-md text-label-md text-on-surface">Company Logo</label>
+<div class="border-2 border-dashed border-outline-variant rounded-lg p-md flex flex-col items-center justify-center text-center hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="w-12 h-12 bg-surface-container rounded-full flex items-center justify-center mb-sm group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-primary">upload</span>
+</div>
+<p class="font-title-md text-title-md text-primary mb-xs">Click to upload or drag and drop</p>
+<p class="font-body-md text-body-md text-on-surface-variant">SVG, PNG, JPG or GIF (max. 800x400px)</p>
+</div>
+</div>
+<!-- Team Size Segmented Control -->
+<div class="space-y-sm">
+<label class="block font-label-md text-label-md text-on-surface">Team Size</label>
+<div class="flex bg-surface-container p-1 rounded-lg">
+<label class="flex-1 text-center cursor-pointer">
+<input class="peer sr-only" name="teamSize" type="radio" value="1-10"/>
+<div class="py-2 px-sm rounded-DEFAULT font-title-md text-title-md text-on-surface-variant peer-checked:bg-white peer-checked:text-primary peer-checked:shadow-sm transition-all">1-10</div>
+</label>
+<label class="flex-1 text-center cursor-pointer">
+<input class="peer sr-only" name="teamSize" type="radio" value="11-50"/>
+<div class="py-2 px-sm rounded-DEFAULT font-title-md text-title-md text-on-surface-variant peer-checked:bg-white peer-checked:text-primary peer-checked:shadow-sm transition-all">11-50</div>
+</label>
+<label class="flex-1 text-center cursor-pointer">
+<input class="peer sr-only" name="teamSize" type="radio" value="51-200"/>
+<div class="py-2 px-sm rounded-DEFAULT font-title-md text-title-md text-on-surface-variant peer-checked:bg-white peer-checked:text-primary peer-checked:shadow-sm transition-all">51-200</div>
+</label>
+<label class="flex-1 text-center cursor-pointer">
+<input class="peer sr-only" name="teamSize" type="radio" value="200+"/>
+<div class="py-2 px-sm rounded-DEFAULT font-title-md text-title-md text-on-surface-variant peer-checked:bg-white peer-checked:text-primary peer-checked:shadow-sm transition-all">200+</div>
+</label>
+</div>
+</div>
+<!-- Services Offered Multi-select Tags -->
+<div class="space-y-sm">
+<label class="block font-label-md text-label-md text-on-surface mb-xs">Services Offered</label>
+<div class="flex flex-wrap gap-2">
+<label class="cursor-pointer">
+<input class="peer sr-only" type="checkbox"/>
+<div class="px-sm py-1 border border-outline-variant rounded-full font-body-md text-body-md text-on-surface-variant peer-checked:bg-primary-fixed peer-checked:border-primary peer-checked:text-primary transition-colors hover:bg-surface-container">Consulting</div>
+</label>
+<label class="cursor-pointer">
+<input class="peer sr-only" type="checkbox"/>
+<div class="px-sm py-1 border border-outline-variant rounded-full font-body-md text-body-md text-on-surface-variant peer-checked:bg-primary-fixed peer-checked:border-primary peer-checked:text-primary transition-colors hover:bg-surface-container">Development</div>
+</label>
+<label class="cursor-pointer">
+<input class="peer sr-only" type="checkbox"/>
+<div class="px-sm py-1 border border-outline-variant rounded-full font-body-md text-body-md text-on-surface-variant peer-checked:bg-primary-fixed peer-checked:border-primary peer-checked:text-primary transition-colors hover:bg-surface-container">Design</div>
+</label>
+<label class="cursor-pointer">
+<input class="peer sr-only" type="checkbox"/>
+<div class="px-sm py-1 border border-outline-variant rounded-full font-body-md text-body-md text-on-surface-variant peer-checked:bg-primary-fixed peer-checked:border-primary peer-checked:text-primary transition-colors hover:bg-surface-container">Marketing</div>
+</label>
+<label class="cursor-pointer">
+<input class="peer sr-only" type="checkbox"/>
+<div class="px-sm py-1 border border-outline-variant rounded-full font-body-md text-body-md text-on-surface-variant peer-checked:bg-primary-fixed peer-checked:border-primary peer-checked:text-primary transition-colors hover:bg-surface-container">Sales</div>
+</label>
+</div>
+</div>
+<!-- Primary Action -->
+<div class="pt-md border-t border-outline-variant/30 flex justify-end">
+<button class="bg-primary text-on-primary font-title-md text-title-md px-lg py-sm rounded-DEFAULT hover:bg-primary/90 transition-colors flex items-center gap-sm" type="button">
+                    Configure Workspace
+                    <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</form>
+</main>
+</body></html>

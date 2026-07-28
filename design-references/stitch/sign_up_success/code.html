@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Coldingrod - Workspace Ready</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed-variant": "#3f465c",
+                        "on-secondary-fixed-variant": "#3323cc",
+                        "on-tertiary-fixed": "#191c1e",
+                        "on-primary-fixed": "#131b2e",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed": "#e0e3e5",
+                        "tertiary": "#000000",
+                        "secondary": "#4b41e1",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "secondary-fixed-dim": "#c3c0ff",
+                        "outline": "#76777d",
+                        "inverse-surface": "#213145",
+                        "on-secondary-container": "#fffbff",
+                        "secondary-fixed": "#e2dfff",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-primary-container": "#7c839b",
+                        "surface": "#f8f9ff",
+                        "primary": "#000000",
+                        "surface-container-highest": "#d3e4fe",
+                        "outline-variant": "#c6c6cd",
+                        "on-surface-variant": "#45464d",
+                        "on-secondary-fixed": "#0f0069",
+                        "surface-container": "#e5eeff",
+                        "on-secondary": "#ffffff",
+                        "inverse-primary": "#bec6e0",
+                        "surface-bright": "#f8f9ff",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#dae2fd",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#565e74",
+                        "surface-variant": "#d3e4fe",
+                        "surface-container-high": "#dce9ff",
+                        "on-tertiary-container": "#818486",
+                        "surface-dim": "#cbdbf5",
+                        "background": "#f8f9ff",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-container": "#131b2e",
+                        "on-background": "#0b1c30",
+                        "surface-container-low": "#eff4ff",
+                        "primary-fixed-dim": "#bec6e0",
+                        "on-surface": "#0b1c30",
+                        "secondary-container": "#645efb",
+                        "tertiary-container": "#191c1e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "12px",
+                        "margin-desktop": "32px",
+                        "base": "8px",
+                        "xl": "48px",
+                        "xs": "4px",
+                        "margin-mobile": "16px",
+                        "md": "24px",
+                        "lg": "32px",
+                        "gutter": "20px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "display-lg": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "code-sm": ["Geist Mono"],
+                        "body-lg": ["Geist"],
+                        "title-lg": ["Geist"],
+                        "label-md": ["Geist"],
+                        "headline-lg-mobile": ["Geist"],
+                        "title-md": ["Geist"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "code-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "title-md": ["16px", { "lineHeight": "24px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Ambient Background Animation */
+        @keyframes subtle-drift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .bg-ambient {
+            background: linear-gradient(-45deg, #f8f9ff, #eff4ff, #dce9ff, #f8f9ff);
+            background-size: 400% 400%;
+            animation: subtle-drift 15s ease infinite;
+        }
+
+        /* Toast Animation */
+        @keyframes slide-in-top {
+            0% { transform: translateY(-100%); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .toast-animate {
+            animation: slide-in-top 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        
+        /* Celebration Confetti Effect */
+        @keyframes float-up {
+            0% { transform: translateY(0) scale(1); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-100px) scale(0.5); opacity: 0; }
+        }
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #645efb;
+            animation: float-up 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="h-full bg-background font-body-md text-on-surface antialiased bg-ambient overflow-hidden flex items-center justify-center relative">
+<!-- Toast Notification (Layer 2 Floating UI) -->
+<div class="fixed top-margin-desktop right-margin-desktop z-50 flex items-center gap-sm px-md py-sm bg-surface/80 backdrop-blur-xl border border-outline-variant/30 rounded-lg shadow-sm toast-animate">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-title-md text-title-md text-on-surface">Workspace initialized successfully</span>
+</div>
+<!-- Main Content Area -->
+<main class="w-full max-w-[600px] px-margin-mobile md:px-0 relative z-10">
+<!-- Celebration Particles Container -->
+<div class="absolute inset-0 pointer-events-none -z-10 flex justify-center items-center" id="particles">
+<!-- Particles injected via JS -->
+</div>
+<!-- Bento Card Layout -->
+<div class="bg-surface rounded-xl border border-outline-variant/30 shadow-[0_4px_24px_rgba(0,0,0,0.02)] p-xl flex flex-col items-center text-center gap-xl relative overflow-hidden">
+<!-- Header Section -->
+<div class="flex flex-col items-center gap-md">
+<div class="w-24 h-24 rounded-full bg-surface-container-high flex items-center justify-center mb-sm relative">
+<span class="material-symbols-outlined text-[48px] text-secondary" style="font-variation-settings: 'FILL' 1;">rocket_launch</span>
+<!-- Decorative rings -->
+<div class="absolute inset-0 border-2 border-secondary/20 rounded-full animate-ping" style="animation-duration: 3s;"></div>
+<div class="absolute inset-[-12px] border border-secondary/10 rounded-full"></div>
+</div>
+<div class="flex flex-col gap-sm">
+<h1 class="font-display-lg text-display-lg text-on-surface">Workspace Ready</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-[400px]">Your enterprise environment is configured and ready for your team. Let's get to work.</p>
+</div>
+</div>
+<!-- Workspace Summary Bento Card -->
+<div class="w-full bg-surface-container-lowest rounded-lg border border-outline-variant/50 p-md flex flex-col gap-md">
+<!-- Company Info -->
+<div class="flex items-center gap-md pb-md border-b border-outline-variant/30">
+<div class="w-16 h-16 rounded-md overflow-hidden bg-surface-container flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A clean, minimalist abstract logo design featuring geometric shapes intersecting. The color palette consists of deep blacks, pristine whites, and a subtle indigo accent. The aesthetic is high-end, corporate, and modern, suitable for a technology or finance enterprise." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIflvT1n9slKIsj8ZIXs_in-rAdFQSRrtMuQGb511tjmgRJRBVFfzi4GNsuv_VadLTDdHYxQAUCpIb8q1U58ZzK_T3PZji-xxNGGGq7fCaS_GxNSaZP0KmS8dDIh81osFz3TC18JXI2W9rQumdT9NMXQUIsYQKa4zFDWh5WPYzMf7MGkybX5XT49kkrCcR29Qx5jgFaHPe4yqSNDJ5mbdb_CzSkXqfUGeuoYclRFWkJmFV04zrulg7"/>
+</div>
+<div class="flex flex-col text-left">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase">Workspace Name</span>
+<span class="font-title-lg text-title-lg text-on-surface mt-xs">Acme Global Enterprise</span>
+<div class="flex items-center gap-xs mt-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">domain</span>
+<span class="font-body-md text-body-md">San Francisco, CA</span>
+</div>
+</div>
+</div>
+<!-- Team Members Summary -->
+<div class="flex items-center justify-between">
+<div class="flex flex-col text-left">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase">Team Members</span>
+<span class="font-title-md text-title-md text-on-surface mt-xs">5 Invitations Sent</span>
+</div>
+<div class="flex -space-x-3">
+<img class="w-10 h-10 rounded-full border-2 border-surface-container-lowest object-cover" data-alt="A professional headshot of a confident executive against a clean, light-mode background. Soft, diffused lighting highlights sharp features. The mood is calm and authoritative. The aesthetic is modern and corporate." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfn3afmmQ0AwuUFLg_jedvUeEA9iy5CGPH4JJNuOQBAnQezFz-Kb_7S4jH_f0Zal-naDFnoGK_diaYSWrkDzgRqpWqlTAZt4cDwOcYNjQLBLHcfjaqx8_-pjfCn65zMK6S2wulgQlBoac8eDGcASQtXYB5pLfT8UjG7Sw8tp6jvsLmsUl0MmP_DMBMEmbtBMxmNIhdRSlEoCZcRNQdl5QI5OZIMWnGK_SBnrJVm1kHe1LG_fUsBdUT"/>
+<img class="w-10 h-10 rounded-full border-2 border-surface-container-lowest object-cover" data-alt="A professional headshot of a creative director against a crisp white background. Natural lighting with soft shadows. The mood is approachable yet professional. High-end, clean corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBii6qTHM9zRuUJ-IgZ2RqR5sW_5eT8vLVjWBq75Z5RnukGNdTJ8GpetQ8OJKa2RggN2pdpdwDlp7GlVdLyFlPMnGMwN9yNPTzBNe7-xgrnrvpHSMrqjuueOlImx1HmCLPl7mgrTM2cOdvDMvn60sliE6wQ0TBxBjFADbrAVknBICr94QqjNI5VqRnDx1073LEDn2fB94_scpC9OvaXPWXhBT-NOe74qUzFNA1sjfULS2N7VvRnw24D"/>
+<img class="w-10 h-10 rounded-full border-2 border-surface-container-lowest object-cover" data-alt="A professional headshot of a software engineer against a subtle gray background. Bright, high-key lighting creates a pristine, modern look. The subject appears focused and reliable. Corporate minimal style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4HH6R0A2hAuZOUEQq-hHG1tr81LdsuIzvnhoFhAbIc_8qaWvID4tPuFW3Yr7N-aSSnagVG1gJEwU7EK5JTuhaakGFagqiuRDCvvoFC-wopuiZaOx9qtokU-tiHLkRW6gQh7GBIMWbj8cUbdE2HxrTFRCKo9l98dKhJNokQ_Dvev9gZYTOKxJ0ApqA-c_UvLRIq6IvM4eevl2YIvbLZomDZWj-w96DUdg7wQ5vkiz4Rtt4_TdPr6dV"/>
+<div class="w-10 h-10 rounded-full border-2 border-surface-container-lowest bg-surface-container flex items-center justify-center font-label-md text-label-md text-on-surface-variant">
+                            +2
+                        </div>
+</div>
+</div>
+</div>
+<!-- Primary Action -->
+<button class="w-full md:w-auto mt-sm px-xl py-md bg-primary text-on-primary font-title-md text-title-md rounded-lg flex items-center justify-center gap-sm hover:bg-on-primary-fixed-variant transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-surface group">
+                Continue to Dashboard
+                <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</main>
+<!-- Subtle Background Shader (Layer 0 Canvas enhancement) -->
+
+<script>
+        // Simple particle effect for celebration
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('particles');
+            const colors = ['#645efb', '#4b41e1', '#d3e4fe', '#000000'];
+            
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // Randomize position
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${50 + Math.random() * 50}%`; // Start lower half
+                
+                // Randomize appearance
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.animationDelay = `${Math.random() * 2}s`;
+                particle.style.animationDuration = `${1.5 + Math.random()}s`;
+                
+                container.appendChild(particle);
+            }
+        });
+    </script>
+</body></html>

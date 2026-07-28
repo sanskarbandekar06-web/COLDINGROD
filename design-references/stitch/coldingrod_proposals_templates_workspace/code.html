@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Proposals & Templates - Coldingrod Business OS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#bec6e0",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#213145",
+                        "background": "#f8f9ff",
+                        "outline": "#76777d",
+                        "on-surface": "#0b1c30",
+                        "surface-dim": "#cbdbf5",
+                        "inverse-on-surface": "#eaf1ff",
+                        "tertiary": "#000000",
+                        "tertiary-fixed": "#e0e3e5",
+                        "primary-fixed": "#dae2fd",
+                        "on-surface-variant": "#45464d",
+                        "outline-variant": "#c6c6cd",
+                        "surface-container-high": "#dce9ff",
+                        "on-tertiary-fixed": "#191c1e",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#7c839b",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#645efb",
+                        "surface-variant": "#d3e4fe",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed-variant": "#3323cc",
+                        "secondary": "#4b41e1",
+                        "surface-container": "#e5eeff",
+                        "secondary-fixed": "#e2dfff",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "surface-container-low": "#eff4ff",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-container": "#818486",
+                        "surface-tint": "#565e74",
+                        "primary-container": "#131b2e",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "on-background": "#0b1c30",
+                        "inverse-primary": "#bec6e0",
+                        "secondary-fixed-dim": "#c3c0ff",
+                        "on-secondary-container": "#fffbff",
+                        "tertiary-container": "#191c1e",
+                        "surface-bright": "#f8f9ff",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#f8f9ff",
+                        "on-secondary-fixed": "#0f0069",
+                        "on-primary-fixed": "#131b2e",
+                        "primary": "#000000"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "24px",
+                        "lg": "32px",
+                        "gutter": "20px",
+                        "sm": "12px",
+                        "xl": "48px",
+                        "base": "8px",
+                        "margin-desktop": "32px",
+                        "margin-mobile": "16px",
+                        "xs": "4px"
+                    },
+                    "fontFamily": {
+                        "title-lg": ["Geist"],
+                        "body-md": ["Geist"],
+                        "label-md": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "code-sm": ["Geist Mono"],
+                        "headline-lg-mobile": ["Geist"],
+                        "title-md": ["Geist"],
+                        "display-lg": ["Geist"],
+                        "headline-lg": ["Geist"]
+                    },
+                    "fontSize": {
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "code-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "title-md": ["16px", { "lineHeight": "24px", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Geist', sans-serif; background-color: #f8f9ff; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .bento-card { background: white; border: 1px solid #c6c6cd; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02); }
+        .glass-panel { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(198, 198, 205, 0.5); }
+    </style>
+</head>
+<body class="text-on-surface antialiased flex h-screen overflow-hidden">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-screen w-[280px] bg-primary-container dark:bg-primary-container border-r border-outline-variant dark:border-outline shadow-sm flex flex-col py-md px-sm z-50">
+<div class="mb-xl flex items-center gap-sm px-4">
+<div class="w-8 h-8 rounded bg-secondary flex items-center justify-center text-on-secondary font-bold font-title-lg">C</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary">Coldingrod</h1>
+<p class="font-label-md text-label-md text-on-primary-container">Business OS</p>
+</div>
+</div>
+<button class="w-full bg-secondary hover:bg-secondary-fixed-dim text-on-secondary py-2 rounded-lg font-title-md transition-colors mb-lg flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span> New Workspace
+        </button>
+<ul class="flex flex-col gap-2 flex-grow">
+<li><a class="flex items-center gap-3 text-on-primary-container hover:text-on-primary px-4 py-2 hover:bg-surface-variant/10 transition-colors rounded-lg" href="#"><span class="material-symbols-outlined">dashboard</span> <span class="font-label-md text-label-md">Dashboard</span></a></li>
+<li><a class="flex items-center gap-3 bg-secondary-container text-on-secondary-container rounded-lg px-4 py-2 border-l-4 border-secondary transition-colors" href="#"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_tree</span> <span class="font-label-md text-label-md">Projects</span></a></li>
+<li><a class="flex items-center gap-3 text-on-primary-container hover:text-on-primary px-4 py-2 hover:bg-surface-variant/10 transition-colors rounded-lg" href="#"><span class="material-symbols-outlined">groups</span> <span class="font-label-md text-label-md">Clients</span></a></li>
+<li><a class="flex items-center gap-3 text-on-primary-container hover:text-on-primary px-4 py-2 hover:bg-surface-variant/10 transition-colors rounded-lg" href="#"><span class="material-symbols-outlined">payments</span> <span class="font-label-md text-label-md">Finance</span></a></li>
+<li><a class="flex items-center gap-3 text-on-primary-container hover:text-on-primary px-4 py-2 hover:bg-surface-variant/10 transition-colors rounded-lg" href="#"><span class="material-symbols-outlined">badge</span> <span class="font-label-md text-label-md">Team</span></a></li>
+<li><a class="flex items-center gap-3 text-on-primary-container hover:text-on-primary px-4 py-2 hover:bg-surface-variant/10 transition-colors rounded-lg" href="#"><span class="material-symbols-outlined">settings</span> <span class="font-label-md text-label-md">Settings</span></a></li>
+</ul>
+<ul class="flex flex-col gap-2 mt-auto pt-lg border-t border-outline-variant/20">
+<li><a class="flex items-center gap-3 text-on-primary-container hover:text-on-primary px-4 py-2 hover:bg-surface-variant/10 transition-colors rounded-lg" href="#"><span class="material-symbols-outlined">help</span> <span class="font-label-md text-label-md">Help Center</span></a></li>
+<li><a class="flex items-center gap-3 text-on-primary-container hover:text-on-primary px-4 py-2 hover:bg-surface-variant/10 transition-colors rounded-lg" href="#"><span class="material-symbols-outlined">logout</span> <span class="font-label-md text-label-md">Log Out</span></a></li>
+</ul>
+</nav>
+<!-- Main Content Area -->
+<div class="ml-[280px] flex-1 flex flex-col h-screen overflow-hidden">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-40 w-full bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl border-b border-outline-variant/30 flex justify-between items-center h-16 px-margin-desktop">
+<div class="flex items-center gap-lg">
+<nav class="flex gap-md">
+<a class="text-on-surface-variant font-medium hover:text-secondary transition-all font-body-lg text-body-lg" href="#">Overview</a>
+<a class="text-secondary font-bold border-b-2 border-secondary pb-1 font-body-lg text-body-lg" href="#">Proposals</a>
+<a class="text-on-surface-variant font-medium hover:text-secondary transition-all font-body-lg text-body-lg" href="#">Reports</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="pl-10 pr-4 py-1.5 bg-surface-container rounded-full text-body-md border-none focus:ring-1 focus:ring-secondary w-64" placeholder="Search templates..." type="text"/>
+</div>
+<button class="text-on-surface-variant hover:text-secondary transition-all opacity-80 hover:opacity-100 flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-full"><span class="material-symbols-outlined text-[20px]">smart_toy</span> <span class="font-label-md">AI Assistant</span></button>
+<button class="text-on-surface-variant hover:text-secondary transition-all opacity-80 hover:opacity-100"><span class="material-symbols-outlined">notifications</span></button>
+<img alt="User Profile Avatar" class="w-8 h-8 rounded-full border border-outline-variant object-cover" data-alt="A highly detailed close-up portrait of a professional individual in a corporate setting, soft studio lighting, sharp focus, neutral tones, premium business aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUgp57sFk2W_Hfd-XrqsAEG9wBejqdo3MoxCN1xQw6hRXSL-GRtthAGaha8uFUaoMIGTqNft6nwDKfd091dCjqsGTntf8OAI22FWXdbwZB5AzWCLFxpXsYKSEnPloraOPLc2boVmQLy4rTE6VqcCdjU0Evrg8ggxYet_C-Hm5PHWqy92XwMCSlgWboJq0HKY19qvHohIV_yvYAY0DWy0_kWZLiqNY6uh0rXe0vMtpROi9l1Z84_G_7"/>
+</div>
+</header>
+<!-- Page Content -->
+<main class="flex-1 overflow-y-auto p-margin-desktop">
+<!-- Header Section -->
+<div class="flex justify-between items-end mb-lg">
+<div>
+<div class="flex items-center gap-2 text-on-surface-variant font-label-md mb-2">
+<span>Home</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="text-primary font-semibold">Proposals & Templates</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Proposals & Templates</h2>
+</div>
+<div class="flex gap-sm">
+<button class="bg-surface-container text-primary px-4 py-2 rounded-lg font-title-md border border-outline-variant hover:bg-surface-variant transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">auto_awesome</span> Generate Proposal
+                    </button>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-title-md hover:bg-primary/90 transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span> Create Template
+                    </button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-gutter">
+<!-- AI Intelligence Section (Col span 4) -->
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-gutter">
+<!-- Recommendation Card -->
+<div class="bento-card p-md relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-secondary to-secondary-container"></div>
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-secondary">lightbulb</span>
+<h3 class="font-title-lg text-title-lg">AI Suggestion</h3>
+</div>
+<p class="font-body-md text-on-surface-variant mb-4">Based on recent talks with 'Acme Corp', we recommend preparing a:</p>
+<div class="bg-surface-container rounded-lg p-3 border border-outline-variant/30 flex items-center justify-between hover:border-secondary transition-colors cursor-pointer">
+<div>
+<h4 class="font-title-md text-title-md text-primary">Digital Marketing Retainer</h4>
+<span class="font-label-md text-on-surface-variant text-[10px]">95% Match • Standard Terms</span>
+</div>
+<span class="material-symbols-outlined text-secondary">arrow_forward</span>
+</div>
+</div>
+<!-- Generator Card -->
+<div class="bento-card p-md">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-secondary">magic_button</span>
+<h3 class="font-title-lg text-title-lg">Quick Draft</h3>
+</div>
+<p class="font-body-md text-on-surface-variant mb-4 text-sm">Describe the proposal you need in plain English.</p>
+<textarea class="w-full bg-surface-container border-outline-variant/50 rounded-lg p-3 font-body-md text-sm mb-3 focus:ring-secondary focus:border-secondary resize-none" placeholder="E.g., A 6-month SEO campaign for a local dental clinic including content creation..." rows="3"></textarea>
+<button class="w-full bg-secondary-container text-on-secondary-container py-2 rounded-lg font-title-md hover:bg-secondary hover:text-on-secondary transition-colors flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">bolt</span> Generate Outline
+                        </button>
+</div>
+<!-- Categories Nav -->
+<div class="bento-card p-md flex-1">
+<h3 class="font-title-lg text-title-lg mb-4">Categories</h3>
+<ul class="flex flex-col gap-1">
+<li><a class="flex justify-between items-center px-3 py-2 bg-surface-container rounded-md text-primary font-title-md" href="#">Website Development <span class="font-label-md bg-white px-2 py-0.5 rounded text-on-surface-variant">12</span></a></li>
+<li><a class="flex justify-between items-center px-3 py-2 hover:bg-surface-container rounded-md text-on-surface-variant font-title-md transition-colors" href="#">Digital Marketing <span class="font-label-md bg-surface-container px-2 py-0.5 rounded text-on-surface-variant">8</span></a></li>
+<li><a class="flex justify-between items-center px-3 py-2 hover:bg-surface-container rounded-md text-on-surface-variant font-title-md transition-colors" href="#">SEO & Content <span class="font-label-md bg-surface-container px-2 py-0.5 rounded text-on-surface-variant">5</span></a></li>
+<li><a class="flex justify-between items-center px-3 py-2 hover:bg-surface-container rounded-md text-on-surface-variant font-title-md transition-colors" href="#">Branding Identity <span class="font-label-md bg-surface-container px-2 py-0.5 rounded text-on-surface-variant">4</span></a></li>
+<li><a class="flex justify-between items-center px-3 py-2 hover:bg-surface-container rounded-md text-on-surface-variant font-title-md transition-colors" href="#">Contracts & MSA <span class="font-label-md bg-surface-container px-2 py-0.5 rounded text-on-surface-variant">3</span></a></li>
+</ul>
+</div>
+</div>
+<!-- Main Library Grid (Col span 8) -->
+<div class="col-span-12 lg:col-span-8 flex flex-col gap-gutter">
+<!-- Filters & Sort -->
+<div class="flex justify-between items-center bg-white p-2 rounded-lg border border-outline-variant shadow-sm">
+<div class="flex gap-2">
+<select class="bg-surface-container border-none text-sm font-title-md rounded-md py-1.5 pl-3 pr-8 focus:ring-secondary">
+<option>All Statuses</option>
+<option>Active</option>
+<option>Draft</option>
+</select>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-[16px]">filter_list</span>
+<input class="bg-surface-container border-none text-sm font-title-md rounded-md py-1.5 pl-8 pr-3 focus:ring-secondary w-32" placeholder="Filter tags..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-2 text-sm">
+<span class="text-on-surface-variant">Sort by:</span>
+<select class="bg-transparent border-none font-title-md text-primary font-medium focus:ring-0 cursor-pointer pl-1 pr-6 py-1">
+<option>Last Modified</option>
+<option>Usage Rate</option>
+<option>Name A-Z</option>
+</select>
+<div class="flex border border-outline-variant rounded-md overflow-hidden ml-2">
+<button class="bg-surface-container p-1 text-primary"><span class="material-symbols-outlined text-[18px]">grid_view</span></button>
+<button class="bg-white p-1 text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined text-[18px]">view_list</span></button>
+</div>
+</div>
+</div>
+<!-- Sync Error Toast (Inline for design purposes) -->
+<div class="bg-error-container text-on-error-container border border-error/20 rounded-lg p-3 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-error">sync_problem</span>
+<span class="font-title-md text-sm">PDF Export Failed for 'Q3 SEO Retainer'. Retrying...</span>
+</div>
+<button class="text-error hover:text-on-error-container"><span class="material-symbols-outlined text-[18px]">close</span></button>
+</div>
+<!-- Template Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<!-- Card 1 -->
+<div class="bento-card p-4 hover:border-secondary transition-colors cursor-pointer group flex flex-col h-full border-l-4 border-l-secondary">
+<div class="flex justify-between items-start mb-3">
+<div class="bg-surface-container p-2 rounded-md text-primary"><span class="material-symbols-outlined">description</span></div>
+<span class="bg-secondary-container text-on-secondary-container text-[10px] font-label-md px-2 py-0.5 rounded-full">v2.4</span>
+</div>
+<h4 class="font-title-lg text-title-lg mb-1 group-hover:text-secondary transition-colors">Enterprise E-Commerce Build</h4>
+<div class="flex gap-1 mb-4 flex-wrap">
+<span class="text-[10px] bg-surface-container text-on-surface-variant px-2 py-0.5 rounded border border-outline-variant/30">#WebDev</span>
+<span class="text-[10px] bg-surface-container text-on-surface-variant px-2 py-0.5 rounded border border-outline-variant/30">#Enterprise</span>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant/30 flex justify-between items-center">
+<div class="flex flex-col">
+<span class="text-[10px] text-on-surface-variant font-label-md">Last Mod: Today</span>
+</div>
+<div class="flex items-center gap-1 text-secondary font-title-md text-sm">
+<span class="material-symbols-outlined text-[16px]">trending_up</span> 85% Win
+                                </div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bento-card p-4 hover:border-secondary transition-colors cursor-pointer group flex flex-col h-full">
+<div class="flex justify-between items-start mb-3">
+<div class="bg-surface-container p-2 rounded-md text-on-surface-variant"><span class="material-symbols-outlined">campaign</span></div>
+<span class="bg-surface-variant text-on-surface-variant text-[10px] font-label-md px-2 py-0.5 rounded-full">v1.1</span>
+</div>
+<h4 class="font-title-lg text-title-lg mb-1 group-hover:text-secondary transition-colors">Standard Social Media Mgmt</h4>
+<div class="flex gap-1 mb-4 flex-wrap">
+<span class="text-[10px] bg-surface-container text-on-surface-variant px-2 py-0.5 rounded border border-outline-variant/30">#Marketing</span>
+<span class="text-[10px] bg-surface-container text-on-surface-variant px-2 py-0.5 rounded border border-outline-variant/30">#Retainer</span>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant/30 flex justify-between items-center">
+<div class="flex flex-col">
+<span class="text-[10px] text-on-surface-variant font-label-md">Last Mod: 2 days ago</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant font-title-md text-sm">
+<span class="material-symbols-outlined text-[16px]">trending_flat</span> 62% Win
+                                </div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bento-card p-4 hover:border-secondary transition-colors cursor-pointer group flex flex-col h-full">
+<div class="flex justify-between items-start mb-3">
+<div class="bg-surface-container p-2 rounded-md text-on-surface-variant"><span class="material-symbols-outlined">gavel</span></div>
+<span class="bg-error-container text-on-error-container text-[10px] font-label-md px-2 py-0.5 rounded-full">Draft</span>
+</div>
+<h4 class="font-title-lg text-title-lg mb-1 group-hover:text-secondary transition-colors">Master Services Agreement</h4>
+<div class="flex gap-1 mb-4 flex-wrap">
+<span class="text-[10px] bg-surface-container text-on-surface-variant px-2 py-0.5 rounded border border-outline-variant/30">#Legal</span>
+<span class="text-[10px] bg-surface-container text-on-surface-variant px-2 py-0.5 rounded border border-outline-variant/30">#Contract</span>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant/30 flex justify-between items-center">
+<div class="flex flex-col">
+<span class="text-[10px] text-on-surface-variant font-label-md">Last Mod: 1 week ago</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant font-title-md text-sm">
+<span class="material-symbols-outlined text-[16px]">remove</span> N/A
+                                </div>
+</div>
+</div>
+<!-- Loading Skeleton Card -->
+<div class="bento-card p-4 flex flex-col h-full animate-pulse">
+<div class="flex justify-between items-start mb-3">
+<div class="bg-surface-variant h-10 w-10 rounded-md"></div>
+<div class="bg-surface-variant h-4 w-12 rounded-full"></div>
+</div>
+<div class="bg-surface-variant h-6 w-3/4 rounded mb-2 mt-1"></div>
+<div class="flex gap-2 mb-4 mt-2">
+<div class="bg-surface-variant h-4 w-16 rounded"></div>
+<div class="bg-surface-variant h-4 w-20 rounded"></div>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant/30 flex justify-between items-center">
+<div class="bg-surface-variant h-3 w-24 rounded"></div>
+<div class="bg-surface-variant h-4 w-16 rounded"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

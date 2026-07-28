@@ -1,0 +1,77 @@
+/* ============================================
+ * COLDINGROD DESIGN SYSTEM — TYPOGRAPHY TOKENS
+ * Fonts: Geist (sans) + Geist Mono (mono)
+ * Source: Stitch tailwind.config fontSize + fontFamily
+ * ============================================ */
+
+@font-face {
+  font-family: 'Geist';
+  src: url('/fonts/GeistVF.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('/fonts/GeistMonoVF.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+:root {
+  --font-family-sans:   'Geist', system-ui, -apple-system, sans-serif;
+  --font-family-mono:   'Geist Mono', 'JetBrains Mono', ui-monospace, monospace;
+
+  /* display-lg: Hero headlines, page titles */
+  --text-display-lg-size:          48px;
+  --text-display-lg-line-height:   56px;
+  --text-display-lg-weight:        700;
+  --text-display-lg-tracking:      -0.02em;
+
+  /* headline-lg: Section headers */
+  --text-headline-lg-size:         32px;
+  --text-headline-lg-line-height:  40px;
+  --text-headline-lg-weight:       600;
+  --text-headline-lg-tracking:     -0.01em;
+
+  /* headline-lg-mobile: Section headers on mobile */
+  --text-headline-lg-mobile-size:         24px;
+  --text-headline-lg-mobile-line-height:  32px;
+  --text-headline-lg-mobile-weight:       600;
+
+  /* headline-md: Card titles, subsection headers */
+  --text-headline-md-size:         24px;
+  --text-headline-md-line-height:  32px;
+  --text-headline-md-weight:       600;
+
+  /* title-lg: Emphasized labels */
+  --text-title-lg-size:            20px;
+  --text-title-lg-line-height:     28px;
+  --text-title-lg-weight:          600;
+
+  /* title-md: Buttons, nav items, form labels */
+  --text-title-md-size:            16px;
+  --text-title-md-line-height:     24px;
+  --text-title-md-weight:          500;
+
+  /* body-lg: Primary body text */
+  --text-body-lg-size:             16px;
+  --text-body-lg-line-height:      24px;
+  --text-body-lg-weight:           400;
+
+  /* body-md: Secondary body text, table cells */
+  --text-body-md-size:             14px;
+  --text-body-md-line-height:      20px;
+  --text-body-md-weight:           400;
+
+  /* label-md: Uppercase labels, metadata, table headers */
+  --text-label-md-size:            12px;
+  --text-label-md-line-height:     16px;
+  --text-label-md-weight:          500;
+  --text-label-md-tracking:        0.05em;
+
+  /* code-sm: Monospace data, IDs, currency */
+  --text-code-sm-size:             12px;
+  --text-code-sm-line-height:      16px;
+  --text-code-sm-weight:           400;
+}

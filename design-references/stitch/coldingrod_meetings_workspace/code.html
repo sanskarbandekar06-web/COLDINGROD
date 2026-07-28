@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Coldingrod - Meetings Workspace</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;900&amp;family=Geist+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-container": "#645efb",
+                      "surface-variant": "#d3e4fe",
+                      "surface-container": "#e5eeff",
+                      "error": "#ba1a1a",
+                      "error-container": "#ffdad6",
+                      "inverse-surface": "#213145",
+                      "on-secondary-container": "#fffbff",
+                      "surface-tint": "#565e74",
+                      "tertiary-fixed-dim": "#c4c7c9",
+                      "inverse-primary": "#bec6e0",
+                      "primary-fixed": "#dae2fd",
+                      "on-secondary-fixed": "#0f0069",
+                      "on-error": "#ffffff",
+                      "on-tertiary-fixed-variant": "#444749",
+                      "secondary-fixed-dim": "#c3c0ff",
+                      "surface-container-highest": "#d3e4fe",
+                      "secondary": "#4b41e1",
+                      "background": "#f8f9ff",
+                      "on-primary-fixed": "#131b2e",
+                      "on-background": "#0b1c30",
+                      "surface-container-low": "#eff4ff",
+                      "on-secondary": "#ffffff",
+                      "on-surface-variant": "#45464d",
+                      "primary-fixed-dim": "#bec6e0",
+                      "surface-dim": "#cbdbf5",
+                      "primary": "#000000",
+                      "surface-container-high": "#dce9ff",
+                      "secondary-fixed": "#e2dfff",
+                      "tertiary-container": "#191c1e",
+                      "on-tertiary-fixed": "#191c1e",
+                      "on-primary-fixed-variant": "#3f465c",
+                      "outline-variant": "#c6c6cd",
+                      "on-primary-container": "#7c839b",
+                      "on-primary": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "outline": "#76777d",
+                      "on-tertiary": "#ffffff",
+                      "surface-bright": "#f8f9ff",
+                      "tertiary": "#000000",
+                      "on-tertiary-container": "#818486",
+                      "surface": "#f8f9ff",
+                      "on-surface": "#0b1c30",
+                      "on-secondary-fixed-variant": "#3323cc",
+                      "primary-container": "#131b2e",
+                      "on-error-container": "#93000a",
+                      "tertiary-fixed": "#e0e3e5",
+                      "inverse-on-surface": "#eaf1ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "base": "8px",
+                      "lg": "32px",
+                      "xl": "48px",
+                      "xs": "4px",
+                      "sm": "12px",
+                      "margin-desktop": "32px",
+                      "margin-mobile": "16px",
+                      "md": "24px",
+                      "gutter": "20px"
+              },
+              "fontFamily": {
+                      "title-md": [
+                              "Geist"
+                      ],
+                      "headline-lg-mobile": [
+                              "Geist"
+                      ],
+                      "body-md": [
+                              "Geist"
+                      ],
+                      "title-lg": [
+                              "Geist"
+                      ],
+                      "code-sm": [
+                              "Geist Mono"
+                      ],
+                      "body-lg": [
+                              "Geist"
+                      ],
+                      "headline-md": [
+                              "Geist"
+                      ],
+                      "display-lg": [
+                              "Geist"
+                      ],
+                      "label-md": [
+                              "Geist"
+                      ],
+                      "headline-lg": [
+                              "Geist"
+                      ]
+              },
+              "fontSize": {
+                      "title-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "title-lg": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "code-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body { background-color: #F8FAFC; }
+        .bento-card {
+            background-color: #ffffff;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 4px 4px -2px rgba(0, 0, 0, 0.02);
+            border-radius: 0.75rem;
+            padding: 24px;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .ai-glow {
+            box-shadow: 0 0 15px rgba(100, 94, 251, 0.15);
+            border: 1px solid rgba(100, 94, 251, 0.2);
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-surface bg-background flex min-h-screen selection:bg-secondary selection:text-white">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-screen w-[280px] bg-primary-container dark:bg-primary-container text-on-primary dark:text-on-primary-fixed border-r border-outline-variant dark:border-outline shadow-sm flex flex-col py-md px-sm z-50 hidden md:flex">
+<!-- Header -->
+<div class="flex items-center gap-sm px-4 mb-xl">
+<div class="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-white" data-weight="fill">hub</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary">Coldingrod</h1>
+<p class="font-label-md text-label-md text-on-primary-container">Business OS</p>
+</div>
+</div>
+<!-- Navigation Tabs -->
+<div class="flex-1 space-y-1">
+<a class="flex items-center gap-3 text-on-primary-container hover:text-on-primary px-4 py-2 hover:bg-surface-variant/10 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 bg-secondary-container text-on-secondary-container rounded-lg px-4 py-2 border-l-4 border-secondary scale-95 transition-transform shadow-sm" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="font-label-md text-label-md">Projects</span>
+</a>
+<a class="flex items-center gap-3 text-on-primary-container hover:text-on-primary px-4 py-2 hover:bg-surface-variant/10 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-label-md text-label-md">Clients</span>
+</a>
+<a class="flex items-center gap-3 text-on-primary-container hover:text-on-primary px-4 py-2 hover:bg-surface-variant/10 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-md text-label-md">Finance</span>
+</a>
+<a class="flex items-center gap-3 text-on-primary-container hover:text-on-primary px-4 py-2 hover:bg-surface-variant/10 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-label-md text-label-md">Team</span>
+</a>
+<a class="flex items-center gap-3 text-on-primary-container hover:text-on-primary px-4 py-2 hover:bg-surface-variant/10 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</div>
+<!-- CTA & Footer -->
+<div class="mt-auto space-y-sm pt-4 border-t border-outline-variant/20">
+<button class="w-full bg-secondary text-white rounded-lg py-2 font-label-md text-label-md hover:bg-secondary/90 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">add</span> New Workspace
+            </button>
+<div class="space-y-1 mt-4">
+<a class="flex items-center gap-3 text-on-primary-container hover:text-on-primary px-4 py-2 hover:bg-surface-variant/10 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md text-label-md">Help Center</span>
+</a>
+<a class="flex items-center gap-3 text-on-primary-container hover:text-on-primary px-4 py-2 hover:bg-surface-variant/10 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Log Out</span>
+</a>
+</div>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<main class="flex-1 flex flex-col md:ml-[280px] min-h-screen max-w-[1600px] mx-auto w-full relative">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-40 w-full bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl border-b border-outline-variant/30 flex justify-between items-center h-16 px-margin-desktop text-primary dark:text-primary-fixed">
+<div class="flex items-center gap-lg">
+<div class="font-title-lg text-title-lg font-black text-on-surface md:hidden">Coldingrod</div>
+<nav class="hidden lg:flex gap-6">
+<a class="text-on-surface-variant font-medium hover:text-secondary transition-all" href="#">Overview</a>
+<a class="text-secondary font-bold border-b-2 border-secondary pb-1" href="#">Analytics</a>
+<a class="text-on-surface-variant font-medium hover:text-secondary transition-all" href="#">Reports</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex items-center bg-surface-container rounded-full px-3 py-1.5 border border-outline-variant/50 focus-within:border-secondary transition-colors w-64">
+<span class="material-symbols-outlined text-on-surface-variant text-sm mr-2">search</span>
+<input class="bg-transparent border-none outline-none text-sm w-full font-body-md text-body-md placeholder:text-on-surface-variant/70 focus:ring-0 p-0" placeholder="Search across Coldingrod..." type="text"/>
+<div class="flex items-center gap-1 text-[10px] text-on-surface-variant/70 border border-outline-variant/30 rounded px-1.5 ml-2 font-code-sm">
+<span>⌘</span><span>K</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 transition-colors opacity-80 hover:opacity-100">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 transition-colors opacity-80 hover:opacity-100 relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full border-2 border-surface"></span>
+</button>
+<button class="w-8 h-8 rounded-full flex items-center justify-center text-secondary hover:bg-surface-variant/50 transition-colors opacity-80 hover:opacity-100">
+<span class="material-symbols-outlined" data-weight="fill">smart_toy</span>
+</button>
+</div>
+<div class="w-px h-6 bg-outline-variant/30 mx-2"></div>
+<div class="flex items-center gap-3 cursor-pointer group">
+<div class="text-right hidden sm:block">
+<div class="font-title-md text-title-md text-on-surface group-hover:text-secondary transition-colors">Alex Rivera</div>
+<div class="font-label-md text-label-md text-on-surface-variant">Director</div>
+</div>
+<img class="w-9 h-9 rounded-full object-cover border border-outline-variant/20 shadow-sm" data-alt="A professional headshot of a business executive in a modern office setting. The lighting is soft and natural, highlighting a confident expression. The background is a slightly blurred out premium workspace with glass partitions and subtle indoor plants. The color palette features neutral grays and professional blues." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjOKTe2yKtY0uw3Jcb7JIdR-nFfdjFE9DmByNlMEvNPpqH9pvL6N_-FVKwzTC5Vx81U1_Ykdp09lFqtQSpVJVH7KYIuCzko1bZKWOARSLg7-JkEnLazGJ4LkhCsX3EPPEJI591dKN3CZN_66FkXUduOk8Lz07KEOHJ45K8noDz6qqBXD0DHMGiT-2hmQmCZ7PSff5nDMgpyFWrixDT3ggv4UVl0iAWdnfbUyit5iJ9EuQSw4bRt56a"/>
+</div>
+</div>
+</header>
+<!-- Page Content: Meetings Workspace -->
+<div class="p-margin-desktop flex-1 flex flex-col gap-lg">
+<!-- Page Header & Workspace Navigation -->
+<div class="flex flex-col gap-md">
+<div class="flex justify-between items-end">
+<div>
+<h2 class="font-display-lg text-display-lg text-on-surface mb-1">Meetings</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Coordinate, capture, and analyze discussions.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-4 py-2 bg-surface border border-outline-variant rounded-lg font-title-md text-title-md hover:bg-surface-variant/30 transition-colors shadow-sm">
+<span class="material-symbols-outlined text-on-surface-variant">filter_list</span>
+                            Filter
+                        </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-lg font-title-md text-title-md hover:bg-secondary/90 transition-colors shadow-sm">
+<span class="material-symbols-outlined">add</span>
+                            Schedule
+                        </button>
+</div>
+</div>
+<!-- Secondary Nav Tabs -->
+<div class="border-b border-outline-variant/30">
+<nav class="flex gap-6 -mb-px overflow-x-auto hide-scrollbar">
+<a class="font-title-md text-title-md text-secondary border-b-2 border-secondary pb-3 px-1 whitespace-nowrap" href="#">Calendar</a>
+<a class="font-title-md text-title-md text-on-surface-variant hover:text-on-surface pb-3 px-1 whitespace-nowrap transition-colors border-b-2 border-transparent hover:border-outline-variant" href="#">Agenda</a>
+<a class="font-title-md text-title-md text-on-surface-variant hover:text-on-surface pb-3 px-1 whitespace-nowrap transition-colors border-b-2 border-transparent hover:border-outline-variant" href="#">Upcoming</a>
+<a class="font-title-md text-title-md text-on-surface-variant hover:text-on-surface pb-3 px-1 whitespace-nowrap transition-colors border-b-2 border-transparent hover:border-outline-variant" href="#">Completed</a>
+<a class="font-title-md text-title-md text-on-surface-variant hover:text-on-surface pb-3 px-1 whitespace-nowrap transition-colors border-b-2 border-transparent hover:border-outline-variant" href="#">AI Notes</a>
+</nav>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-lg">
+<!-- Left Column (8 cols): Agenda & Calendar Core -->
+<div class="col-span-12 lg:col-span-8 flex flex-col gap-lg">
+<!-- Today's Agenda Bento -->
+<div class="bento-card flex flex-col h-full">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">calendar_today</span>
+                                Today's Agenda
+                            </h3>
+<button class="text-secondary font-title-md text-title-md hover:underline">View Full Calendar</button>
+</div>
+<div class="flex-1 space-y-4">
+<!-- Meeting Card 1: Active -->
+<div class="border border-secondary/30 bg-surface-container-low rounded-lg p-4 flex gap-4 items-start relative overflow-hidden group">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-secondary"></div>
+<div class="w-16 shrink-0 flex flex-col items-center justify-center bg-white border border-outline-variant/30 rounded py-2 shadow-sm">
+<span class="font-title-lg text-title-lg text-on-surface leading-none">10</span>
+<span class="font-label-md text-label-md text-on-surface-variant">AM</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<h4 class="font-title-lg text-title-lg text-on-surface">Acme Corp Kickoff</h4>
+<span class="px-2 py-1 rounded text-xs font-label-md bg-secondary/10 text-secondary border border-secondary/20 flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span> In Progress
+                                        </span>
+</div>
+<div class="flex gap-4 text-on-surface-variant font-body-md text-body-md mb-3">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">schedule</span> 10:00 - 11:30 (90m)</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">videocam</span> Google Meet</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">category</span> Project Kickoff</span>
+</div>
+<div class="flex justify-between items-center mt-4">
+<div class="flex -space-x-2">
+<img class="w-8 h-8 rounded-full border-2 border-white object-cover" data-alt="Small circular avatar of a diverse team member with a warm smile, well lit, professional setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuqCXWkJtFCeZBUcuhFi5UfMLu37snpGRtS3yMhUYisIgvqFKJZ-sh7UTBHmXp24bbh3XjEI6KpoiRHnPlL8B3h-pGznTOXlXeHXa0VOchz5AbiikhHGpLXlfzJVhReJQdsmmjRsIveUp1pvW_XRWCzXNjXTPM4HMA9QmYXu5zJQvHitPKFZ0AsCNPD5YY4Kigw9t49WYPoTOt-cQeSCI6awRL3BjvNCME2Y93VoWOCdPFqJOqBNfb"/>
+<img class="w-8 h-8 rounded-full border-2 border-white object-cover" data-alt="Small circular avatar of a professional in business casual attire against a neutral backdrop." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAauVTZjM901K-iz8e3KBtsa364z22ZyhtE7H3h1548KBs7IivkX5uO9ETEEfCc4CyMqx5I3h583wuN95QXBwbBumGLox6gtgA5M5pmfnHsdq-YyeqYIhWHAMBHsG5lrwUkQ3o7hVfGQnvoITaWvYBrjlDKuj5Gu3cXZY9qvjq1ZZqnuGsbSxrBjyJMQ1tnixFkKKb4x2VjtP5-p_vwGy8vSmyJXI-g64E0zgh7VaZqTduOpIfV0Lw8"/>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-surface-variant flex items-center justify-center font-label-md text-label-md text-on-surface-variant">+3</div>
+</div>
+<div class="flex gap-2">
+<button class="px-3 py-1.5 bg-secondary text-white rounded font-title-md text-title-md text-sm hover:bg-secondary/90 transition-colors shadow-sm">Join Now</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Meeting Card 2: Upcoming -->
+<div class="border border-outline-variant/30 hover:border-outline-variant bg-white rounded-lg p-4 flex gap-4 items-start transition-colors group">
+<div class="w-16 shrink-0 flex flex-col items-center justify-center bg-surface border border-outline-variant/20 rounded py-2">
+<span class="font-title-lg text-title-lg text-on-surface-variant leading-none">1:30</span>
+<span class="font-label-md text-label-md text-on-surface-variant">PM</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<h4 class="font-title-lg text-title-lg text-on-surface">Design Review: Beta V2</h4>
+<span class="px-2 py-1 rounded text-xs font-label-md bg-surface-variant text-on-surface-variant border border-outline-variant/30">Upcoming</span>
+</div>
+<div class="flex gap-4 text-on-surface-variant font-body-md text-body-md mb-3">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">schedule</span> 1:30 - 2:00 (30m)</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">videocam</span> Google Meet</span>
+</div>
+<div class="flex justify-between items-center mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="text-secondary font-title-md text-title-md text-sm flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">edit</span> Edit Details</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column (4 cols): AI Intelligence & Quick Actions -->
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-lg">
+<!-- AI Intelligence Bento -->
+<div class="bento-card ai-glow bg-gradient-to-b from-white to-surface-container-low border-secondary/20 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-10">
+<span class="material-symbols-outlined text-6xl text-secondary" data-weight="fill">smart_toy</span>
+</div>
+<div class="flex items-center gap-2 mb-4 relative z-10">
+<div class="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary" data-weight="fill">auto_awesome</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Meeting Intelligence</h3>
+</div>
+<div class="space-y-4 relative z-10">
+<div class="p-3 bg-white/60 backdrop-blur-sm border border-white/40 rounded-lg shadow-sm">
+<div class="font-label-md text-label-md text-on-surface-variant mb-1 uppercase tracking-wider">Latest Summary</div>
+<p class="font-body-md text-body-md text-on-surface mb-2">Weekly sync finalized Q3 roadmap. Key blockers resolved regarding API integration. Marketing launch pushed to Nov 12.</p>
+<button class="text-secondary text-sm font-title-md flex items-center gap-1 hover:underline">Read Full Transcript <span class="material-symbols-outlined text-[14px]">arrow_forward</span></button>
+</div>
+<div class="p-3 bg-white/60 backdrop-blur-sm border border-white/40 rounded-lg shadow-sm">
+<div class="font-label-md text-label-md text-on-surface-variant mb-2 uppercase tracking-wider">Extracted Action Items</div>
+<ul class="space-y-2">
+<li class="flex items-start gap-2 font-body-md text-body-md">
+<input class="mt-1 rounded border-outline-variant text-secondary focus:ring-secondary" type="checkbox"/>
+<span>Draft API specs document (Assigned to Sarah)</span>
+</li>
+<li class="flex items-start gap-2 font-body-md text-body-md">
+<input class="mt-1 rounded border-outline-variant text-secondary focus:ring-secondary" type="checkbox"/>
+<span>Schedule follow-up with legal team</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<!-- Sync Error State Skeleton Example -->
+<div class="bento-card border-error/20 bg-error-container/10">
+<div class="flex items-center gap-3 mb-2 text-error">
+<span class="material-symbols-outlined">sync_problem</span>
+<h4 class="font-title-md text-title-md">Calendar Sync Issue</h4>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-3">Unable to fetch latest events from Outlook integration. Retrying connection...</p>
+<div class="w-full bg-outline-variant/20 h-1 rounded-full overflow-hidden">
+<div class="bg-error/50 h-full w-1/3 animate-pulse rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

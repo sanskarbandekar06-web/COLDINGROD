@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Coldingrod - Workspace Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary": "#ffffff",
+                      "surface-container-high": "#dce9ff",
+                      "on-error": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-container": "#7c839b",
+                      "secondary-fixed-dim": "#c3c0ff",
+                      "on-secondary": "#ffffff",
+                      "on-tertiary-fixed-variant": "#444749",
+                      "inverse-on-surface": "#eaf1ff",
+                      "surface-container-highest": "#d3e4fe",
+                      "background": "#f8f9ff",
+                      "tertiary": "#000000",
+                      "secondary": "#4b41e1",
+                      "outline-variant": "#c6c6cd",
+                      "on-tertiary-fixed": "#191c1e",
+                      "on-secondary-container": "#fffbff",
+                      "primary-fixed-dim": "#bec6e0",
+                      "outline": "#76777d",
+                      "primary": "#000000",
+                      "on-primary": "#ffffff",
+                      "surface-container-low": "#eff4ff",
+                      "on-surface-variant": "#45464d",
+                      "on-secondary-fixed-variant": "#3323cc",
+                      "surface-dim": "#cbdbf5",
+                      "primary-container": "#131b2e",
+                      "on-secondary-fixed": "#0f0069",
+                      "surface": "#f8f9ff",
+                      "on-tertiary-container": "#818486",
+                      "error": "#ba1a1a",
+                      "on-surface": "#0b1c30",
+                      "inverse-surface": "#213145",
+                      "secondary-container": "#645efb",
+                      "surface-variant": "#d3e4fe",
+                      "tertiary-container": "#191c1e",
+                      "secondary-fixed": "#e2dfff",
+                      "tertiary-fixed-dim": "#c4c7c9",
+                      "surface-tint": "#565e74",
+                      "on-background": "#0b1c30",
+                      "on-error-container": "#93000a",
+                      "surface-container": "#e5eeff",
+                      "on-primary-fixed-variant": "#3f465c",
+                      "on-primary-fixed": "#131b2e",
+                      "error-container": "#ffdad6",
+                      "surface-bright": "#f8f9ff",
+                      "primary-fixed": "#dae2fd",
+                      "tertiary-fixed": "#e0e3e5",
+                      "inverse-primary": "#bec6e0"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "base": "8px",
+                      "margin-mobile": "16px",
+                      "gutter": "20px",
+                      "xs": "4px",
+                      "sm": "12px",
+                      "md": "24px",
+                      "lg": "32px",
+                      "xl": "48px",
+                      "margin-desktop": "32px"
+              },
+              "fontFamily": {
+                      "title-lg": [
+                              "Geist"
+                      ],
+                      "code-sm": [
+                              "Geist Mono"
+                      ],
+                      "headline-lg-mobile": [
+                              "Geist"
+                      ],
+                      "display-lg": [
+                              "Geist"
+                      ],
+                      "title-md": [
+                              "Geist"
+                      ],
+                      "headline-lg": [
+                              "Geist"
+                      ],
+                      "label-md": [
+                              "Geist"
+                      ],
+                      "body-md": [
+                              "Geist"
+                      ],
+                      "body-lg": [
+                              "Geist"
+                      ],
+                      "headline-md": [
+                              "Geist"
+                      ]
+              },
+              "fontSize": {
+                      "title-lg": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "code-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "title-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body { font-family: 'Geist', sans-serif; background-color: #f8f9ff; }
+        .glass-panel { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); }
+        .bento-card { background: white; border: 1px solid #c6c6cd; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+      </style>
+</head>
+<body class="text-on-background h-screen overflow-hidden flex">
+<!-- SideNavBar -->
+<nav class="bg-primary-container dark:bg-primary-container fixed left-0 top-0 h-screen w-[280px] border-r border-outline-variant dark:border-outline shadow-sm flex flex-col py-md px-sm z-50">
+<div class="mb-xl flex items-center gap-3 px-2">
+<img alt="Coldingrod Company Logo" class="w-8 h-8 rounded" data-alt="A minimalist and sharp abstract geometric logo for a modern business operating system. The logo uses deep navy and bright white, communicating trust, stability, and high-tech efficiency in a soft minimalist style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRJXe1wIICJTg_cLFML2DiEZzx_SGZ1DQ-sSVSinp7rUfhXhX4guwWP8GgjhincRyuIuCSeHFIL5yAVqJexrGWQ_1MCFLn_oyoZrcL8zhzs0RvUFeKgBe-HfJgKikuqcWO2XR4WPxyL_OK9CUuOX5EktEH8OVKxf9qya-Iy0OH5FljBM2trTc91iKoKnFiY1kjhPTF34z2RVuy-apAhKwAn1x6NAzFN9G_SqYDrRlTRgY5lHCPo5Zh"/>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary">Coldingrod</h1>
+<p class="font-label-md text-label-md text-on-primary-container">Business OS</p>
+</div>
+</div>
+<button class="w-full bg-secondary text-on-secondary font-label-md text-label-md py-3 rounded-lg mb-8 hover:opacity-90 transition-opacity flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-sm">add</span> New Workspace
+        </button>
+<div class="flex-1 flex flex-col gap-2">
+<a class="flex items-center gap-3 text-on-primary-container hover:text-on-primary px-4 py-2 rounded-lg hover:bg-surface-variant/10 transition-colors scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 text-on-primary-container hover:text-on-primary px-4 py-2 rounded-lg hover:bg-surface-variant/10 transition-colors scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="font-label-md text-label-md">Projects</span>
+</a>
+<a class="flex items-center gap-3 text-on-primary-container hover:text-on-primary px-4 py-2 rounded-lg hover:bg-surface-variant/10 transition-colors scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-label-md text-label-md">Clients</span>
+</a>
+<a class="flex items-center gap-3 text-on-primary-container hover:text-on-primary px-4 py-2 rounded-lg hover:bg-surface-variant/10 transition-colors scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-md text-label-md">Finance</span>
+</a>
+<a class="flex items-center gap-3 text-on-primary-container hover:text-on-primary px-4 py-2 rounded-lg hover:bg-surface-variant/10 transition-colors scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-label-md text-label-md">Team</span>
+</a>
+<a class="flex items-center gap-3 bg-secondary-container text-on-secondary-container rounded-lg px-4 py-2 border-l-4 border-secondary scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</div>
+<div class="mt-auto flex flex-col gap-2 pt-4 border-t border-outline-variant/20">
+<a class="flex items-center gap-3 text-on-primary-container hover:text-on-primary px-4 py-2 rounded-lg hover:bg-surface-variant/10 transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md text-label-md">Help Center</span>
+</a>
+<a class="flex items-center gap-3 text-on-primary-container hover:text-on-primary px-4 py-2 rounded-lg hover:bg-surface-variant/10 transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Log Out</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 ml-[280px] flex flex-col h-screen overflow-hidden">
+<!-- TopAppBar -->
+<header class="bg-surface/80 dark:bg-surface-dim/80 sticky top-0 z-40 w-full backdrop-blur-xl border-b border-outline-variant/30 flex justify-between items-center h-16 px-margin-desktop">
+<div class="flex items-center gap-8">
+<span class="font-title-lg text-title-lg font-black text-on-surface">Coldingrod</span>
+<nav class="hidden md:flex gap-6">
+<a class="text-on-surface-variant font-medium font-body-lg text-body-lg hover:text-secondary transition-all" href="#">Overview</a>
+<a class="text-on-surface-variant font-medium font-body-lg text-body-lg hover:text-secondary transition-all" href="#">Analytics</a>
+<a class="text-secondary font-bold border-b-2 border-secondary pb-1 font-body-lg text-body-lg hover:text-secondary transition-all" href="#">Reports</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="pl-10 pr-4 py-1.5 bg-surface-variant/50 border border-outline-variant/50 rounded-full font-body-md text-body-md focus:outline-none focus:border-secondary w-64 transition-all" placeholder="Search settings..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-variant/50 text-primary dark:text-primary-fixed opacity-80 hover:opacity-100 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-variant/50 text-primary dark:text-primary-fixed opacity-80 hover:opacity-100 transition-all relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-secondary rounded-full"></span>
+</button>
+<div class="h-6 w-px bg-outline-variant/50 mx-2"></div>
+<img alt="User Profile Avatar" class="w-8 h-8 rounded-full border border-outline-variant cursor-pointer opacity-80 hover:opacity-100 transition-all" data-alt="A professional headshot of a business executive in a modern office, softly lit to fit a light-mode UI profile picture avatar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBD3ylu0xZG7wLU3oDXEiZIx6AZ1HaVyonaKN1VALaa8JP5FdlJno4w5lzNA38jg5gifPPQ7c14y9Ti0j1fIu0sVjKAmK50LoPqae_dZB2yh-L_gyBzbkkGXFsJ6VpYyYtqtW8C3IW9MOZTh0GLgAKkw-HB11UgBFcXcRJIqvagI8ZjuPvoNeauJ5Wd3WH_6qfMjKALInwNK4qcXBfJD-kdtQ3wKk-0JiXgJ5hiaXUJI26mm_TrL1XN"/>
+</div>
+</div>
+</header>
+<!-- Settings Layout -->
+<div class="flex-1 flex overflow-hidden">
+<!-- Inner Sidebar Navigation -->
+<aside class="w-[240px] border-r border-outline-variant/30 bg-surface-bright flex-shrink-0 overflow-y-auto py-lg px-md">
+<h2 class="font-title-md text-title-md text-on-surface mb-6 px-3">Workspace Settings</h2>
+<ul class="space-y-1">
+<li><a class="block px-3 py-2 rounded-md bg-secondary/10 text-secondary font-label-md text-label-md font-bold" href="#">General</a></li>
+<li><a class="block px-3 py-2 rounded-md text-on-surface-variant hover:bg-surface-variant/30 font-label-md text-label-md" href="#">Team Management</a></li>
+<li><a class="block px-3 py-2 rounded-md text-on-surface-variant hover:bg-surface-variant/30 font-label-md text-label-md" href="#">Workspace Access</a></li>
+<li><a class="block px-3 py-2 rounded-md text-on-surface-variant hover:bg-surface-variant/30 font-label-md text-label-md" href="#">Integrations</a></li>
+<li><a class="block px-3 py-2 rounded-md text-on-surface-variant hover:bg-surface-variant/30 font-label-md text-label-md" href="#">AI Settings</a></li>
+<li><a class="block px-3 py-2 rounded-md text-on-surface-variant hover:bg-surface-variant/30 font-label-md text-label-md" href="#">Notifications</a></li>
+<li><a class="block px-3 py-2 rounded-md text-on-surface-variant hover:bg-surface-variant/30 font-label-md text-label-md" href="#">Security</a></li>
+</ul>
+</aside>
+<!-- Scrollable Content Panel -->
+<main class="flex-1 overflow-y-auto p-lg lg:p-xl bg-background">
+<div class="max-w-4xl mx-auto space-y-xl">
+<!-- General Settings Bento -->
+<section class="bento-card rounded-xl p-lg">
+<div class="border-b border-outline-variant/30 pb-4 mb-6">
+<h3 class="font-headline-md text-headline-md text-on-surface">General Preferences</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Manage core workspace identity and display settings.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-lg">
+<div class="md:col-span-4">
+<label class="block font-label-md text-label-md text-on-surface mb-2">Workspace Logo</label>
+<div class="flex items-center gap-4">
+<div class="w-16 h-16 rounded bg-surface-variant flex items-center justify-center border border-outline-variant/50">
+<span class="material-symbols-outlined text-outline">image</span>
+</div>
+<button class="px-4 py-2 border border-outline-variant rounded font-label-md text-label-md hover:bg-surface-variant/20 transition-colors">Upload</button>
+</div>
+</div>
+<div class="md:col-span-8 space-y-6">
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2">Workspace Name</label>
+<input class="w-full px-4 py-2 border border-outline-variant rounded focus:border-secondary focus:ring-1 focus:ring-secondary outline-none font-body-md text-body-md" type="text" value="Coldingrod Global"/>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container rounded-lg border border-outline-variant/20">
+<div>
+<p class="font-title-md text-title-md text-on-surface">Premium Business Mode</p>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mt-1">Enable advanced analytics and extended storage.</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+</div>
+</div>
+</section>
+<!-- Integrations Section -->
+<section class="bento-card rounded-xl p-lg">
+<div class="flex justify-between items-center border-b border-outline-variant/30 pb-4 mb-6">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Connected Services</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Manage external tool connections.</p>
+</div>
+</div>
+<!-- Error State Banner Example -->
+<div class="mb-6 p-4 rounded-lg bg-error-container text-on-error-container border border-error/20 flex items-start gap-3">
+<span class="material-symbols-outlined mt-0.5">warning</span>
+<div>
+<h4 class="font-title-md text-title-md">Calendar Sync Failed</h4>
+<p class="font-body-md text-body-md mt-1 opacity-90">We lost connection to Google Calendar. Please re-authenticate to continue syncing events.</p>
+<button class="mt-2 text-sm font-label-md text-label-md underline">Reconnect Now</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Card 1 -->
+<div class="p-md rounded-lg border border-outline-variant/50 flex items-center justify-between hover:border-secondary transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-[#EA4335]/10 text-[#EA4335] flex items-center justify-center">
+<span class="material-symbols-outlined">calendar_month</span>
+</div>
+<div>
+<p class="font-title-md text-title-md text-on-surface">Google Calendar</p>
+<p class="font-label-md text-label-md text-error flex items-center gap-1 mt-0.5"><span class="w-2 h-2 rounded-full bg-error"></span> Error</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-secondary">arrow_forward</span>
+</div>
+<!-- Card 2 -->
+<div class="p-md rounded-lg border border-outline-variant/50 flex items-center justify-between hover:border-secondary transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-[#0077b5]/10 text-[#0077b5] flex items-center justify-center">
+<span class="material-symbols-outlined">work</span>
+</div>
+<div>
+<p class="font-title-md text-title-md text-on-surface">LinkedIn</p>
+<p class="font-label-md text-label-md text-on-surface-variant flex items-center gap-1 mt-0.5"><span class="w-2 h-2 rounded-full bg-outline-variant"></span> Disconnected</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-secondary">arrow_forward</span>
+</div>
+</div>
+</section>
+<!-- Danger Zone -->
+<section class="rounded-xl p-lg border-2 border-error/30 bg-error/5 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-2 h-full bg-error"></div>
+<h3 class="font-headline-md text-headline-md text-error mb-2">Danger Zone</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">Irreversible and destructive actions for this workspace.</p>
+<div class="flex flex-col sm:flex-row gap-4 items-center justify-between p-4 bg-surface rounded-lg border border-error/20">
+<div>
+<p class="font-title-md text-title-md text-on-surface">Delete Workspace</p>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mt-1">Permanently remove all data, projects, and settings.</p>
+</div>
+<button class="px-6 py-2 bg-error text-on-error rounded font-label-md text-label-md hover:bg-error/90 transition-colors whitespace-nowrap">Delete Everything</button>
+</div>
+</section>
+<div class="h-24"></div> <!-- Spacer -->
+</div>
+</main>
+</div>
+</div>
+</body></html>

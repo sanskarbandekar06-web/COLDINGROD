@@ -1,0 +1,86 @@
+/* ============================================
+ * COLDINGROD DESIGN SYSTEM — COLOR TOKENS
+ * Source: Stitch "Executive Precision" theme
+ * Palette: Material 3-derived, 60-30-10 distribution
+ * ============================================ */
+
+:root {
+  /* ---- Primary (Structural Dark) ---- */
+  --color-primary:                 #000000;
+  --color-on-primary:              #ffffff;
+  --color-primary-container:       #131B2E;
+  --color-on-primary-container:    #7C839B;
+  --color-inverse-primary:         #BEC6E0;
+  --color-primary-fixed:           #DAE2FD;
+  --color-primary-fixed-dim:       #BEC6E0;
+  --color-on-primary-fixed:        #131B2E;
+  --color-on-primary-fixed-variant: #3F465C;
+
+  /* ---- Secondary (Accent Indigo) ---- */
+  --color-secondary:               #4B41E1;
+  --color-on-secondary:            #ffffff;
+  --color-secondary-container:     #645EFB;
+  --color-on-secondary-container:  #FFFBFF;
+  --color-secondary-fixed:         #E2DFFF;
+  --color-secondary-fixed-dim:     #C3C0FF;
+  --color-on-secondary-fixed:      #0F0069;
+  --color-on-secondary-fixed-variant: #3323CC;
+
+  /* ---- Tertiary (Neutral Accent) ---- */
+  --color-tertiary:                #000000;
+  --color-on-tertiary:             #ffffff;
+  --color-tertiary-container:      #191C1E;
+  --color-on-tertiary-container:   #818486;
+  --color-tertiary-fixed:          #E0E3E5;
+  --color-tertiary-fixed-dim:      #C4C7C9;
+  --color-on-tertiary-fixed:       #191C1E;
+  --color-on-tertiary-fixed-variant: #444749;
+
+  /* ---- Surface (60% — Canvas & Cards) ---- */
+  --color-surface:                 #F8F9FF;
+  --color-surface-dim:             #CBDBF5;
+  --color-surface-bright:          #F8F9FF;
+  --color-surface-variant:         #D3E4FE;
+  --color-surface-tint:            #565E74;
+  --color-surface-container-lowest:  #FFFFFF;
+  --color-surface-container-low:     #EFF4FF;
+  --color-surface-container:         #E5EEFF;
+  --color-surface-container-high:    #DCE9FF;
+  --color-surface-container-highest: #D3E4FE;
+
+  /* ---- On-Surface (Text) ---- */
+  --color-on-surface:              #0B1C30;
+  --color-on-surface-variant:      #45464D;
+  --color-on-background:           #0B1C30;
+  --color-background:              #F8F9FF;
+
+  /* ---- Inverse (Tooltips, Snackbars) ---- */
+  --color-inverse-surface:         #213145;
+  --color-inverse-on-surface:      #EAF1FF;
+
+  /* ---- Outline (Borders) ---- */
+  --color-outline:                 #76777D;
+  --color-outline-variant:         #C6C6CD;
+
+  /* ---- Error ---- */
+  --color-error:                   #BA1A1A;
+  --color-on-error:                #ffffff;
+  --color-error-container:         #FFDAD6;
+  --color-on-error-container:      #93000A;
+
+  /* ---- Functional (Success / Warning) ---- */
+  --color-success:                 #10B981;
+  --color-success-container:       #D1FAE5;
+  --color-on-success:              #065F46;
+  --color-warning:                 #F59E0B;
+  --color-warning-container:       #FEF3C7;
+  --color-on-warning:              #92400E;
+
+  /* ---- Bento Card (from Stitch .bento-card) ---- */
+  --color-card-bg:                 #FFFFFF;
+  --color-card-border:             #E2E8F0;
+
+  /* ---- AI Glow (from Stitch .ai-glow) ---- */
+  --color-ai-glow-border:          rgba(75, 65, 225, 0.2);
+  --color-ai-glow-shadow:          rgba(75, 65, 225, 0.05);
+}

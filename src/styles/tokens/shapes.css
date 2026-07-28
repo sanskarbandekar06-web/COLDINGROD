@@ -1,0 +1,13 @@
+/* ============================================
+ * COLDINGROD DESIGN SYSTEM — SHAPE TOKENS
+ * Source: Stitch tailwind.config borderRadius
+ * ============================================ */
+
+:root {
+  --radius-sm:      0.25rem;   /* 4px — small chips, tags */
+  --radius-default: 0.5rem;    /* 8px — buttons, inputs */
+  --radius-md:      0.75rem;   /* 12px — bento cards */
+  --radius-lg:      1rem;      /* 16px — large cards */
+  --radius-xl:      1.5rem;    /* 24px — modals, auth containers */
+  --radius-full:    9999px;    /* Pills, avatars, search bar */
+}

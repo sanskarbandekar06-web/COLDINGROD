@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-background antialiased" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sign Up - Workspace Choice | Coldingrod</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&amp;family=Geist+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-fixed-variant": "#3f465c",
+                      "on-secondary-fixed-variant": "#3323cc",
+                      "on-tertiary-fixed": "#191c1e",
+                      "on-primary-fixed": "#131b2e",
+                      "tertiary-fixed-dim": "#c4c7c9",
+                      "error": "#ba1a1a",
+                      "tertiary-fixed": "#e0e3e5",
+                      "tertiary": "#000000",
+                      "secondary": "#4b41e1",
+                      "on-error-container": "#93000a",
+                      "on-tertiary-fixed-variant": "#444749",
+                      "secondary-fixed-dim": "#c3c0ff",
+                      "outline": "#76777d",
+                      "inverse-surface": "#213145",
+                      "on-secondary-container": "#fffbff",
+                      "secondary-fixed": "#e2dfff",
+                      "on-tertiary": "#ffffff",
+                      "inverse-on-surface": "#eaf1ff",
+                      "on-primary-container": "#7c839b",
+                      "surface": "#f8f9ff",
+                      "primary": "#000000",
+                      "surface-container-highest": "#d3e4fe",
+                      "outline-variant": "#c6c6cd",
+                      "on-surface-variant": "#45464d",
+                      "on-secondary-fixed": "#0f0069",
+                      "surface-container": "#e5eeff",
+                      "on-secondary": "#ffffff",
+                      "inverse-primary": "#bec6e0",
+                      "surface-bright": "#f8f9ff",
+                      "on-primary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "primary-fixed": "#dae2fd",
+                      "on-error": "#ffffff",
+                      "surface-tint": "#565e74",
+                      "surface-variant": "#d3e4fe",
+                      "surface-container-high": "#dce9ff",
+                      "on-tertiary-container": "#818486",
+                      "surface-dim": "#cbdbf5",
+                      "background": "#f8f9ff",
+                      "surface-container-lowest": "#ffffff",
+                      "primary-container": "#131b2e",
+                      "on-background": "#0b1c30",
+                      "surface-container-low": "#eff4ff",
+                      "primary-fixed-dim": "#bec6e0",
+                      "on-surface": "#0b1c30",
+                      "secondary-container": "#645efb",
+                      "tertiary-container": "#191c1e"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "sm": "12px",
+                      "margin-desktop": "32px",
+                      "base": "8px",
+                      "xl": "48px",
+                      "xs": "4px",
+                      "margin-mobile": "16px",
+                      "md": "24px",
+                      "lg": "32px",
+                      "gutter": "20px"
+              },
+              "fontFamily": {
+                      "body-md": [
+                              "Geist"
+                      ],
+                      "headline-md": [
+                              "Geist"
+                      ],
+                      "display-lg": [
+                              "Geist"
+                      ],
+                      "headline-lg": [
+                              "Geist"
+                      ],
+                      "code-sm": [
+                              "Geist Mono"
+                      ],
+                      "body-lg": [
+                              "Geist"
+                      ],
+                      "title-lg": [
+                              "Geist"
+                      ],
+                      "label-md": [
+                              "Geist"
+                      ],
+                      "headline-lg-mobile": [
+                              "Geist"
+                      ],
+                      "title-md": [
+                              "Geist"
+                      ]
+              },
+              "fontSize": {
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "code-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "title-lg": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "title-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "500"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        .glass-overlay {
+            backdrop-filter: blur(12px);
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        .bento-card {
+            background-color: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+            transition: all 0.2s ease-in-out;
+        }
+        .bento-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+            transform: translateY(-2px);
+        }
+        .bento-card:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col font-body-md text-on-background overflow-hidden relative">
+<!-- Decorative Ambient Background Elements -->
+<div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+<div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] rounded-full bg-surface-variant blur-[100px] opacity-60"></div>
+<div class="absolute top-[20%] -right-[10%] w-[30%] h-[50%] rounded-full bg-surface-container-highest blur-[120px] opacity-40"></div>
+</div>
+<!-- Main Content Canvas (Transactional Page - No Nav Shell) -->
+<main class="flex-grow flex flex-col items-center justify-center p-margin-mobile md:p-margin-desktop z-10 relative w-full max-w-[1600px] mx-auto min-h-screen">
+<!-- Header Section -->
+<div class="w-full max-w-4xl mb-xl text-center">
+<!-- Brand Logo (Placeholder styling mimicking the top app bar for consistency) -->
+<div class="mb-lg inline-flex items-center justify-center">
+<span class="font-title-lg text-title-lg font-black text-on-surface tracking-tight">Coldingrod</span>
+</div>
+<!-- Step Indicator -->
+<div class="flex items-center justify-center gap-2 mb-md">
+<div class="w-8 h-1 rounded-full bg-surface-variant"></div>
+<div class="w-8 h-1 rounded-full bg-surface-variant"></div>
+<div class="w-8 h-1 rounded-full bg-secondary"></div>
+</div>
+<h1 class="font-display-lg text-display-lg md:hidden font-headline-lg-mobile text-headline-lg-mobile text-primary mb-sm">Choose Your Workspace</h1>
+<h1 class="hidden md:block font-display-lg text-display-lg text-primary mb-sm">Choose Your Workspace</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
+                Set up a new environment for your team or connect with colleagues in an existing organization.
+            </p>
+</div>
+<!-- Bento Grid Layout for Choices -->
+<div class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-md md:gap-lg">
+<!-- Card 1: Create New -->
+<button class="bento-card rounded-xl p-xl flex flex-col items-start text-left group w-full relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent">
+<!-- Subtle Gradient Accent on Hover -->
+<div class="absolute inset-0 bg-gradient-to-br from-secondary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+<div class="w-16 h-16 rounded-lg bg-surface-container flex items-center justify-center mb-lg group-hover:bg-secondary group-hover:text-on-secondary transition-colors duration-300 shadow-sm border border-outline-variant/20">
+<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 0, 'wght' 300;">add</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-xs group-hover:text-secondary transition-colors duration-200">Create New Company Workspace</h2>
+<p class="font-body-md text-body-md text-on-surface-variant flex-grow mb-xl">
+                    Start fresh. Set up departments, roles, and initial configurations for your entire organization. Best for founders and IT admins.
+                </p>
+<div class="mt-auto flex items-center text-secondary font-label-md text-label-md font-semibold tracking-wide uppercase opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+                    Get Started
+                    <span class="material-symbols-outlined ml-1 text-[16px]">arrow_forward</span>
+</div>
+</button>
+<!-- Card 2: Join Existing -->
+<button class="bento-card rounded-xl p-xl flex flex-col items-start text-left group w-full relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent">
+<!-- Subtle Gradient Accent on Hover -->
+<div class="absolute inset-0 bg-gradient-to-br from-secondary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+<div class="w-16 h-16 rounded-lg bg-surface-container flex items-center justify-center mb-lg group-hover:bg-secondary group-hover:text-on-secondary transition-colors duration-300 shadow-sm border border-outline-variant/20">
+<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 0, 'wght' 300;">group</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-xs group-hover:text-secondary transition-colors duration-200">Join Existing Company Workspace</h2>
+<p class="font-body-md text-body-md text-on-surface-variant flex-grow mb-xl">
+                    Connect with your team. Enter an invite code or search for your company domain to request access to an established workspace.
+                </p>
+<div class="mt-auto flex items-center text-secondary font-label-md text-label-md font-semibold tracking-wide uppercase opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+                    Find Workspace
+                    <span class="material-symbols-outlined ml-1 text-[16px]">arrow_forward</span>
+</div>
+</button>
+</div>
+<!-- Back / Cancel Action (Task-focused context) -->
+<div class="mt-xl text-center w-full">
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors duration-200 uppercase tracking-widest inline-flex items-center px-4 py-2 rounded-md hover:bg-surface-variant/50">
+<span class="material-symbols-outlined mr-2 text-[18px]">arrow_back</span>
+                Back
+            </button>
+</div>
+</main>
+</body></html>

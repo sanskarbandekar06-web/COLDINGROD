@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Coldingrod - Invite Team</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;900&amp;family=Geist+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-fixed-variant": "#3f465c",
+                      "on-secondary-fixed-variant": "#3323cc",
+                      "on-tertiary-fixed": "#191c1e",
+                      "on-primary-fixed": "#131b2e",
+                      "tertiary-fixed-dim": "#c4c7c9",
+                      "error": "#ba1a1a",
+                      "tertiary-fixed": "#e0e3e5",
+                      "tertiary": "#000000",
+                      "secondary": "#4b41e1",
+                      "on-error-container": "#93000a",
+                      "on-tertiary-fixed-variant": "#444749",
+                      "secondary-fixed-dim": "#c3c0ff",
+                      "outline": "#76777d",
+                      "inverse-surface": "#213145",
+                      "on-secondary-container": "#fffbff",
+                      "secondary-fixed": "#e2dfff",
+                      "on-tertiary": "#ffffff",
+                      "inverse-on-surface": "#eaf1ff",
+                      "on-primary-container": "#7c839b",
+                      "surface": "#f8f9ff",
+                      "primary": "#000000",
+                      "surface-container-highest": "#d3e4fe",
+                      "outline-variant": "#c6c6cd",
+                      "on-surface-variant": "#45464d",
+                      "on-secondary-fixed": "#0f0069",
+                      "surface-container": "#e5eeff",
+                      "on-secondary": "#ffffff",
+                      "inverse-primary": "#bec6e0",
+                      "surface-bright": "#f8f9ff",
+                      "on-primary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "primary-fixed": "#dae2fd",
+                      "on-error": "#ffffff",
+                      "surface-tint": "#565e74",
+                      "surface-variant": "#d3e4fe",
+                      "surface-container-high": "#dce9ff",
+                      "on-tertiary-container": "#818486",
+                      "surface-dim": "#cbdbf5",
+                      "background": "#f8f9ff",
+                      "surface-container-lowest": "#ffffff",
+                      "primary-container": "#131b2e",
+                      "on-background": "#0b1c30",
+                      "surface-container-low": "#eff4ff",
+                      "primary-fixed-dim": "#bec6e0",
+                      "on-surface": "#0b1c30",
+                      "secondary-container": "#645efb",
+                      "tertiary-container": "#191c1e"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "sm": "12px",
+                      "margin-desktop": "32px",
+                      "base": "8px",
+                      "xl": "48px",
+                      "xs": "4px",
+                      "margin-mobile": "16px",
+                      "md": "24px",
+                      "lg": "32px",
+                      "gutter": "20px"
+              },
+              "fontFamily": {
+                      "body-md": ["Geist"],
+                      "headline-md": ["Geist"],
+                      "display-lg": ["Geist"],
+                      "headline-lg": ["Geist"],
+                      "code-sm": ["Geist Mono"],
+                      "body-lg": ["Geist"],
+                      "title-lg": ["Geist"],
+                      "label-md": ["Geist"],
+                      "headline-lg-mobile": ["Geist"],
+                      "title-md": ["Geist"]
+              },
+              "fontSize": {
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "code-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "title-md": ["16px", {"lineHeight": "24px", "fontWeight": "500"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background h-full flex flex-col items-center justify-center text-on-surface antialiased selection:bg-secondary-container selection:text-on-secondary-container">
+<div class="w-full max-w-lg px-margin-mobile md:px-0">
+<!-- Progress Indicator -->
+<div class="flex justify-between items-center mb-12">
+<div class="font-title-lg text-title-lg font-black text-on-surface tracking-tight">Coldingrod</div>
+<div class="flex gap-2">
+<div class="w-8 h-1 rounded-full bg-outline-variant/30"></div>
+<div class="w-8 h-1 rounded-full bg-outline-variant/30"></div>
+<div class="w-8 h-1 rounded-full bg-outline-variant/30"></div>
+<div class="w-8 h-1 rounded-full bg-outline-variant/30"></div>
+<div class="w-8 h-1 rounded-full bg-secondary"></div>
+</div>
+</div>
+<!-- Main Content Canvas -->
+<div class="bg-surface-container-lowest border border-outline-variant/50 rounded-xl p-md md:p-lg shadow-[0_4px_24px_rgba(0,0,0,0.02)] backdrop-blur-sm relative overflow-hidden">
+<div class="mb-8">
+<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-xs">Invite your team to Coldingrod</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Collaboration is key. Add members to your workspace to start building together.</p>
+</div>
+<div class="space-y-6">
+<!-- Dynamic Email List Input -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-sm">EMAIL ADDRESSES</label>
+<div class="space-y-sm" id="email-list">
+<div class="flex gap-sm items-center group">
+<div class="relative flex-1">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline">mail</span>
+<input class="w-full pl-10 pr-sm py-2 bg-surface-container-low border border-outline-variant/50 rounded-lg font-body-md text-body-md text-on-surface focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all" placeholder="colleague@company.com" type="email" value="sarah.jenkins@example.com"/>
+</div>
+<button aria-label="Remove email" class="text-outline-variant hover:text-error transition-colors p-1" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<div class="flex gap-sm items-center group">
+<div class="relative flex-1">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline">mail</span>
+<input class="w-full pl-10 pr-sm py-2 bg-surface-container-low border border-outline-variant/50 rounded-lg font-body-md text-body-md text-on-surface focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all" placeholder="colleague@company.com" type="email"/>
+</div>
+<button aria-label="Remove email" class="text-outline-variant hover:text-error transition-colors p-1 opacity-0 group-hover:opacity-100" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<div class="flex gap-sm items-center group">
+<div class="relative flex-1">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline">mail</span>
+<input class="w-full pl-10 pr-sm py-2 bg-surface-container-low border border-outline-variant/50 border-dashed rounded-lg font-body-md text-body-md text-on-surface-variant focus:border-secondary focus:border-solid focus:ring-1 focus:ring-secondary outline-none transition-all bg-transparent hover:bg-surface-container-lowest" placeholder="colleague@company.com" type="email"/>
+</div>
+<button aria-label="Remove email" class="text-outline-variant hover:text-error transition-colors p-1 opacity-0" disabled="" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+</div>
+<button class="mt-sm flex items-center gap-xs text-secondary font-label-md text-label-md hover:text-secondary-fixed-dim transition-colors" onclick="addEmailField()" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                        Add another
+                    </button>
+</div>
+<!-- Invite Link Action -->
+<div class="pt-6 border-t border-outline-variant/30">
+<div class="flex items-center justify-between">
+<div>
+<div class="font-title-md text-title-md text-on-surface">Or share a link</div>
+<div class="font-body-md text-body-md text-on-surface-variant text-sm">Anyone with the link can join your workspace</div>
+</div>
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container border border-outline-variant/50 rounded-lg font-label-md text-label-md text-on-surface hover:bg-surface-variant transition-colors" onclick="copyLink(this)" type="button">
+<span class="material-symbols-outlined text-[18px]">link</span>
+<span>Copy Link</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Bottom Actions -->
+<div class="mt-12 flex items-center justify-between">
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors px-2 py-2" type="button">
+                    Skip for now
+                </button>
+<button class="px-6 py-3 bg-primary text-on-primary rounded-lg font-label-md text-label-md hover:bg-primary-container hover:text-on-primary-container transition-all shadow-sm flex items-center gap-2" type="button">
+                    Send Invitations
+                    <span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</div>
+</div>
+<p class="text-center mt-8 font-body-md text-body-md text-on-surface-variant/70 text-xs">
+            By sending invitations, you agree to our Terms of Service.
+        </p>
+</div>
+<script>
+        function copyLink(btn) {
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span class="material-symbols-outlined text-[18px]">check</span><span>Copied!</span>`;
+            btn.classList.add('bg-secondary', 'text-on-secondary', 'border-secondary');
+            btn.classList.remove('bg-surface-container', 'text-on-surface', 'border-outline-variant/50');
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.remove('bg-secondary', 'text-on-secondary', 'border-secondary');
+                btn.classList.add('bg-surface-container', 'text-on-surface', 'border-outline-variant/50');
+            }, 2000);
+        }
+
+        // Simple visual interaction for demo
+        const inputs = document.querySelectorAll('input[type="email"]');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.classList.remove('border-dashed', 'bg-transparent');
+                this.classList.add('bg-surface-container-low');
+            });
+        });
+    </script>
+</body></html>

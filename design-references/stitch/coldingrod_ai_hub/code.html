@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Coldingrod AI Hub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-high": "#dce9ff",
+                      "on-primary": "#ffffff",
+                      "surface-tint": "#565e74",
+                      "outline-variant": "#c6c6cd",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary-container": "#fffbff",
+                      "on-error-container": "#93000a",
+                      "primary-container": "#131b2e",
+                      "inverse-primary": "#bec6e0",
+                      "on-tertiary-fixed": "#191c1e",
+                      "secondary-fixed": "#e2dfff",
+                      "surface-dim": "#cbdbf5",
+                      "error": "#ba1a1a",
+                      "on-secondary-fixed": "#0f0069",
+                      "background": "#f8f9ff",
+                      "surface-container": "#e5eeff",
+                      "tertiary-container": "#191c1e",
+                      "primary": "#000000",
+                      "on-surface": "#0b1c30",
+                      "on-primary-container": "#7c839b",
+                      "tertiary-fixed": "#e0e3e5",
+                      "surface": "#f8f9ff",
+                      "on-background": "#0b1c30",
+                      "surface-container-low": "#eff4ff",
+                      "on-secondary-fixed-variant": "#3323cc",
+                      "inverse-on-surface": "#eaf1ff",
+                      "surface-bright": "#f8f9ff",
+                      "secondary": "#4b41e1",
+                      "primary-fixed": "#dae2fd",
+                      "tertiary-fixed-dim": "#c4c7c9",
+                      "on-surface-variant": "#45464d",
+                      "on-primary-fixed-variant": "#3f465c",
+                      "surface-container-lowest": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "on-tertiary-fixed-variant": "#444749",
+                      "on-tertiary-container": "#818486",
+                      "secondary-fixed-dim": "#c3c0ff",
+                      "primary-fixed-dim": "#bec6e0",
+                      "on-secondary": "#ffffff",
+                      "on-primary-fixed": "#131b2e",
+                      "surface-variant": "#d3e4fe",
+                      "outline": "#76777d",
+                      "on-error": "#ffffff",
+                      "inverse-surface": "#213145",
+                      "surface-container-highest": "#d3e4fe",
+                      "secondary-container": "#645efb",
+                      "tertiary": "#000000"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xs": "4px",
+                      "gutter": "20px",
+                      "margin-desktop": "32px",
+                      "md": "24px",
+                      "sm": "12px",
+                      "base": "8px",
+                      "lg": "32px",
+                      "xl": "48px",
+                      "margin-mobile": "16px"
+              },
+              "fontFamily": {
+                      "label-md": [
+                              "Geist"
+                      ],
+                      "headline-md": [
+                              "Geist"
+                      ],
+                      "body-lg": [
+                              "Geist"
+                      ],
+                      "title-md": [
+                              "Geist"
+                      ],
+                      "headline-lg-mobile": [
+                              "Geist"
+                      ],
+                      "title-lg": [
+                              "Geist"
+                      ],
+                      "code-sm": [
+                              "Geist Mono"
+                      ],
+                      "headline-lg": [
+                              "Geist"
+                      ],
+                      "body-md": [
+                              "Geist"
+                      ],
+                      "display-lg": [
+                              "Geist"
+                      ]
+              },
+              "fontSize": {
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "title-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "title-lg": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "code-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap');
+        
+        body {
+            font-family: 'Geist', sans-serif;
+            background-color: #F8FAFC;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+        }
+
+        .ai-gradient-border {
+            position: relative;
+        }
+        .ai-gradient-border::before {
+            content: "";
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(45deg, #4b41e1, #8b5cf6, #ec4899);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .bento-card {
+            background-color: #ffffff;
+            border: 1px solid #E2E8F0;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            padding: 24px;
+        }
+
+        /* Skeleton Animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        .skeleton {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+<body class="text-on-surface antialiased flex h-screen overflow-hidden">
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col fixed left-0 top-0 h-screen w-[280px] bg-primary-container border-r border-outline-variant shadow-sm z-50 py-md px-sm">
+<div class="flex items-center gap-3 mb-xl px-4">
+<img alt="Coldingrod Company Logo" class="w-8 h-8 rounded" data-alt="A minimalist logo for a premium enterprise software company named Coldingrod, featuring sharp geometric lines and a sophisticated deep blue and white color palette. The aesthetic is clean, corporate, and highly professional." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoXZM6P5oo9umPZEYKa5Haa2V-YT7yOXlM-J-C8sAjzo-wEhPOQI9JHYdIQPzcKok9VrT_FtDuN08g1oWleHeFDB-6pFeWKq2lMzyzsqnBp8n7rKe7432GTO-D48S85Wqmt7aACXwxDRBvq4xmByRu4n3rTmPUdFzXrp4X8PdJhQWGIUxLTxdrIoxbC1kPfJD4dQxKXsfH8ncpJRFPPQD0PIvQWX23Ix-NMePfYop_3XaDtCM7JeTf"/>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary tracking-tight">Coldingrod</h1>
+<p class="font-label-md text-label-md text-on-primary-container">Business OS</p>
+</div>
+</div>
+<div class="flex flex-col gap-2 flex-grow">
+<!-- Non-Active Tab -->
+<a class="flex items-center gap-3 text-on-primary-container hover:bg-surface-variant/10 transition-colors px-4 py-2 rounded-lg font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 text-on-primary-container hover:bg-surface-variant/10 transition-colors px-4 py-2 rounded-lg font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+                Projects
+            </a>
+<a class="flex items-center gap-3 text-on-primary-container hover:bg-surface-variant/10 transition-colors px-4 py-2 rounded-lg font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">groups</span>
+                Clients
+            </a>
+<a class="flex items-center gap-3 text-on-primary-container hover:bg-surface-variant/10 transition-colors px-4 py-2 rounded-lg font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">payments</span>
+                Finance
+            </a>
+<a class="flex items-center gap-3 text-on-primary-container hover:bg-surface-variant/10 transition-colors px-4 py-2 rounded-lg font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">badge</span>
+                Team
+            </a>
+<!-- Active Tab (AI Hub conceptually maps here or is a new prime destination) -->
+<a class="flex items-center gap-3 bg-secondary-container text-on-secondary-container rounded-lg px-4 py-2 border-l-4 border-secondary font-body-md text-body-md shadow-sm" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+                AI Hub
+            </a>
+<a class="flex items-center gap-3 text-on-primary-container hover:bg-surface-variant/10 transition-colors px-4 py-2 rounded-lg font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+</div>
+<div class="mt-auto flex flex-col gap-2 pt-4 border-t border-outline-variant/30">
+<button class="w-full bg-surface-variant/10 hover:bg-surface-variant/20 text-on-primary rounded-lg py-2 font-label-md text-label-md transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">add</span> New Workspace
+            </button>
+<a class="flex items-center gap-3 text-on-primary-container hover:bg-surface-variant/10 transition-colors px-4 py-2 rounded-lg font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">help</span>
+                Help Center
+            </a>
+<a class="flex items-center gap-3 text-on-primary-container hover:bg-surface-variant/10 transition-colors px-4 py-2 rounded-lg font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">logout</span>
+                Log Out
+            </a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col md:ml-[280px] h-screen overflow-hidden">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-40 w-full bg-surface/80 backdrop-blur-xl border-b border-outline-variant/30 flex justify-between items-center h-16 px-margin-desktop">
+<div class="flex items-center gap-8">
+<!-- Mobile brand, hidden on desktop -->
+<div class="md:hidden font-title-lg text-title-lg font-black text-on-surface">Coldingrod</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-secondary font-bold border-b-2 border-secondary pb-1 hover:text-secondary transition-all font-body-md text-body-md" href="#">Overview</a>
+<a class="text-on-surface-variant font-medium hover:text-secondary transition-all font-body-md text-body-md" href="#">Analytics</a>
+<a class="text-on-surface-variant font-medium hover:text-secondary transition-all font-body-md text-body-md" href="#">Reports</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="bg-surface-container-low border-none rounded-full py-1.5 pl-9 pr-4 text-sm focus:ring-1 focus:ring-secondary w-48 transition-all font-body-md" placeholder="Search..." type="text"/>
+</div>
+<button class="opacity-80 hover:opacity-100 transition-all text-primary">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="opacity-80 hover:opacity-100 transition-all text-primary">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="opacity-80 hover:opacity-100 transition-all text-primary bg-secondary/10 p-1.5 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">smart_toy</span>
+</button>
+<img alt="User Profile Avatar" class="w-8 h-8 rounded-full border border-outline-variant/50 ml-2" data-alt="A professional headshot of a business executive in a modern office setting. Soft, natural lighting. The person is wearing a tailored grey suit. High-end corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4gOducw01WVAU71Zl2gy9X2GSb6xOy4VZgNz8DYawJ8jeCNjAdYOA9skBLfjcnjxTCdG7RIMTtA8UHqNQ26DcLUxYX-1xVVy--kqwGfu9laOoPmp5AbJucLDhTkThY-QsZgReOVkCQ1gBSdBCn34m_rsuu3j8DTZjXsgUftM81EOGFeLgepgvqaKL5Nb3r-5WQfdv-AEH2Dk_Z6oVUAYOzLUBMWRtcIRuQ_CISSkokfdSmC1xXgeX"/>
+</div>
+</header>
+<!-- Scrollable Content Canvas -->
+<div class="flex-1 overflow-y-auto p-4 md:p-8">
+<div class="max-w-[1600px] mx-auto w-full flex flex-col gap-6">
+<!-- AI Overview Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-2">
+<div>
+<div class="flex items-center gap-3 mb-1">
+<h2 class="font-display-lg text-display-lg text-on-surface tracking-tight">AI Command Center</h2>
+<span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1 border border-green-200">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                                Systems Operational
+                            </span>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Manage agents, monitor workflows, and review automated intelligence tasks.</p>
+</div>
+<div class="flex gap-3">
+<button class="glass-panel px-4 py-2 rounded-lg font-label-md text-label-md text-on-surface hover:bg-surface-container transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">history</span> View Logs
+                        </button>
+<button class="bg-secondary text-on-secondary px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-secondary/90 transition-colors shadow-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">add</span> New Workflow
+                        </button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Left Column: Metrics & Agents (8 cols) -->
+<div class="md:col-span-8 flex flex-col gap-6">
+<!-- Usage Summary Bento -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+<div class="bento-card flex flex-col gap-2">
+<div class="flex items-center justify-between text-on-surface-variant mb-2">
+<span class="font-label-md text-label-md uppercase tracking-wider">Tasks Processed</span>
+<span class="material-symbols-outlined text-lg">check_circle</span>
+</div>
+<div class="font-headline-lg text-headline-lg text-on-surface">1,284</div>
+<div class="font-code-sm text-code-sm text-green-600 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">trending_up</span> +12% this week
+                                </div>
+</div>
+<div class="bento-card flex flex-col gap-2">
+<div class="flex items-center justify-between text-on-surface-variant mb-2">
+<span class="font-label-md text-label-md uppercase tracking-wider">Hours Saved</span>
+<span class="material-symbols-outlined text-lg">schedule</span>
+</div>
+<div class="font-headline-lg text-headline-lg text-on-surface">342</div>
+<div class="font-code-sm text-code-sm text-on-surface-variant flex items-center gap-1">
+                                    Across 5 active agents
+                                </div>
+</div>
+<div class="bento-card flex flex-col gap-2">
+<div class="flex items-center justify-between text-on-surface-variant mb-2">
+<span class="font-label-md text-label-md uppercase tracking-wider">Review Queue</span>
+<span class="material-symbols-outlined text-lg text-amber-500">warning</span>
+</div>
+<div class="font-headline-lg text-headline-lg text-on-surface">7</div>
+<div class="font-code-sm text-code-sm text-amber-600 flex items-center gap-1">
+                                    Requires human approval
+                                </div>
+</div>
+</div>
+<!-- Active Agents Section -->
+<div class="bento-card">
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-headline-md text-headline-md text-on-surface">Active Intelligence Agents</h3>
+<button class="text-secondary font-label-md text-label-md hover:underline">Manage Agents</button>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<!-- Agent Card 1 -->
+<div class="border border-outline-variant/50 rounded-lg p-4 hover:border-secondary/50 transition-colors ai-gradient-border bg-surface-container-lowest">
+<div class="flex items-start justify-between mb-3">
+<div class="flex items-center gap-3">
+<div class="bg-blue-50 text-blue-600 p-2 rounded-lg">
+<span class="material-symbols-outlined">group_add</span>
+</div>
+<div>
+<h4 class="font-title-md text-title-md text-on-surface">Lead Intelligence</h4>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Scoring &amp; Enrichment</span>
+</div>
+</div>
+<div class="w-2 h-2 rounded-full bg-green-500"></div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">Analyzing 45 new inbound leads from Q3 campaign.</p>
+<div class="flex items-center justify-between mt-auto pt-3 border-t border-outline-variant/30">
+<span class="font-label-md text-label-md text-on-surface-variant">Active Task: Scoring</span>
+<span class="font-code-sm text-code-sm bg-surface-container px-2 py-1 rounded">v2.1</span>
+</div>
+</div>
+<!-- Agent Card 2 -->
+<div class="border border-outline-variant/50 rounded-lg p-4 hover:border-secondary/50 transition-colors bg-surface-container-lowest">
+<div class="flex items-start justify-between mb-3">
+<div class="flex items-center gap-3">
+<div class="bg-purple-50 text-purple-600 p-2 rounded-lg">
+<span class="material-symbols-outlined">mail</span>
+</div>
+<div>
+<h4 class="font-title-md text-title-md text-on-surface">Outreach Agent</h4>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Email Personalization</span>
+</div>
+</div>
+<div class="w-2 h-2 rounded-full bg-green-500"></div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">Drafting follow-ups for Enterprise tier accounts.</p>
+<div class="flex items-center justify-between mt-auto pt-3 border-t border-outline-variant/30">
+<span class="font-label-md text-label-md text-on-surface-variant">Active Task: Drafting (12)</span>
+<span class="font-code-sm text-code-sm bg-surface-container px-2 py-1 rounded">v1.8</span>
+</div>
+</div>
+<!-- Agent Card 3 -->
+<div class="border border-outline-variant/50 rounded-lg p-4 hover:border-secondary/50 transition-colors bg-surface-container-lowest">
+<div class="flex items-start justify-between mb-3">
+<div class="flex items-center gap-3">
+<div class="bg-amber-50 text-amber-600 p-2 rounded-lg">
+<span class="material-symbols-outlined">insights</span>
+</div>
+<div>
+<h4 class="font-title-md text-title-md text-on-surface">BI Agent</h4>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Risk &amp; Trend Detection</span>
+</div>
+</div>
+<div class="w-2 h-2 rounded-full bg-amber-500"></div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">Scanning Q2 revenue data for churn indicators.</p>
+<div class="flex items-center justify-between mt-auto pt-3 border-t border-outline-variant/30">
+<span class="font-label-md text-label-md text-amber-600">Status: Processing</span>
+<span class="font-code-sm text-code-sm bg-surface-container px-2 py-1 rounded">v3.0</span>
+</div>
+</div>
+<!-- Agent Card 4 -->
+<div class="border border-outline-variant/50 rounded-lg p-4 hover:border-secondary/50 transition-colors bg-surface-container-lowest">
+<div class="flex items-start justify-between mb-3">
+<div class="flex items-center gap-3">
+<div class="bg-slate-100 text-slate-400 p-2 rounded-lg">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div>
+<h4 class="font-title-md text-title-md text-on-surface text-on-surface-variant">Proposal Agent</h4>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Document Generation</span>
+</div>
+</div>
+<div class="w-2 h-2 rounded-full bg-slate-300"></div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">Currently idle. Waiting for next trigger event.</p>
+<div class="flex items-center justify-between mt-auto pt-3 border-t border-outline-variant/30">
+<span class="font-label-md text-label-md text-slate-500">Status: Standby</span>
+<span class="font-code-sm text-code-sm bg-surface-container px-2 py-1 rounded text-slate-500">v1.2</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Prompt Workspace -->
+<div class="bento-card border-secondary/30 shadow-[0_0_15px_rgba(75,65,225,0.05)]">
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">forum</span>
+                                    Intelligence Terminal
+                                </h3>
+<div class="flex items-center gap-2">
+<span class="font-code-sm text-code-sm text-on-surface-variant">Model: Coldingrod-LLM-Pro</span>
+</div>
+</div>
+<!-- Chat Area -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-lg h-80 mb-4 p-4 overflow-y-auto flex flex-col gap-4">
+<!-- User Message -->
+<div class="flex gap-3 max-w-[85%] self-end">
+<div class="bg-surface-container px-4 py-3 rounded-2xl rounded-tr-sm text-on-surface font-body-md text-body-md">
+                                        Analyze the recent interactions with Acme Corp and draft a follow-up email focusing on their enterprise security concerns.
+                                    </div>
+<img alt="User" class="w-8 h-8 rounded-full flex-shrink-0" data-alt="A professional headshot of a business executive in a modern office setting. Soft, natural lighting. The person is wearing a tailored grey suit. High-end corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCoakUwTsCzseYLktX0wlQ1htVtwFPL7bI1BVkLxqTGmtW-A56b2eAwuAKjqD2y_bmBqIj3K29OnOGUg3-oBCnfgnR8DmHXHCq4wHjrUISDCiBALh8Tfi3hnGDvB38NDdq949TUk-zNg5VA_lMXifBwgygJJf2_Bo4Sd8YbopGbZTcT_toJJ6gNrFPmOhOyI4wo7sk5DELPTp737jS2EUAupD-daIkLVpprgb0H397SG0iHoSBc5Mfw"/>
+</div>
+<!-- AI Response (Drafting) -->
+<div class="flex gap-3 max-w-[90%]">
+<div class="bg-secondary/10 p-2 rounded-lg h-8 w-8 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-secondary text-sm">smart_toy</span>
+</div>
+<div class="bg-white border border-outline-variant/30 px-4 py-3 rounded-2xl rounded-tl-sm text-on-surface font-body-md text-body-md shadow-sm w-full">
+<p class="mb-3">I've analyzed the last 3 call transcripts. Security compliance (SOC2) and data residency were mentioned 7 times. Here is a proposed draft:</p>
+<div class="bg-surface-container-low p-3 rounded border border-outline-variant/20 font-body-md text-body-md text-on-surface-variant mb-3 italic">
+                                            "Hi Sarah, following up on our discussion regarding Acme's security architecture. I've compiled a detailed brief on how our infrastructure meets SOC2 Type II requirements and handles regional data residency..."
+                                        </div>
+<!-- Review Status UI -->
+<div class="flex items-center justify-between border-t border-outline-variant/20 pt-3 mt-2">
+<div class="flex items-center gap-4">
+<span class="flex items-center gap-1 font-label-md text-label-md text-green-700 bg-green-50 px-2 py-1 rounded">
+<span class="material-symbols-outlined text-sm">verified</span>
+                                                    92% Confidence
+                                                </span>
+<span class="font-label-md text-label-md text-amber-600 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">pending_actions</span>
+                                                    Human Review Required
+                                                </span>
+</div>
+<div class="flex gap-2">
+<button class="px-3 py-1.5 rounded text-error hover:bg-error/10 font-label-md text-label-md transition-colors">Reject</button>
+<button class="px-3 py-1.5 rounded border border-outline-variant/50 hover:bg-surface-container font-label-md text-label-md transition-colors">Edit</button>
+<button class="px-3 py-1.5 rounded bg-secondary text-on-secondary hover:bg-secondary/90 font-label-md text-label-md transition-colors shadow-sm">Approve &amp; Send</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Skeleton Loading State Example -->
+<div class="flex gap-3 max-w-[80%] mt-2 opacity-60">
+<div class="bg-secondary/10 p-2 rounded-lg h-8 w-8 flex items-center justify-center flex-shrink-0 skeleton">
+<span class="material-symbols-outlined text-secondary text-sm">smart_toy</span>
+</div>
+<div class="bg-white border border-outline-variant/30 p-4 rounded-2xl rounded-tl-sm w-full">
+<div class="flex items-center gap-2 mb-3">
+<span class="w-2 h-2 bg-secondary rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+<span class="w-2 h-2 bg-secondary rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+<span class="w-2 h-2 bg-secondary rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+<span class="font-code-sm text-code-sm text-on-surface-variant ml-2">Generating insights...</span>
+</div>
+<div class="h-3 bg-surface-container rounded skeleton w-3/4 mb-2"></div>
+<div class="h-3 bg-surface-container rounded skeleton w-1/2"></div>
+</div>
+</div>
+</div>
+<!-- Input Area -->
+<div class="relative">
+<textarea class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg py-3 pl-4 pr-12 focus:ring-2 focus:ring-secondary focus:border-secondary transition-all font-body-md text-body-md resize-none shadow-sm" placeholder="Instruct the AI or ask a question about your business data..." rows="2"></textarea>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 bg-secondary text-on-secondary p-1.5 rounded-md hover:bg-secondary/90 transition-colors">
+<span class="material-symbols-outlined text-sm">send</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Right Column: Sidebar (4 cols) -->
+<div class="md:col-span-4 flex flex-col gap-6">
+<!-- Quick Actions -->
+<div class="bento-card">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-4">Quick Actions</h3>
+<div class="flex flex-col gap-2">
+<button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg border border-outline-variant/30 hover:bg-surface-container hover:border-secondary/30 transition-all text-left group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary transition-colors">person_search</span>
+<div>
+<div class="font-title-md text-title-md text-on-surface">Analyze Lead</div>
+<div class="font-code-sm text-code-sm text-on-surface-variant">Run enrichment &amp; scoring</div>
+</div>
+</button>
+<button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg border border-outline-variant/30 hover:bg-surface-container hover:border-secondary/30 transition-all text-left group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary transition-colors">edit_document</span>
+<div>
+<div class="font-title-md text-title-md text-on-surface">Generate Proposal</div>
+<div class="font-code-sm text-code-sm text-on-surface-variant">Draft from templates</div>
+</div>
+</button>
+<button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg border border-outline-variant/30 hover:bg-surface-container hover:border-secondary/30 transition-all text-left group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary transition-colors">query_stats</span>
+<div>
+<div class="font-title-md text-title-md text-on-surface">Business Review</div>
+<div class="font-code-sm text-code-sm text-on-surface-variant">Scan metrics for risks</div>
+</div>
+</button>
+</div>
+</div>
+<!-- Recent Activities Timeline -->
+<div class="bento-card flex-1">
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-title-lg text-title-lg text-on-surface">Activity Log</h3>
+<span class="material-symbols-outlined text-on-surface-variant text-sm cursor-pointer hover:text-on-surface">filter_list</span>
+</div>
+<div class="relative border-l border-outline-variant/30 ml-3 pl-4 flex flex-col gap-5">
+<div class="relative">
+<div class="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-secondary ring-4 ring-white"></div>
+<p class="font-title-md text-title-md text-on-surface">Proposal Drafted</p>
+<p class="font-body-md text-body-md text-on-surface-variant mb-1">Globex Corp Q4 Contract</p>
+<p class="font-code-sm text-code-sm text-on-surface-variant">10 mins ago • Proposal Agent</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-green-500 ring-4 ring-white"></div>
+<p class="font-title-md text-title-md text-on-surface">12 Leads Enriched</p>
+<p class="font-body-md text-body-md text-on-surface-variant mb-1">Website inbound campaign</p>
+<p class="font-code-sm text-code-sm text-on-surface-variant">45 mins ago • Lead Agent</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-error ring-4 ring-white"></div>
+<p class="font-title-md text-title-md text-error">API Sync Failed</p>
+<p class="font-body-md text-body-md text-on-surface-variant mb-1">CRM data fetch timeout</p>
+<p class="font-code-sm text-code-sm text-on-surface-variant">2 hrs ago • System</p>
+</div>
+<!-- Empty State Example (Hidden by default, shown for structure) -->
+<div class="hidden flex-col items-center justify-center py-8 text-center">
+<span class="material-symbols-outlined text-4xl text-outline-variant mb-2">history</span>
+<p class="font-title-md text-title-md text-on-surface">No recent activity</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Agents are currently standing by.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom padding -->
+<div class="h-8"></div>
+</div>
+</div>
+</main>
+</body></html>

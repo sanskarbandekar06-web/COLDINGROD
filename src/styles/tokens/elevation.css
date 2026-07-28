@@ -1,0 +1,33 @@
+/* ============================================
+ * COLDINGROD DESIGN SYSTEM — ELEVATION TOKENS
+ * Spatial UI: 4-layer depth hierarchy
+ * Source: Stitch .bento-card, .subtle-shadow, .glass-panel
+ * ============================================ */
+
+:root {
+  /* Layer 1: Bento Cards */
+  --shadow-card:     0 4px 6px -1px rgba(0, 0, 0, 0.02),
+                     0 2px 4px -1px rgba(0, 0, 0, 0.02);
+
+  --shadow-subtle:   0 4px 20px -4px rgba(11, 28, 48, 0.05);
+
+  /* Layer 2: Floating UI */
+  --shadow-float:    0 10px 15px -3px rgba(15, 23, 42, 0.1),
+                     0 4px 6px -2px rgba(15, 23, 42, 0.05);
+
+  /* Layer 3: Overlays (Modals, Drawers) */
+  --shadow-overlay:  0 25px 50px -12px rgba(15, 23, 42, 0.25);
+
+  /* Glassmorphism */
+  --glass-bg:            rgba(255, 255, 255, 0.8);
+  --glass-blur:          12px;
+  --glass-border:        rgba(226, 232, 240, 0.5);
+  --glass-topbar-bg:     rgba(248, 249, 255, 0.8);
+  --glass-topbar-blur:   24px;
+
+  /* Overlay dimming */
+  --overlay-dim:         rgba(15, 23, 42, 0.4);
+
+  /* AI glow */
+  --shadow-ai-glow:      inset 0 0 20px rgba(75, 65, 225, 0.05);
+}
