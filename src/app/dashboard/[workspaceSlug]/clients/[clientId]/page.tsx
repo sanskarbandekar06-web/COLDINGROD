@@ -1,68 +1,65 @@
-import { getWorkspaceContext } from '@/services/workspace.service';
-import { getClientDetails } from '@/services/client.service';
-import { getClientActivities } from '@/services/client-activity.service';
-import { getClientProjects } from '@/services/client-project.service';
-import { getClientMeetings } from '@/services/meeting.service';
-import { getEntityAssets } from '@/services/asset.service';
 import { notFound } from 'next/navigation';
-import { ClientHealthCard } from '@/components/clients/ClientHealthCard';
-import { ClientTimeline } from '@/components/clients/ClientTimeline';
-import { ClientNotes } from '@/components/clients/ClientNotes';
-import { ProjectListMini } from '@/components/projects/ProjectListMini';
-import { MeetingListMini } from '@/components/meetings/MeetingListMini';
 import { AssetListMini } from '@/components/assets/AssetListMini';
 import { ClientHeader } from '@/components/clients/ClientHeader';
+import { ClientHealthCard } from '@/components/clients/ClientHealthCard';
+import { ClientNotes } from '@/components/clients/ClientNotes';
+import { ClientTimeline } from '@/components/clients/ClientTimeline';
+import { MeetingListMini } from '@/components/meetings/MeetingListMini';
+import { ProjectListMini } from '@/components/projects/ProjectListMini';
+import { getEntityAssets } from '@/services/asset.service';
+import { getClientActivities } from '@/services/client-activity.service';
+import { getClientProjects } from '@/services/client-project.service';
+import { getClientDetails } from '@/services/client.service';
+import { getClientMeetings } from '@/services/meeting.service';
+import { getWorkspaceContext } from '@/services/workspace.service';
 
 export default async function ClientProfilePage({
   params,
 }: {
-  params: { workspaceSlug: string; clientId: string };
+  params: Promise<{ workspaceSlug: string; clientId: string }>;
 }) {
-  const context = await getWorkspaceContext(params.workspaceSlug);
+  const { workspaceSlug, clientId } = await params;
+  const context = await getWorkspaceContext(workspaceSlug);
   const workspace = context?.workspace;
-  
-  if (!workspace) {
-    notFound();
-  }
+  if (!workspace) notFound();
 
   const [client, activities, projects, meetings, assets] = await Promise.all([
-    getClientDetails(workspace.id, params.clientId),
-    getClientActivities(workspace.id, params.clientId),
-    getClientProjects(workspace.id, params.clientId),
-    getClientMeetings(workspace.id, params.clientId),
-    getEntityAssets(workspace.id, 'client', params.clientId),
+    getClientDetails(workspace.id, clientId),
+    getClientActivities(workspace.id, clientId),
+    getClientProjects(workspace.id, clientId),
+    getClientMeetings(workspace.id, clientId),
+    getEntityAssets(workspace.id, 'client', clientId),
   ]);
+  if (!client) notFound();
 
-  if (!client) {
-    notFound();
-  }
-
-  const notes = activities.filter(a => a.action === 'note');
-  const timelineActivities = activities.filter(a => a.action !== 'note');
+  const notes = activities.filter((activity) => activity.action === 'note');
+  const timelineActivities = activities.filter(
+    (activity) => activity.action !== 'note',
+  );
 
   return (
     <div className="flex-1 space-y-6 p-8 pt-6">
       <ClientHeader client={client} workspaceId={workspace.id} />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 space-y-6">
-          <ClientHealthCard 
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="space-y-6 md:col-span-2">
+          <ClientHealthCard
             projects={projects}
             meetings={meetings}
             activities={timelineActivities}
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <ProjectListMini projects={projects} workspaceId={workspace.id} />
             <MeetingListMini meetings={meetings} workspaceId={workspace.id} />
           </div>
 
-          <AssetListMini assets={assets} workspaceId={workspace.id} />
-          
-          <ClientNotes 
-            notes={notes} 
-            workspaceId={workspace.id} 
-            clientId={client.id} 
+          <AssetListMini assets={assets} workspaceSlug={workspaceSlug} />
+
+          <ClientNotes
+            notes={notes}
+            workspaceId={workspace.id}
+            clientId={client.id}
           />
         </div>
 
