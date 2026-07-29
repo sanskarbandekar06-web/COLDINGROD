@@ -1,9 +1,13 @@
 import React from 'react';
-import { notFound, redirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { AppSidebar } from '@/components/layout/AppSidebar';
 import { Topbar } from '@/components/layout/Topbar';
-import { getWorkspaceContext, getUserWorkspaces } from '@/services/workspace.service';
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { getNotificationSummary } from '@/services/notification.service';
+import {
+  getUserWorkspaces,
+  getWorkspaceContext,
+} from '@/services/workspace.service';
 
 export default async function DashboardWorkspaceLayout(props: {
   children: React.ReactNode;
@@ -12,22 +16,31 @@ export default async function DashboardWorkspaceLayout(props: {
   const params = await props.params;
   const context = await getWorkspaceContext(params.workspaceSlug);
 
-  if (!context) {
-    // This catches either a missing workspace or missing membership (404/unauthorized)
-    redirect('/dashboard');
-  }
+  if (!context) redirect('/dashboard');
 
-  const { workspace } = context;
-
-  // We fetch all workspaces for the switcher
-  const workspaces = await getUserWorkspaces();
+  const [workspaces, notificationSummary] = await Promise.all([
+    getUserWorkspaces(),
+    getNotificationSummary(
+      context.workspace.id,
+      context.member.id,
+      context.user.id,
+    ),
+  ]);
 
   return (
     <SidebarProvider>
-      <AppSidebar workspaces={workspaces} activeWorkspace={workspace} permissions={context.permissions} />
+      <AppSidebar
+        workspaces={workspaces}
+        activeWorkspace={context.workspace}
+        permissions={context.permissions}
+      />
       <SidebarInset>
-        <Topbar activeWorkspace={workspace} />
-        <main className="flex flex-1 flex-col overflow-y-auto p-4 sm:p-6 lg:p-8 bg-background">
+        <Topbar
+          activeWorkspace={context.workspace}
+          memberId={context.member.id}
+          notificationSummary={notificationSummary}
+        />
+        <main className="flex flex-1 flex-col overflow-y-auto bg-background p-4 sm:p-6 lg:p-8">
           {props.children}
         </main>
       </SidebarInset>

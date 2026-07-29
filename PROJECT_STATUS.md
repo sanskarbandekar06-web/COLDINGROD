@@ -6,94 +6,81 @@ Primary implementation workspace: `C:\Users\SANSKAR\COLDINGROD IMPLEMENTATION\co
 
 ## Current phase
 
-Phase 2.8 is approved: the real browser signup, email confirmation, login, and authenticated dashboard smoke test passed.
+Phase 2.10 (Activity Center and Notifications) is implemented, deployed to the linked Supabase project, and validated. Phase 2 is now complete.
 
-Phase 2.9 (Assets and File Manager) is implemented and validated. The linked Supabase database is migrated through `010`, both rollback-only acceptance suites pass, and the complete signed-in file lifecycle passed in the browser.
-
-The next roadmap phase is Phase 2.10 (Activity Center and Notifications).
+The next roadmap phase is Phase 3: AI Automation and Lead Discovery.
 
 ## Progress estimate
 
 | Scope | Complete | Remaining |
 | --- | ---: | ---: |
 | Phase 1 | 100% | 0% |
-| Phase 2.1–2.8 | 100% | 0% |
-| Phase 2.9 Assets and File Manager | 100% | 0% |
-| Phase 2 overall | approximately 92% | approximately 8% |
-| Full currently discussed product plan | approximately 72% | approximately 28% |
+| Phase 2.1–2.9 | 100% | 0% |
+| Phase 2.10 Activity Center and Notifications | 100% | 0% |
+| Phase 2 overall | 100% | 0% |
+| Full currently discussed product plan | approximately 75% | approximately 25% |
 
-These are planning estimates. Phase 2.10 is now the main remaining portion of Phase 2.
+These percentages are planning estimates. The remaining Phase 3 AI work, Phase 4 integrations, and Phase 5 production release are fewer roadmap phases but include substantial external-service and release work.
 
-## Phase 2.9 delivered
+## Phase 2.10 delivered
 
-- Private `workspace-assets` Supabase Storage bucket with a 25 MB per-file limit and an allowed MIME-type list.
-- Workspace-isolated Storage SELECT, INSERT, UPDATE, and DELETE RLS policies.
-- Storage paths scoped as `workspace-id/user-id/unique-file-name`.
-- Asset metadata now includes upload source and automatic `updated_at`.
-- Manager-only upload, rename, archive, restore, and permanent deletion.
-- Active members can browse and download active workspace files; outsiders cannot access metadata or objects.
-- Archived metadata and objects are manager-only.
-- Multi-file drag/drop and native browse upload, up to 10 files per batch.
-- Search, source and type filters, pagination, statistics, active/archive views, and empty states.
-- Client/lead/project relation validation for related uploads.
-- A short-lived signed download route for the private bucket.
-- Permanent deletion removes both the Storage object and metadata row.
-- The dashboard now loads both Tailwind/shadcn utilities and the Stitch design tokens in correct cascade layers. This fixes the previously unstyled login/dashboard/modal UI.
+- Workspace Activity Center with all/unread tabs, entity and actor filters, pagination, statistics, and responsive empty states.
+- Topbar notification bell with live unread count, six recent notifications, mark-all-read, and links to the related entity or Activity Center.
+- Individual read/unread controls and a workspace-wide mark-all-read action for the signed-in member.
+- Realtime refresh for the current member's notification stream.
+- One private notification row per activity and active workspace member, including existing-activity backfill without an old unread-notification flood.
+- Database indexes for member, recent, and unread notification queries.
+- Row Level Security that limits members to their own notifications.
+- Column-level database grants that allow authenticated clients to update only `is_read` and `read_at`.
+- Hardened activity creation that prevents actor spoofing, AI-agent impersonation, and cross-workspace membership references.
+- Automatic trigger-based notification delivery for new activity events.
+- Activity navigation added to the workspace sidebar.
 
-## Verified locally
+## Verified locally and in the browser
 
 - `.env.local` is configured and ignored by Git.
 - `npx tsc --noEmit` passes.
-- Phase 2.9 changed files pass targeted ESLint with zero findings.
-- Production build passes on Next.js `16.2.12`.
-- The local app renders the Stitch palette/typography with functional Tailwind/shadcn layouts and overlays.
-- GitHub `main` tracks the local repository and contains no recognized secrets.
-- Supabase CLI is authenticated, initialized, and linked to project `mspfxgxduehikohdsomg`.
-- The Stitch reference package remains under `design-references/stitch/`.
+- Phase 2.10 changed files pass targeted ESLint with zero findings.
+- Production build passes on Next.js `16.2.12`; the Activity Center route is included in the production route list.
+- A signed-in desktop lifecycle passed: open the bell, navigate to Activity Center, mark one unread, filter unread, mark all read, and filter by entity.
+- The same page was checked at a 390 x 844 mobile viewport with no horizontal overflow.
+- A fresh browser tab produced zero application errors or warnings.
+- The temporary local development server was stopped after testing.
 
 ## Hosted database verification
 
-- Local and remote migration histories match through `010`.
-- All 24 public tables exist with the existing 90 public RLS policies.
-- One private asset bucket and four asset Storage policies are installed.
-- The hosted database has 12 public functions, including the safe Storage workspace-path helper.
-- The Phase 2.8 regression suite still passes after the asset migrations.
-- The Phase 2.9 suite passes and rolls back every synthetic user, asset, and Storage row.
-- The real browser test left zero generated asset rows and zero generated Storage objects.
-- The Docker warning affects only local migration-catalog caching, not hosted deployment or verification.
+- Local and remote migration histories match through `012`.
+- `011_activity_center_notifications.sql` installs the notification table, indexes, RLS, activity hardening, delivery trigger, backfill, and Realtime publication.
+- `012_notification_column_grants.sql` removes inherited broad table access and grants authenticated users only SELECT plus read-state column updates.
+- The rollback-only Phase 2.10 notification acceptance suite passes.
+- The Phase 2.8 authorization regression suite still passes.
+- The Phase 2.9 asset regression suite still passes.
+- Final real-data inventory: 6 activities, 6 backfilled notifications, 0 unread notifications, 2 notification policies, and 1 Realtime publication entry.
+- All synthetic test users and test rows were rolled back; none remain.
 
-## Phase 2.9 acceptance coverage
+## Phase 2.10 acceptance coverage
 
-`supabase/tests/phase_2_9_assets_acceptance.sql` covers:
+`supabase/tests/phase_2_10_notifications_acceptance.sql` covers:
 
-- Private bucket configuration and 25 MB file-size enforcement.
-- Storage workspace path parsing and invalid-path rejection.
-- All four Storage object policies.
-- Manager metadata creation and private object access.
-- Read-only access for a limited active member.
-- Upload and metadata write denial without `manage_assets`.
-- Complete outsider isolation.
-- Manager-only archived metadata and object visibility.
+- Notification table constraints, indexes, RLS policies, grants, and Realtime configuration.
+- Automatic delivery to every active workspace member after a valid activity event.
+- Complete isolation from outsiders and inactive members.
+- Per-member read-state updates and denial of notification relinking or protected-column changes.
+- Denial of client insert/delete operations.
+- Denial of actor spoofing, AI-agent impersonation, and cross-workspace membership references.
+- Rollback of all synthetic acceptance-test data.
 
-The signed-in browser lifecycle additionally passed:
+## TypeScript approach
 
-1. Upload a generated private text file.
-2. Create and display its metadata.
-3. Download it through a 60-second signed URL.
-4. Rename it.
-5. Archive it.
-6. Verify the archived manager view.
-7. Restore it.
-8. Archive and permanently delete it.
-9. Confirm zero test metadata and Storage rows remain.
+The project keeps TypeScript where it protects database and UI contracts, but Phase 2.10 avoids unnecessary type-heavy architecture. Shared notification shapes are centralized, and ordinary implementation details rely on inference. Converting core Next.js files to JavaScript now would increase regression risk without changing the agreed functionality or design.
 
 ## Known follow-up work
 
-- Full-repository ESLint now runs, but reports 61 pre-existing errors and 43 warnings outside the Phase 2.9 files. Most are old explicit `any` types, unused imports, and React hook-rule findings.
-- `npm audit --omit=dev` still reports transitive advisories in Next-bundled `postcss`/`sharp` and CLI-oriented dependencies. Next was upgraded from `16.2.10` to `16.2.12`, removing the direct framework advisories. Remaining transitive upgrades should be handled separately and regression-tested.
-- Next.js still emits the non-blocking warning that the `middleware` convention is deprecated in favor of `proxy`.
-- Supabase performance-advisor RLS optimization recommendations remain performance work, not failed authorization checks.
+- Full-repository ESLint has a pre-existing backlog outside the Phase 2.10 files, mainly old explicit `any` types, unused imports, and React hook-rule findings. New Phase 2.10 files are clean under targeted linting.
+- `npm audit --omit=dev` still reports transitive advisories in Next-bundled and CLI-oriented dependencies; these should be upgraded separately with regression testing.
+- Next.js emits the non-blocking warning that the `middleware` convention is deprecated in favor of `proxy`.
+- Supabase performance-advisor RLS recommendations remain optimization work, not failed authorization checks.
 
 ## Next work
 
-Begin Phase 2.10: Activity Center and Notifications. Start by auditing the existing `activities` table, notification button shell, activity triggers, permission model, and the agreed ChatGPT project plan before implementing the notification inbox and read/unread workflow.
+Begin Phase 3: AI Automation and Lead Discovery. The remaining high-level roadmap after that is Phase 4 integrations, including Google Maps/Places, followed by Phase 5 production hardening and release.

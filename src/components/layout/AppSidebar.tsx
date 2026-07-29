@@ -35,7 +35,8 @@ import {
   Cpu,
   ClipboardCheck,
   History,
-  Send
+  Send,
+  BellRing
 } from 'lucide-react';
 import { Workspace } from '@/types/workspace';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher';
@@ -66,6 +67,7 @@ export function AppSidebar({ workspaces, activeWorkspace, permissions }: AppSide
     { name: 'Tasks', href: `${basePath}/tasks`, icon: CheckSquare },
     { name: 'Meetings', href: `${basePath}/meetings`, icon: CalendarDays },
     { name: 'Assets', href: `${basePath}/assets`, icon: FileBox },
+    { name: 'Activity', href: `${basePath}/activity`, icon: BellRing },
     { name: 'Integrations', href: `${basePath}/integrations`, icon: Blocks },
   ];
 
