@@ -13,13 +13,21 @@ import {
   DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
 import { EditLeadModal } from './EditLeadModal';
+import type { LeadStatus } from '@/types/lead';
 
 export function LeadActionsMenu({
   lead,
-  workspaceId
+  workspaceId,
+  workspaceSlug,
 }: {
-  lead: any;
+  lead: {
+    id: string;
+    company_name: string;
+    source: string | null;
+    status: LeadStatus;
+  };
   workspaceId: string;
+  workspaceSlug: string;
 }) {
   const [isPending, startTransition] = useTransition();
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -29,7 +37,7 @@ export function LeadActionsMenu({
     if (!confirm('Are you sure you want to delete this lead? It will be moved to trash.')) return;
     startTransition(async () => {
       await deleteLead(workspaceId, lead.id);
-      router.push(`/dashboard/${workspaceId}/leads`);
+      router.push(`/dashboard/${workspaceSlug}/leads`);
     });
   };
 
@@ -43,11 +51,18 @@ export function LeadActionsMenu({
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger>
-          <Button variant="outline" size="icon" disabled={isPending}>
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
+        <DropdownMenuTrigger
+          render={
+            <Button
+              variant="outline"
+              size="icon"
+              disabled={isPending}
+              aria-label="Lead actions"
+            >
+              <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
+            </Button>
+          }
+        />
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={() => setIsEditOpen(true)} className="cursor-pointer">
             <Pencil className="mr-2 h-4 w-4" />

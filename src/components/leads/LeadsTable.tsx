@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Lead } from '@/types/lead';
+import type { LeadListItem } from '@/types/lead';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,10 +14,11 @@ import { CreateLeadModal } from './CreateLeadModal';
 import { LeadDrawer } from './LeadDrawer';
 
 interface LeadsTableProps {
-  leads: any[]; // The formatted type from our service
+  leads: LeadListItem[];
   totalPages: number;
   currentPage: number;
   workspaceId: string;
+  workspaceSlug: string;
 }
 
 const statusColors: Record<string, string> = {
@@ -30,7 +31,7 @@ const statusColors: Record<string, string> = {
   lost: 'bg-rose-100 text-rose-800 border-rose-200',
 };
 
-export function LeadsTable({ leads, totalPages, currentPage, workspaceId }: LeadsTableProps) {
+export function LeadsTable({ leads, totalPages, currentPage, workspaceId, workspaceSlug }: LeadsTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentSearch = searchParams.get('search') || '';
@@ -193,6 +194,7 @@ export function LeadsTable({ leads, totalPages, currentPage, workspaceId }: Lead
         isOpen={drawerLeadId !== null}
         onClose={() => setDrawerLeadId(null)}
         workspaceId={workspaceId}
+        workspaceSlug={workspaceSlug}
         leadId={drawerLeadId}
       />
     </div>

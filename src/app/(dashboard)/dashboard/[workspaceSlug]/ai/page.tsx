@@ -1,10 +1,10 @@
 import { getWorkspaceContext } from '@/services/workspace.service';
 import { getAiOverviewStats } from '@/services/ai-action.service';
 import { getAiActions } from '@/services/ai-action.service';
-import { notFound, redirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Bot, Clock, CheckCircle, XCircle, Loader2, AlertTriangle, Activity, Users } from 'lucide-react';
+import { Activity, AlertTriangle, ArrowRight, Bot, CheckCircle, Clock, Loader2, Sparkles, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
 
 export const metadata: Metadata = {
@@ -15,9 +15,10 @@ export const metadata: Metadata = {
 export default async function AiOverviewPage({
   params,
 }: {
-  params: { workspaceSlug: string };
+  params: Promise<{ workspaceSlug: string }>;
 }) {
-  const context = await getWorkspaceContext(params.workspaceSlug);
+  const { workspaceSlug } = await params;
+  const context = await getWorkspaceContext(workspaceSlug);
   if (!context) redirect('/dashboard');
 
   const hasAiPerm = context.permissions.includes('manage_ai');
@@ -32,7 +33,7 @@ export default async function AiOverviewPage({
       label: 'Registered Agents',
       value: stats.totalAgents,
       icon: Bot,
-      href: `./ai/agents`,
+      href: `/dashboard/${workspaceSlug}/ai/agents`,
       description: 'System and workspace agents',
       color: 'text-blue-500',
       bg: 'bg-blue-50 dark:bg-blue-950/30',
@@ -41,7 +42,7 @@ export default async function AiOverviewPage({
       label: 'Pending Approvals',
       value: stats.pendingApprovals,
       icon: Clock,
-      href: `./ai/approvals`,
+      href: `/dashboard/${workspaceSlug}/ai/approvals`,
       description: 'Awaiting human review',
       color: 'text-amber-500',
       bg: 'bg-amber-50 dark:bg-amber-950/30',
@@ -51,7 +52,7 @@ export default async function AiOverviewPage({
       label: 'Approved (all time)',
       value: stats.approvedActions,
       icon: CheckCircle,
-      href: `./ai/actions?status=approved`,
+      href: `/dashboard/${workspaceSlug}/ai/actions?status=approved`,
       description: 'Actions approved by reviewers',
       color: 'text-emerald-500',
       bg: 'bg-emerald-50 dark:bg-emerald-950/30',
@@ -60,7 +61,7 @@ export default async function AiOverviewPage({
       label: 'Rejected (all time)',
       value: stats.rejectedActions,
       icon: XCircle,
-      href: `./ai/actions?status=rejected`,
+      href: `/dashboard/${workspaceSlug}/ai/actions?status=rejected`,
       description: 'Actions rejected by reviewers',
       color: 'text-rose-500',
       bg: 'bg-rose-50 dark:bg-rose-950/30',
@@ -69,7 +70,7 @@ export default async function AiOverviewPage({
       label: 'Currently Executing',
       value: stats.executingActions,
       icon: Loader2,
-      href: `./ai/actions?status=executing`,
+      href: `/dashboard/${workspaceSlug}/ai/actions?status=executing`,
       description: 'Actions in progress now',
       color: 'text-purple-500',
       bg: 'bg-purple-50 dark:bg-purple-950/30',
@@ -78,7 +79,7 @@ export default async function AiOverviewPage({
       label: 'Completed (30d)',
       value: stats.completedLast30Days,
       icon: Activity,
-      href: `./ai/actions?status=completed`,
+      href: `/dashboard/${workspaceSlug}/ai/actions?status=completed`,
       description: 'Completed in last 30 days',
       color: 'text-teal-500',
       bg: 'bg-teal-50 dark:bg-teal-950/30',
@@ -87,7 +88,7 @@ export default async function AiOverviewPage({
       label: 'Failed Actions',
       value: stats.failedActions,
       icon: AlertTriangle,
-      href: `./ai/actions?status=failed`,
+      href: `/dashboard/${workspaceSlug}/ai/actions?status=failed`,
       description: 'Actions that encountered errors',
       color: 'text-orange-500',
       bg: 'bg-orange-50 dark:bg-orange-950/30',
@@ -95,7 +96,7 @@ export default async function AiOverviewPage({
   ];
 
   return (
-    <div className="flex-1 space-y-6 p-8 pt-6">
+    <div className="flex-1 space-y-6 p-4 sm:p-6 lg:p-8 lg:pt-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">AI Center</h2>
@@ -113,6 +114,33 @@ export default async function AiOverviewPage({
           permission to approve or reject AI actions.
         </div>
       )}
+
+      <section className="overflow-hidden rounded-xl border border-secondary/25 bg-gradient-to-br from-secondary/10 via-background to-primary/5 p-5 shadow-sm sm:p-6">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 gap-4">
+            <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-secondary text-on-secondary shadow-sm">
+              <Sparkles className="size-5" aria-hidden="true" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-secondary">
+                Phase 3 active
+              </p>
+              <h3 className="mt-1 text-lg font-semibold">Lead Qualification Agent</h3>
+              <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+                Score an existing lead from observed website, social, reputation,
+                conversion, and SEO signals with a complete audit trail.
+              </p>
+            </div>
+          </div>
+          <Link
+            href={`/dashboard/${workspaceSlug}/leads`}
+            className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-lg bg-secondary px-4 py-2 text-sm font-medium text-on-secondary shadow-sm transition-colors hover:bg-secondary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
+          >
+            Choose a lead
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+        </div>
+      </section>
 
       {/* Stats grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -136,7 +164,7 @@ export default async function AiOverviewPage({
                 )}
               </div>
               <div className={`rounded-lg p-2.5 ${card.bg}`}>
-                <card.icon className={`h-5 w-5 ${card.color}`} />
+                <card.icon className={`h-5 w-5 ${card.color}`} aria-hidden="true" />
               </div>
             </div>
           </Link>
@@ -145,13 +173,13 @@ export default async function AiOverviewPage({
 
       {/* Recent actions */}
       <div className="rounded-lg border bg-card">
-        <div className="flex items-center justify-between p-5 border-b">
+        <div className="flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
           <div>
             <h3 className="font-semibold">Recent AI Actions</h3>
             <p className="text-sm text-muted-foreground">Last 5 actions across all agents</p>
           </div>
           <Link
-            href={`./ai/actions`}
+            href={`/dashboard/${workspaceSlug}/ai/actions`}
             className="text-sm text-primary hover:underline"
           >
             View all →
@@ -163,8 +191,8 @@ export default async function AiOverviewPage({
               No AI actions recorded yet.
             </div>
           ) : (
-            recentActions.data.map((action: any) => (
-              <div key={action.id} className="flex items-center justify-between p-4 hover:bg-muted/30">
+            recentActions.data.map((action) => (
+              <div key={action.id} className="flex flex-col gap-3 p-4 hover:bg-muted/30 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
                   <div>
@@ -174,7 +202,7 @@ export default async function AiOverviewPage({
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3 sm:justify-end">
                   <span className={`text-xs px-2 py-1 rounded-full font-medium capitalize ${
                     action.status === 'pending_approval' ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400' :
                     action.status === 'approved' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400' :
@@ -198,9 +226,9 @@ export default async function AiOverviewPage({
       {/* Quick navigation */}
       <div className="grid gap-4 sm:grid-cols-3">
         {[
-          { label: 'Agent Registry', desc: 'View all registered AI agents', href: './ai/agents', icon: Bot },
-          { label: 'Approval Queue', desc: 'Review pending AI actions', href: './ai/approvals', icon: Clock },
-          { label: 'Action History', desc: 'Browse all AI action records', href: './ai/actions', icon: Activity },
+          { label: 'Agent Registry', desc: 'View all registered AI agents', href: `/dashboard/${workspaceSlug}/ai/agents`, icon: Bot },
+          { label: 'Approval Queue', desc: 'Review pending AI actions', href: `/dashboard/${workspaceSlug}/ai/approvals`, icon: Clock },
+          { label: 'Action History', desc: 'Browse all AI action records', href: `/dashboard/${workspaceSlug}/ai/actions`, icon: Activity },
         ].map((item) => (
           <Link
             key={item.label}
@@ -208,7 +236,7 @@ export default async function AiOverviewPage({
             className="flex items-center gap-4 rounded-lg border bg-card p-4 hover:bg-muted/30 transition-colors"
           >
             <div className="rounded-lg bg-primary/10 p-2.5">
-              <item.icon className="h-5 w-5 text-primary" />
+              <item.icon className="h-5 w-5 text-primary" aria-hidden="true" />
             </div>
             <div>
               <p className="font-medium text-sm">{item.label}</p>

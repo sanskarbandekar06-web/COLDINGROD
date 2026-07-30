@@ -1,3 +1,5 @@
+import 'server-only';
+
 import { createClient } from '@/lib/supabase/server';
 import { AiAction, AiActionStatus } from '@/types/ai';
 import { cache } from 'react';
@@ -15,12 +17,13 @@ export interface GetActionsParams {
   sortOrder?: 'asc' | 'desc';
 }
 
+type AiActionListRow = AiAction & {
+  agent?: { name: string } | null;
+  creator?: { full_name: string | null } | null;
+};
+
 export interface PaginatedActions {
-  data: (AiAction & {
-    agent?: { name: string } | null;
-    creator?: { full_name: string | null } | null;
-    payloadSummary: string;
-  })[];
+  data: (AiActionListRow & { payloadSummary: string })[];
   count: number;
   page: number;
   limit: number;
@@ -70,7 +73,7 @@ export const getAiActions = cache(async (params: GetActionsParams): Promise<Pagi
   }
 
   return {
-    data: (data as AiAction[]).map((action: any) => ({
+    data: (data as unknown as AiActionListRow[]).map((action) => ({
       ...action,
       // Never send raw payload to list views — use summary only
       payloadSummary: extractPayloadSummary(action.payload),

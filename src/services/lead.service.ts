@@ -1,5 +1,7 @@
+import 'server-only';
+
 import { createClient } from '@/lib/supabase/server';
-import { Lead, LeadStatus } from '@/types/lead';
+import type { Lead, LeadAssignedUser, LeadListItem, LeadStatus } from '@/types/lead';
 import { cache } from 'react';
 
 export interface GetLeadsParams {
@@ -15,14 +17,20 @@ export interface GetLeadsParams {
 }
 
 export interface PaginatedLeads {
-  data: (Lead & { 
-    assigned_user?: { full_name: string; email: string; avatar_url: string | null };
-    score?: { score: number };
-  })[];
+  data: LeadListItem[];
   count: number;
   page: number;
   limit: number;
   totalPages: number;
+}
+
+interface LeadQueryRow extends Lead {
+  assigned_user: LeadAssignedUser | LeadAssignedUser[] | null;
+  lead_scores: { score: number }[] | null;
+}
+
+function relationOne<T>(value: T | T[] | null): T | null {
+  return Array.isArray(value) ? value[0] ?? null : value;
 }
 
 export const getLeads = cache(async (params: GetLeadsParams): Promise<PaginatedLeads> => {
@@ -77,14 +85,16 @@ export const getLeads = cache(async (params: GetLeadsParams): Promise<PaginatedL
     throw new Error('Failed to fetch leads');
   }
 
-  // Format the score relation
-  const formattedData = (data as any[]).map(d => ({
-    ...d,
-    score: d.lead_scores && d.lead_scores.length > 0 ? d.lead_scores[0] : undefined
-  }));
+  const formattedData: LeadListItem[] = (data as unknown as LeadQueryRow[]).map(
+    ({ assigned_user: assignedUserRelation, lead_scores: scores, ...lead }) => ({
+      ...lead,
+      assigned_user: relationOne(assignedUserRelation) ?? undefined,
+      score: scores?.[0],
+    }),
+  );
 
   return {
-    data: formattedData as any,
+    data: formattedData,
     count: count || 0,
     page,
     limit,
@@ -111,7 +121,7 @@ export const getLeadDetails = cache(async (workspaceId: string, leadId: string) 
     throw new Error('Failed to fetch lead details');
   }
 
-  return data as Lead & { assigned_user?: { id: string; full_name: string; email: string; avatar_url: string | null } };
+  return data as Lead & { assigned_user?: { id: string; full_name: string | null; email: string; avatar_url: string | null } };
 });
 
 export const getLeadStats = cache(async (workspaceId: string) => {

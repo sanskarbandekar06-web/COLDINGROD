@@ -31,7 +31,7 @@ export interface LeadScore {
   lead_id: string;
   score: number;
   algorithm_version: string | null;
-  factors: any;
+  factors: LeadQualificationAnalysis | null;
   ai_action_id: string | null;
   scored_at: string;
 }
@@ -75,4 +75,64 @@ export interface Activity {
   action: string;
   metadata: Record<string, unknown> | null;
   created_at: string;
+}
+export interface LeadAssignedUser {
+  id: string;
+  full_name: string | null;
+  email: string;
+  avatar_url: string | null;
+}
+
+export interface LeadListItem extends Lead {
+  assigned_user?: LeadAssignedUser;
+  score?: { score: number };
+}
+export type WebsiteStatus = 'unknown' | 'none' | 'poor' | 'outdated' | 'good';
+export type SocialStatus = 'unknown' | 'missing' | 'inactive' | 'active';
+export type SeoStatus = 'unknown' | 'weak' | 'average' | 'strong';
+export type QualificationBand =
+  | 'high_priority'
+  | 'qualified'
+  | 'nurture'
+  | 'low_opportunity';
+
+export interface LeadQualificationSignals {
+  websiteStatus: WebsiteStatus;
+  socialStatus: SocialStatus;
+  seoStatus: SeoStatus;
+  googleRating: number | null;
+  googleReviewCount: number | null;
+  hasClearCta: boolean | null;
+  hasOnlineBooking: boolean | null;
+  evidenceNotes: string;
+}
+
+export interface LeadQualificationFactor {
+  key: string;
+  label: string;
+  signal: string;
+  points: number;
+}
+
+export interface LeadQualificationAnalysis {
+  qualification_band: QualificationBand;
+  confidence: number;
+  factors: LeadQualificationFactor[];
+  opportunities: string[];
+}
+
+export interface LeadQualificationSnapshot {
+  id: string;
+  lead_id: string;
+  score: number;
+  algorithm_version: string | null;
+  factors: LeadQualificationAnalysis | null;
+  ai_action_id: string | null;
+  scored_at: string;
+  action: {
+    id: string;
+    status: string;
+    created_at: string;
+    agent: { name: string } | null;
+  } | null;
 }

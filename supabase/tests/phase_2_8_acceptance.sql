@@ -228,8 +228,11 @@ INSERT INTO public.clients (id, workspace_id, name)
 SELECT '42000000-0000-4000-8000-000000000001', workspace_id, 'Matrix Client' FROM test_context;
 INSERT INTO public.leads (id, workspace_id, company_name)
 SELECT '42000000-0000-4000-8000-000000000002', workspace_id, 'Matrix Lead' FROM test_context;
-INSERT INTO public.lead_scores (id, lead_id, score)
-VALUES ('42000000-0000-4000-8000-000000000003', '42000000-0000-4000-8000-000000000002', 85);
+SELECT pg_temp.expect_permission_denied(
+    $$INSERT INTO public.lead_scores (id, lead_id, score)
+      VALUES ('42000000-0000-4000-8000-000000000003', '42000000-0000-4000-8000-000000000002', 85)$$,
+    'lead scores are immutable agent-owned records'
+);
 INSERT INTO public.lead_contacts (id, lead_id, first_name, email)
 VALUES ('42000000-0000-4000-8000-000000000004', '42000000-0000-4000-8000-000000000002', 'Matrix', 'contact@coldingrod.test');
 INSERT INTO public.outreach_messages (id, workspace_id, lead_id, contact_id, platform, direction, content)
@@ -248,6 +251,15 @@ INSERT INTO public.assets (id, workspace_id, name, file_path, file_type, size_by
 SELECT '43000000-0000-4000-8000-000000000003', workspace_id, 'Matrix Asset', '/matrix/test.txt', 'text/plain', 10,
        '11111111-1111-4111-8111-111111111111' FROM test_context;
 RESET ROLE;
+
+-- Lead scores are now created only by the trusted qualification RPC. This
+-- database-owner insert is test fixture setup, not an authenticated client path.
+INSERT INTO public.lead_scores (id, lead_id, score)
+VALUES (
+    '42000000-0000-4000-8000-000000000003',
+    '42000000-0000-4000-8000-000000000002',
+    85
+);
 
 -- Active limited member can read every workspace domain but writes only clients.
 SELECT set_config('request.jwt.claim.sub', '22222222-2222-4222-8222-222222222222', true);

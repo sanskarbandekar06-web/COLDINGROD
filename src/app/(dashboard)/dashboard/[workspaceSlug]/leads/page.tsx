@@ -64,6 +64,7 @@ export default async function LeadsPage(props: {
             totalPages={leadsData.totalPages} 
             currentPage={leadsData.page} 
             workspaceId={context.workspace.id}
+            workspaceSlug={params.workspaceSlug}
           />
         </TabsContent>
         

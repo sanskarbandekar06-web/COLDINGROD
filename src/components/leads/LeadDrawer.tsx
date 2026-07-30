@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { getLeadDrawerData } from '@/actions/lead-drawer';
-import { Lead } from '@/types/lead';
-import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
   Sheet,
@@ -19,26 +18,29 @@ export function LeadDrawer({
   isOpen,
   onClose,
   workspaceId,
+  workspaceSlug,
   leadId
 }: {
   isOpen: boolean;
   onClose: () => void;
   workspaceId: string;
+  workspaceSlug: string;
   leadId: string | null;
 }) {
-  const [data, setData] = useState<{ lead: any, contacts: any[] } | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<Awaited<ReturnType<typeof getLeadDrawerData>> | null>(null);
+  const loading = Boolean(isOpen && leadId && data?.lead?.id !== leadId);
 
   useEffect(() => {
-    if (isOpen && leadId) {
-      setLoading(true);
-      getLeadDrawerData(workspaceId, leadId).then((res) => {
-        setData(res);
-        setLoading(false);
-      });
-    } else {
-      setData(null);
-    }
+    if (!isOpen || !leadId) return;
+
+    let cancelled = false;
+    void getLeadDrawerData(workspaceId, leadId).then((result) => {
+      if (!cancelled) setData(result);
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [isOpen, leadId, workspaceId]);
 
   return (
@@ -47,14 +49,14 @@ export function LeadDrawer({
         <SheetHeader className="text-left">
           <SheetTitle className="text-xl flex items-center gap-2">
             {loading ? 'Loading...' : data?.lead?.company_name}
-            {data?.lead && (
+            {!loading && data?.lead && (
                <Badge variant="outline" className="capitalize text-xs font-normal">
                  {data.lead.status.replace('_', ' ')}
                </Badge>
             )}
           </SheetTitle>
           <SheetDescription>
-            {data?.lead?.source || 'Unknown Source'}
+            {loading ? 'Loading lead details…' : data?.lead?.source || 'Unknown Source'}
           </SheetDescription>
         </SheetHeader>
 
@@ -90,9 +92,13 @@ export function LeadDrawer({
             </div>
 
             <div className="pt-6 border-t flex flex-col gap-3">
-              <Button className="w-full" onClick={() => window.location.href = `/dashboard/${workspaceId}/leads/${leadId}`}>
-                View Full Details <ExternalLink className="h-4 w-4 ml-2" />
-              </Button>
+              <Link
+                href={`/dashboard/${workspaceSlug}/leads/${leadId}`}
+                className={buttonVariants({ className: 'w-full' })}
+              >
+                View Full Details
+                <ExternalLink className="ml-2 size-4" aria-hidden="true" />
+              </Link>
             </div>
           </div>
         ) : null}

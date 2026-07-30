@@ -18,7 +18,7 @@ const ALLOWED_ENTITY_TYPES: Record<string, (slug: string, id: string) => string>
   lead: (slug, id) => `/dashboard/${slug}/leads/${id}`,
   client: (slug, id) => `/dashboard/${slug}/clients/${id}`,
   project: (slug, id) => `/dashboard/${slug}/projects/${id}`,
-  task: (slug, id) => `/dashboard/${slug}/tasks`, // tasks route to list for now
+  task: (slug) => `/dashboard/${slug}/tasks`, // tasks route to list for now
 };
 
 function StatusBadge({ status }: { status: string }) {
@@ -45,17 +45,18 @@ function StatusBadge({ status }: { status: string }) {
 export default async function AiActionDetailPage({
   params,
 }: {
-  params: { workspaceSlug: string; actionId: string };
+  params: Promise<{ workspaceSlug: string; actionId: string }>;
 }) {
-  const context = await getWorkspaceContext(params.workspaceSlug);
+  const { workspaceSlug, actionId } = await params;
+  const context = await getWorkspaceContext(workspaceSlug);
   if (!context) redirect('/dashboard');
 
-  const action = await getAiActionDetails(context.workspace.id, params.actionId);
+  const action = await getAiActionDetails(context.workspace.id, actionId);
   if (!action) notFound();
 
   // Safe entity link — only for allowlisted entity types
   const entityLink = action.entity_id && ALLOWED_ENTITY_TYPES[action.entity_type]
-    ? ALLOWED_ENTITY_TYPES[action.entity_type](params.workspaceSlug, action.entity_id)
+    ? ALLOWED_ENTITY_TYPES[action.entity_type](workspaceSlug, action.entity_id)
     : null;
 
   // Sanitize payload before rendering
@@ -63,14 +64,14 @@ export default async function AiActionDetailPage({
   const sanitizedResultData = action.result_data ? sanitizeConfig(action.result_data) as Record<string, unknown> : null;
 
   return (
-    <div className="flex-1 space-y-6 p-8 pt-6">
+    <div className="flex-1 space-y-6 p-4 sm:p-6 lg:p-8 lg:pt-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Link href={`/dashboard/${params.workspaceSlug}/ai`} className="hover:underline">AI Center</Link>
+        <Link href={`/dashboard/${workspaceSlug}/ai`} className="hover:underline">AI Center</Link>
         <span>/</span>
-        <Link href={`/dashboard/${params.workspaceSlug}/ai/actions`} className="hover:underline">Actions</Link>
+        <Link href={`/dashboard/${workspaceSlug}/ai/actions`} className="hover:underline">Actions</Link>
         <span>/</span>
-        <span className="text-foreground font-mono text-xs">{params.actionId.slice(0, 8)}…</span>
+        <span className="text-foreground font-mono text-xs">{actionId.slice(0, 8)}…</span>
       </div>
 
       {/* Header */}
@@ -91,7 +92,7 @@ export default async function AiActionDetailPage({
           <StatusBadge status={action.status} />
           {action.status === 'pending_approval' && (
             <Link
-              href={`/dashboard/${params.workspaceSlug}/ai/approvals/${action.id}`}
+              href={`/dashboard/${workspaceSlug}/ai/approvals/${action.id}`}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
             >
               Review →
@@ -110,7 +111,7 @@ export default async function AiActionDetailPage({
                 <div>
                   <p className="text-xs text-muted-foreground">Agent</p>
                   <Link
-                    href={`/dashboard/${params.workspaceSlug}/ai/agents/${action.agent_id}`}
+                    href={`/dashboard/${workspaceSlug}/ai/agents/${action.agent_id}`}
                     className="font-medium text-primary hover:underline"
                   >
                     {action.agent.name}
