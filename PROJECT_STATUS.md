@@ -1,14 +1,14 @@
 # Coldingrod Project Status
 
-Last verified: 2026-07-30
+Last verified: 2026-07-31
 
 Primary implementation workspace: `C:\Users\SANSKAR\COLDINGROD IMPLEMENTATION\coldingrod`
 
 ## Current phase
 
-Phase 3.1 (Lead Qualification Agent) is implemented, deployed to the linked Supabase project, and validated. Phase 2 remains complete, and Phase 3 AI Automation and Lead Discovery is now in progress.
+Phase 3.2 (Lead Discovery Intake and Orchestration) is implemented, deployed to the linked Supabase project, and validated. Phase 2 remains complete, and Phase 3 AI Automation is in progress.
 
-The first production agent is intentionally transparent and deterministic: it scores only evidence a workspace member records, never invents missing facts, and does not require an external AI-provider key.
+The first two production agents are intentionally transparent and deterministic. They use only evidence a workspace member supplies, never invent missing facts, require human selection before lead creation, and do not require an external AI-provider key.
 
 ## Progress estimate
 
@@ -17,10 +17,11 @@ The first production agent is intentionally transparent and deterministic: it sc
 | Phase 1 | 100% | 0% |
 | Phase 2 overall | 100% | 0% |
 | Phase 3.1 Lead Qualification Agent | 100% | 0% |
-| Phase 3 overall | approximately 20% | approximately 80% |
-| Full currently discussed product plan | approximately 78% | approximately 22% |
+| Phase 3.2 Lead Discovery Intake | 100% | 0% |
+| Phase 3 overall | approximately 35% | approximately 65% |
+| Full currently discussed product plan | approximately 80% | approximately 20% |
 
-These are planning estimates. Phase 3 still includes lead discovery intake/orchestration, provider-backed research and pain-point analysis, personalization, compliant message generation, follow-up automation, and analytics. Phase 4 covers integrations such as Google Maps/Places, and Phase 5 covers production hardening and release.
+These are planning estimates. Phase 3 still includes provider-backed business research and pain-point analysis, personalization, compliant message generation, follow-up automation, and analytics. Phase 4 covers integrations such as Google Maps/Places, and Phase 5 covers production hardening and release.
 
 ## Phase 3.1 delivered
 
@@ -37,13 +38,26 @@ These are planning estimates. Phase 3 still includes lead discovery intake/orche
 - Correct slug-based lead drawer navigation and Next.js 16 asynchronous route handling for AI action details.
 - Reduced unnecessary TypeScript complexity in touched lead and AI list paths by replacing explicit `any` values with small shared contracts and inference.
 
+## Phase 3.2 delivered
+
+- A global system `Lead Discovery Agent` registered as `coldingrod-rules-v1`.
+- Trusted discovery and import RPCs requiring active membership plus both `manage_ai` and `manage_leads`.
+- Strict brief and candidate allowlists, length checks, HTTP(S) URL checks, email validation, and a 1–50 candidate batch limit.
+- Workspace-aware duplicate detection against existing leads and within each discovery run.
+- Read-only discovery run/candidate tables for authenticated clients; all mutations belong to the trusted functions.
+- Human review and explicit selection before any staged candidate becomes a lead.
+- Enriched lead creation with website, industry, location, business email, and business phone.
+- One descriptive import activity per batch instead of generic per-lead audit notification spam.
+- Completed AI actions, AI/human activities, member notifications, and safe links between discovery runs, AI actions, and imported leads.
+- Responsive discovery intake, recent-run overview, review cards, selection/import controls, and enriched business profiles.
+- A forward migration correcting PostgreSQL output-column name resolution on the already-hosted import RPC, with the clean-install migration carrying the explicit fix.
 ## Hosted database verification
 
-- Local and remote migration histories match through `013_lead_qualification_agent.sql`.
-- The rollback-only Phase 3.1 acceptance suite passes.
+- Local and remote migration histories match through `015_lead_discovery_import_name_resolution.sql`.
+- The rollback-only Phase 3.1 and Phase 3.2 acceptance suites pass.
 - Phase 2.8 authorization, Phase 2.9 asset, and Phase 2.10 notification regression suites still pass.
-- Acceptance coverage includes authentication, dual permissions, workspace and lead isolation, system/workspace agent scoping, input allowlisting, minimum evidence, deterministic score output, immutable score history, activity delivery, and notification delivery.
-- Direct authenticated writes to lead scores are denied; score creation belongs to the trusted qualification function.
+- Acceptance coverage includes authentication, dual permissions, workspace and lead/run isolation, agent scoping, strict input allowlisting, deterministic scoring, duplicate traceability, atomic human-approved import, audit suppression, activity delivery, and notification delivery.
+- Direct authenticated writes to lead scores and discovery tables are denied; trusted RPCs own score, run, candidate, and batch-import mutations.
 - All synthetic SQL fixtures were rolled back.
 - The real browser lifecycle produced a temporary lead, 94/100 score, completed AI action, activities, and notifications; every temporary record was then deleted and verified at zero.
 
@@ -51,12 +65,15 @@ These are planning estimates. Phase 3 still includes lead discovery intake/orche
 
 - `.env.local` is configured and ignored by Git.
 - `npx tsc --noEmit` passes.
-- Phase 3.1 and related navigation files pass targeted ESLint with zero findings.
+- Phase 3.1, Phase 3.2, and related navigation files pass targeted ESLint with zero findings.
 - A signed-in desktop lifecycle passed: create a lead, record seven observed signals, run qualification, verify 94/100 and 100% confidence, inspect the linked AI action, and confirm AI Center statistics.
 - Lead status advanced from `new` to `analyzed`, and the three highest-value opportunities rendered correctly.
 - Lead drawer “View Full Details” now uses the workspace slug and reaches the correct lead page.
 - AI Center, lead details, and the qualification dialog were checked at a 390 × 844 mobile viewport with no horizontal overflow.
-- A fresh browser tab produced zero application warnings or errors.
+- A signed-in Phase 3.2 lifecycle passed: supply two candidates, confirm one ready and one within-run duplicate, explicitly select the ready candidate, import it, inspect the enriched lead profile, and follow the linked AI action back to its run.
+- The discovery review page was checked at a 390 × 844 mobile viewport with no horizontal overflow.
+- Browser console verification found and drove a fix for non-deterministic candidate field IDs; the final deterministic implementation passes lint, TypeScript, and production build checks.
+- Every temporary browser-test run, candidate, action, notification, and lead was deleted and verified at zero remaining rows.
 
 ## TypeScript approach
 
@@ -71,4 +88,4 @@ The project keeps TypeScript where it protects database, authorization, and UI c
 
 ## Next work
 
-Continue Phase 3 with lead-discovery intake and agent orchestration, followed by business research, pain-point analysis, personalization, compliant outreach generation, follow-up automation, and analytics. Google Maps/Places remains in the agreed Phase 4 integration scope.
+Continue Phase 3 with business research and pain-point analysis, followed by personalization, compliant outreach generation, follow-up automation, and analytics. Google Maps/Places remains in the agreed Phase 4 integration scope and will feed the same discovery pipeline.

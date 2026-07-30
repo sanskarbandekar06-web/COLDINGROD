@@ -7,6 +7,9 @@ import { LeadsTable } from '@/components/leads/LeadsTable';
 import { LeadsKanban } from '@/components/leads/LeadsKanban';
 import { LeadStatus } from '@/types/lead';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import Link from 'next/link';
+import { Search } from 'lucide-react';
+import { buttonVariants } from '@/components/ui/button';
 
 export default async function LeadsPage(props: { 
   params: Promise<{ workspaceSlug: string }>;
@@ -43,9 +46,18 @@ export default async function LeadsPage(props: {
 
   return (
     <div className="space-y-6">
-      <PageHeader 
-        title="Leads" 
-        description="Manage your pipeline and track potential clients." 
+      <PageHeader
+        title="Leads"
+        description="Manage your pipeline and track potential clients."
+        action={
+          <Link
+            href={`/dashboard/${params.workspaceSlug}/leads/discovery`}
+            className={buttonVariants()}
+          >
+            <Search className="size-4" aria-hidden="true" />
+            Discover leads
+          </Link>
+        }
       />
       
       <LeadKPIs stats={stats} />

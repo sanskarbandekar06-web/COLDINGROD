@@ -42,6 +42,7 @@ const ENTITY_LABELS: Record<string, string> = {
   clients: 'client',
   lead: 'lead',
   leads: 'lead',
+  lead_discovery_run: 'lead discovery',
   meeting: 'meeting',
   meetings: 'meeting',
   member: 'member',
@@ -127,6 +128,7 @@ export function notificationHref(
     clients: `${base}/clients/${entityId}`,
     lead: `${base}/leads/${entityId}`,
     leads: `${base}/leads/${entityId}`,
+    lead_discovery_run: `${base}/leads/discovery/${entityId}`,
     meeting: `${base}/meetings/${entityId}`,
     meetings: `${base}/meetings/${entityId}`,
     member: `${base}/members`,
@@ -148,7 +150,7 @@ export function notificationHref(
 export function notificationEntityValues(filter: NotificationEntityType) {
   const values: Record<NotificationEntityType, string[]> = {
     all: [],
-    lead: ['lead', 'leads'],
+    lead: ['lead', 'leads', 'lead_discovery_run'],
     client: ['client', 'clients'],
     project: ['project', 'projects'],
     task: ['task', 'tasks'],

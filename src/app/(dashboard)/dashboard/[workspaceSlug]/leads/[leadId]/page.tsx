@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, BriefcaseBusiness, ExternalLink, Globe2, Mail, MapPin, Phone } from 'lucide-react';
 import { buttonVariants } from '@/components/ui/button';
 import { SectionCard } from '@/components/dashboard/SectionCard';
 import { ActivityTimeline } from '@/components/leads/ActivityTimeline';
@@ -72,6 +72,75 @@ export default async function LeadDetailsPage({
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <div className="space-y-6 md:col-span-2">
+          {(lead.website_url ||
+            lead.industry ||
+            lead.location ||
+            lead.business_email ||
+            lead.business_phone) && (
+            <SectionCard
+              title="Business Profile"
+              description="Business details preserved from lead discovery or manual research."
+            >
+              <dl className="grid gap-4 sm:grid-cols-2">
+                {lead.website_url && (
+                  <div className="flex gap-3">
+                    <Globe2 className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                    <div className="min-w-0">
+                      <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Website</dt>
+                      <dd>
+                        <a
+                          href={lead.website_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex max-w-full items-center gap-1 break-all text-primary hover:underline"
+                        >
+                          {lead.website_url}
+                          <ExternalLink className="size-3.5 shrink-0" aria-hidden="true" />
+                        </a>
+                      </dd>
+                    </div>
+                  </div>
+                )}
+                {lead.industry && (
+                  <div className="flex gap-3">
+                    <BriefcaseBusiness className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                    <div>
+                      <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Industry</dt>
+                      <dd>{lead.industry}</dd>
+                    </div>
+                  </div>
+                )}
+                {lead.location && (
+                  <div className="flex gap-3">
+                    <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                    <div>
+                      <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Location</dt>
+                      <dd>{lead.location}</dd>
+                    </div>
+                  </div>
+                )}
+                {lead.business_email && (
+                  <div className="flex gap-3">
+                    <Mail className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                    <div className="min-w-0">
+                      <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Business email</dt>
+                      <dd className="break-all">{lead.business_email}</dd>
+                    </div>
+                  </div>
+                )}
+                {lead.business_phone && (
+                  <div className="flex gap-3">
+                    <Phone className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                    <div>
+                      <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Business phone</dt>
+                      <dd>{lead.business_phone}</dd>
+                    </div>
+                  </div>
+                )}
+              </dl>
+            </SectionCard>
+          )}
+
           <SectionCard title="Contacts" description="People associated with this lead.">
             <ContactsList
               contacts={contacts}

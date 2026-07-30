@@ -16,6 +16,8 @@ export const metadata: Metadata = {
 // Allowed entity types for safe routing
 const ALLOWED_ENTITY_TYPES: Record<string, (slug: string, id: string) => string> = {
   lead: (slug, id) => `/dashboard/${slug}/leads/${id}`,
+  lead_discovery_run: (slug, id) =>
+    `/dashboard/${slug}/leads/discovery/${id}`,
   client: (slug, id) => `/dashboard/${slug}/clients/${id}`,
   project: (slug, id) => `/dashboard/${slug}/projects/${id}`,
   task: (slug) => `/dashboard/${slug}/tasks`, // tasks route to list for now

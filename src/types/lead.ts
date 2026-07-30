@@ -6,6 +6,11 @@ export interface Lead {
   company_name: string;
   status: LeadStatus;
   source: string | null;
+  website_url: string | null;
+  industry: string | null;
+  location: string | null;
+  business_email: string | null;
+  business_phone: string | null;
   assigned_to: string | null;
   created_at: string;
   updated_at: string;
