@@ -36,7 +36,8 @@ import {
   ClipboardCheck,
   History,
   Send,
-  BellRing
+  BellRing,
+  BarChart3
 } from 'lucide-react';
 import { Workspace } from '@/types/workspace';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher';
@@ -75,6 +76,7 @@ export function AppSidebar({ workspaces, activeWorkspace, permissions }: AppSide
     { name: 'AI Center', href: `${basePath}/ai`, icon: Bot },
     { name: 'Agents', href: `${basePath}/ai/agents`, icon: Cpu },
     { name: 'Approvals', href: `${basePath}/ai/approvals`, icon: ClipboardCheck },
+    { name: 'Analytics', href: `${basePath}/ai/analytics`, icon: BarChart3 },
     { name: 'Action History', href: `${basePath}/ai/actions`, icon: History },
   ];
 

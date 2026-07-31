@@ -6,9 +6,9 @@ Primary implementation workspace: `C:\Users\SANSKAR\COLDINGROD IMPLEMENTATION\co
 
 ## Current phase
 
-Phase 3.5 (Response-Aware Follow-Up Automation) is implemented, deployed to the linked Supabase project, and validated. Phase 2 remains complete, and Phase 3 AI Automation is in progress.
+Phase 3.6 (Analytics and Optimization) is implemented, deployed to the linked Supabase project, and validated. Phase 2 and the complete Phase 3 AI Automation roadmap are now complete.
 
-The first seven production agents are transparent and deterministic. They use only stored qualification evidence and verified research a workspace member supplies, preserve unknowns, require human selection before lead creation, and do not require an external AI-provider key.
+All eight Phase 3 production agents are transparent and deterministic. They use only stored qualification evidence and verified research a workspace member supplies, preserve unknowns, require human selection before lead creation, and do not require an external AI-provider key.
 
 ## Progress estimate
 
@@ -21,10 +21,11 @@ The first seven production agents are transparent and deterministic. They use on
 | Phase 3.3 Research & Pain Points | 100% | 0% |
 | Phase 3.4 Personalization & Compliance | 100% | 0% |
 | Phase 3.5 Follow-Up Automation | 100% | 0% |
-| Phase 3 overall | approximately 85% | approximately 15% |
-| Full currently discussed product plan | approximately 90% | approximately 10% |
+| Phase 3.6 Analytics & Optimization | 100% | 0% |
+| Phase 3 overall | 100% | 0% |
+| Full currently discussed product plan | approximately 92% | approximately 8% |
 
-These are planning estimates. Phase 3 still includes the analytics and optimization agent. Phase 4 covers integrations such as Google Maps/Places, and Phase 5 covers production hardening and release.
+These are planning estimates. Phase 4 covers provider integrations such as Google Maps/Places, and Phase 5 covers production hardening and release.
 
 ## Phase 3.1 delivered
 
@@ -87,10 +88,19 @@ These are planning estimates. Phase 3 still includes the analytics and optimizat
 - Transparent outcomes for not-due, waiting, paused, stopped, and completed states, plus pause/resume/cancel controls and full activity/notification delivery.
 - A responsive follow-up panel on message details with cadence selection, step status/due times, prepared-draft links, and explicit delivery safety guidance.
 
+## Phase 3.6 delivered
+
+- A global `Analytics and Optimization Agent` registered as `coldingrod-rules-v1`.
+- A trusted `run_workspace_analytics` RPC requiring active membership plus both `manage_ai` and `manage_leads`.
+- Immutable 7-, 30-, and 90-day snapshots with active-member read-only RLS and no direct authenticated mutation path.
+- Verified lead, qualification, research, AI-draft, approval, delivery, response, meeting, win, pending-review, and follow-up metrics with explicit denominators.
+- A seven-stage lead-to-client funnel, exact rates capped at 100%, and deterministic bottleneck recommendations that never invent outcomes or claim causation.
+- Completed linked AI actions, AI-authored activities, member notifications, and safe routing between analytics, action history, and notification views.
+- A responsive analytics dashboard with eight headline metrics, funnel stages, priority guidance, immutable history, permission-aware execution, and a Phase 3-complete AI Center.
 ## Hosted database verification
 
-- Local and remote migration histories match through `019_follow_up_automation.sql`.
-- The rollback-only Phase 3.1 through Phase 3.5 acceptance suites pass.
+- Local and remote migration histories match through `020_analytics_and_optimization.sql`.
+- The rollback-only Phase 3.1 through Phase 3.6 acceptance suites pass.
 - Phase 2.8 authorization, Phase 2.9 asset, and Phase 2.10 notification regression suites still pass.
 - Acceptance coverage includes authentication, dual permissions, workspace and lead/run isolation, agent scoping, strict input allowlisting, deterministic scoring, duplicate traceability, atomic human-approved import, research prerequisites, source validation, pain-point mapping, grounded outreach, exact approval snapshots, atomic approval/rejection, audit suppression, activity delivery, and notification delivery.
 - Direct authenticated writes to lead scores, discovery tables, and research reports are denied; trusted RPCs own scoring, discovery, research, personalization, and review transitions.
@@ -101,7 +111,7 @@ These are planning estimates. Phase 3 still includes the analytics and optimizat
 
 - `.env.local` is configured and ignored by Git.
 - `npx tsc --noEmit` passes.
-- Phases 3.1–3.5 and related navigation files pass targeted ESLint with zero findings.
+- Phases 3.1–3.6 and related navigation files pass targeted ESLint with zero findings.
 - A signed-in desktop lifecycle passed: create a lead, record seven observed signals, run qualification, verify 94/100 and 100% confidence, inspect the linked AI action, and confirm AI Center statistics.
 - Lead status advanced from `new` to `analyzed`, and the three highest-value opportunities rendered correctly.
 - Lead drawer “View Full Details” now uses the workspace slug and reaches the correct lead page.
@@ -113,6 +123,7 @@ These are planning estimates. Phase 3 still includes the analytics and optimizat
 - A live Phase 3.3 lifecycle produced a 4-field/1-source report at 88% confidence with all seven exact pain-point mappings; its temporary lead, report, actions, activities, and notifications were deleted and verified at zero.
 - Phase 3.4 TypeScript, targeted ESLint, the full hosted seven-suite regression matrix, and the production build pass; the acceptance test verifies exact message snapshots, atomic decisions, permissions, RLS isolation, and zero automatic delivery.
 - Phase 3.5 TypeScript, targeted ESLint, the complete eight-suite hosted regression matrix, and the production build pass; response detection prevents further drafts and every acceptance fixture rolls back.
+- Phase 3.6 TypeScript, targeted ESLint, the complete nine-suite hosted regression matrix, and the production build pass; the live signed-in analytics page renders with no browser errors.
 
 ## TypeScript approach
 
@@ -127,4 +138,4 @@ The project keeps TypeScript where it protects database, authorization, and UI c
 
 ## Next work
 
-Complete Phase 3 with analytics and optimization, then continue into Phase 4 provider integrations. Google Maps/Places remains in the agreed Phase 4 integration scope and will feed the same discovery pipeline.
+Implement Phase 4 provider integrations, including Google Maps/Places feeding the existing discovery pipeline, then complete Phase 5 production hardening and release.

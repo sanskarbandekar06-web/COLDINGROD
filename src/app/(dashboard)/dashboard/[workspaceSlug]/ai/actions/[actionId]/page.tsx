@@ -22,6 +22,8 @@ const ALLOWED_ENTITY_TYPES: Record<string, (slug: string, id: string) => string>
     `/dashboard/${slug}/outreach/messages/${id}`,
   follow_up_sequence: (slug) => `/dashboard/${slug}/outreach/messages`,
   follow_up_step: (slug) => `/dashboard/${slug}/outreach/messages`,
+  workspace_analytics_snapshot: (slug) =>
+    `/dashboard/${slug}/ai/analytics`,
   client: (slug, id) => `/dashboard/${slug}/clients/${id}`,
   project: (slug, id) => `/dashboard/${slug}/projects/${id}`,
   task: (slug) => `/dashboard/${slug}/tasks`, // tasks route to list for now

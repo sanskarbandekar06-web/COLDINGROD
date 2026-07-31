@@ -4,7 +4,7 @@ import { getAiActions } from '@/services/ai-action.service';
 import { redirect } from 'next/navigation';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Activity, AlertTriangle, ArrowRight, Bot, CheckCircle, Clock, Loader2, Sparkles, XCircle } from 'lucide-react';
+import { Activity, AlertTriangle, ArrowRight, BarChart3, Bot, CheckCircle, Clock, Loader2, Sparkles, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
 
 export const metadata: Metadata = {
@@ -123,20 +123,20 @@ export default async function AiOverviewPage({
             </div>
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-secondary">
-                Phase 3 active
+                Phase 3 complete
               </p>
-              <h3 className="mt-1 text-lg font-semibold">Lead Qualification Agent</h3>
+              <h3 className="mt-1 text-lg font-semibold">Auditable AI Automation</h3>
               <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-                Score an existing lead from observed website, social, reputation,
-                conversion, and SEO signals with a complete audit trail.
+                Discover and qualify leads, research evidence, draft personalized
+                outreach, manage follow-ups, and optimize the funnel with human control.
               </p>
             </div>
           </div>
           <Link
-            href={`/dashboard/${workspaceSlug}/leads`}
+            href={`/dashboard/${workspaceSlug}/ai/analytics`}
             className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-lg bg-secondary px-4 py-2 text-sm font-medium text-on-secondary shadow-sm transition-colors hover:bg-secondary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
           >
-            Choose a lead
+            View analytics
             <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </div>
@@ -224,10 +224,11 @@ export default async function AiOverviewPage({
       </div>
 
       {/* Quick navigation */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { label: 'Agent Registry', desc: 'View all registered AI agents', href: `/dashboard/${workspaceSlug}/ai/agents`, icon: Bot },
           { label: 'Approval Queue', desc: 'Review pending AI actions', href: `/dashboard/${workspaceSlug}/ai/approvals`, icon: Clock },
+          { label: 'Analytics', desc: 'Inspect funnel snapshots and guidance', href: `/dashboard/${workspaceSlug}/ai/analytics`, icon: BarChart3 },
           { label: 'Action History', desc: 'Browse all AI action records', href: `/dashboard/${workspaceSlug}/ai/actions`, icon: Activity },
         ].map((item) => (
           <Link

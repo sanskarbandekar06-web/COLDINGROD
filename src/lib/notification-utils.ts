@@ -45,6 +45,7 @@ const ENTITY_LABELS: Record<string, string> = {
   lead_discovery_run: 'lead discovery',
   follow_up_sequence: 'follow-up sequence',
   follow_up_step: 'follow-up step',
+  workspace_analytics_snapshot: 'analytics snapshot',
   meeting: 'meeting',
   meetings: 'meeting',
   member: 'member',
@@ -133,6 +134,7 @@ export function notificationHref(
     lead_discovery_run: `${base}/leads/discovery/${entityId}`,
     follow_up_sequence: `${base}/outreach/messages`,
     follow_up_step: `${base}/outreach/messages`,
+    workspace_analytics_snapshot: `${base}/ai/analytics`,
     meeting: `${base}/meetings/${entityId}`,
     meetings: `${base}/meetings/${entityId}`,
     member: `${base}/members`,
@@ -174,6 +176,7 @@ export function notificationEntityValues(filter: NotificationEntityType) {
       'ai_agents',
       'ai_approval',
       'ai_approvals',
+      'workspace_analytics_snapshot',
     ],
   };
 
