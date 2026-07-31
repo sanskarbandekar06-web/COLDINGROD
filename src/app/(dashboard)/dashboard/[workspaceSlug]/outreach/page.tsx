@@ -128,10 +128,9 @@ export default async function OutreachPage(props: {
 
       {/* Delivery safety boundary */}
       <div className="rounded-lg border border-dashed border-muted-foreground/30 p-4 text-sm text-muted-foreground">
-        <p className="font-medium mb-1">Delivery integrations arrive in Phase 4</p>
+        <p className="font-medium mb-1">Provider-safe delivery boundary</p>
         <p>
-          Personalization, compliance review, approvals, and response-aware follow-up planning are available now.
-          Follow-up timing starts only after a connected provider records verified delivery; drafts are never marked as sent automatically.
+          Phase 4 integration state and health tracking are active. Outbound delivery still requires a verified provider receipt; Coldingrod never treats an enabled integration, copied draft, or approval as proof that a message was sent.
         </p>
       </div>
     </div>

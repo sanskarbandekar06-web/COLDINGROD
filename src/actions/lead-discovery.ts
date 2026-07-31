@@ -103,6 +103,7 @@ function isCandidate(value: unknown): value is LeadDiscoveryCandidateInput {
       'businessEmail',
       'businessPhone',
       'evidenceNotes',
+      'externalReference',
     ])
   );
 }
@@ -153,6 +154,15 @@ function validateRunInput(input: RunLeadDiscoveryInput): string | null {
   if (input.candidates.length < 1 || input.candidates.length > 50) {
     return 'Add between 1 and 50 observed businesses.';
   }
+  const providerReferenceCount = input.candidates.filter(
+    (candidate) => candidate.externalReference.trim().length > 0,
+  ).length;
+  if (
+    providerReferenceCount > 0 &&
+    providerReferenceCount !== input.candidates.length
+  ) {
+    return 'Use Google Place IDs for every candidate in a provider run, or start a separate manual run.';
+  }
 
   for (const [index, candidate] of input.candidates.entries()) {
     const label = `Business ${index + 1}`;
@@ -167,7 +177,8 @@ function validateRunInput(input: RunLeadDiscoveryInput): string | null {
       !optionalLength(candidate.sourceUrl, 500) ||
       !optionalLength(candidate.businessEmail, 320) ||
       !optionalLength(candidate.businessPhone, 80) ||
-      !optionalLength(candidate.evidenceNotes, 1000)
+      !optionalLength(candidate.evidenceNotes, 1000) ||
+      !optionalLength(candidate.externalReference, 255)
     ) {
       return `${label} contains a field that is too long.`;
     }
@@ -188,6 +199,12 @@ function validateRunInput(input: RunLeadDiscoveryInput): string | null {
       !EMAIL_PATTERN.test(candidate.businessEmail.trim())
     ) {
       return `${label} email address is invalid.`;
+    }
+    if (
+      candidate.externalReference.trim() &&
+      !/^[A-Za-z0-9_-]{1,255}$/.test(candidate.externalReference.trim())
+    ) {
+      return `${label} Google Place ID is invalid.`;
     }
   }
   return null;
@@ -255,6 +272,9 @@ export async function runLeadDiscoveryAction(
     service_focus: optional(value.brief.serviceFocus),
     notes: optional(value.brief.notes),
   };
+  const providerRun = value.candidates.every(
+    (candidate) => candidate.externalReference.trim().length > 0,
+  );
   const candidates = value.candidates.map((candidate) => ({
     company_name: candidate.companyName.trim(),
     website_url: optional(candidate.websiteUrl),
@@ -264,11 +284,17 @@ export async function runLeadDiscoveryAction(
     business_email: optional(candidate.businessEmail)?.toLowerCase(),
     business_phone: optional(candidate.businessPhone),
     evidence_notes: optional(candidate.evidenceNotes),
+    ...(providerRun
+      ? { external_reference: candidate.externalReference.trim() }
+      : {}),
   }));
 
   const supabase = await createClient();
+  const rpcName = providerRun
+    ? 'run_google_places_discovery_intake'
+    : 'run_lead_discovery_intake';
   const { data, error } = await supabase
-    .rpc('run_lead_discovery_intake', {
+    .rpc(rpcName, {
       check_workspace_id: context.workspace.id,
       intake_brief: brief,
       intake_candidates: candidates,

@@ -11,6 +11,7 @@ import { notFound } from 'next/navigation';
 import { PageHeader } from '@/components/dashboard/PageHeader';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { LeadDiscoveryForm } from '@/components/leads/LeadDiscoveryForm';
+import { GooglePlacesSearch } from '@/components/integrations/GooglePlacesSearch';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import {
@@ -20,6 +21,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { getRecentLeadDiscoveryRuns } from '@/services/lead-discovery.service';
+import { getIntegrationCatalog } from '@/services/integration.service';
 import { getWorkspaceContext } from '@/services/workspace.service';
 
 export default async function LeadDiscoveryPage({
@@ -31,7 +33,13 @@ export default async function LeadDiscoveryPage({
   const context = await getWorkspaceContext(workspaceSlug);
   if (!context) notFound();
 
-  const recentRuns = await getRecentLeadDiscoveryRuns(context.workspace.id);
+  const [recentRuns, integrations] = await Promise.all([
+    getRecentLeadDiscoveryRuns(context.workspace.id),
+    getIntegrationCatalog(context.workspace.id),
+  ]);
+  const google = integrations.find(
+    (integration) => integration.provider === 'google',
+  );
   const canRun =
     context.permissions.includes('manage_ai') &&
     context.permissions.includes('manage_leads');
@@ -99,6 +107,14 @@ export default async function LeadDiscoveryPage({
           You can review previous discovery runs, but starting a new run requires
           both AI and lead management permission.
         </div>
+      )}
+
+      {canRun && google && (
+        <GooglePlacesSearch
+          workspaceSlug={workspaceSlug}
+          enabled={google.enabled}
+          configured={google.environmentConfigured}
+        />
       )}
 
       {canRun && <LeadDiscoveryForm workspaceSlug={workspaceSlug} />}

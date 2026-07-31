@@ -25,6 +25,7 @@ const EMPTY_CANDIDATE: LeadDiscoveryCandidateInput = {
   businessEmail: '',
   businessPhone: '',
   evidenceNotes: '',
+  externalReference: '',
 };
 
 function createCandidate(key: string): CandidateDraft {
@@ -44,6 +45,7 @@ function candidateInput(candidate: CandidateDraft): LeadDiscoveryCandidateInput 
     businessEmail: candidate.businessEmail,
     businessPhone: candidate.businessPhone,
     evidenceNotes: candidate.evidenceNotes,
+    externalReference: candidate.externalReference,
   };
 }
 
@@ -83,6 +85,10 @@ export function LeadDiscoveryForm({
         : current.filter((candidate) => candidate.key !== key),
     );
   }
+
+  const usesGooglePlaces = candidates.every(
+    (candidate) => candidate.externalReference.trim().length > 0,
+  );
 
   function submitDiscovery() {
     startTransition(async () => {
@@ -341,7 +347,7 @@ export function LeadDiscoveryForm({
                   </div>
                   <details className="sm:col-span-2">
                     <summary className="cursor-pointer text-sm font-medium text-primary outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                      Add phone and source evidence
+                      Add phone, source evidence, or Google Place ID
                     </summary>
                     <div className="mt-4 grid gap-4 sm:grid-cols-2">
                       <div className="space-y-2">
@@ -381,6 +387,30 @@ export function LeadDiscoveryForm({
                         />
                       </div>
                       <div className="space-y-2 sm:col-span-2">
+                        <Label htmlFor={`${prefix}-place-id`}>
+                          Google Place ID
+                        </Label>
+                        <Input
+                          id={`${prefix}-place-id`}
+                          value={candidate.externalReference}
+                          onChange={(event) =>
+                            updateCandidate(
+                              candidate.key,
+                              'externalReference',
+                              event.target.value,
+                            )
+                          }
+                          maxLength={255}
+                          placeholder="Paste the permitted Place ID from search"
+                          disabled={pending}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          If one candidate uses a Place ID, every candidate in
+                          this run must use one. Other Google Places content is
+                          not saved automatically.
+                        </p>
+                      </div>
+                      <div className="space-y-2 sm:col-span-2">
                         <Label htmlFor={`${prefix}-evidence`}>
                           Evidence notes
                         </Label>
@@ -413,6 +443,7 @@ export function LeadDiscoveryForm({
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Building2 className="size-4" aria-hidden="true" />
           {candidates.length} of 50 businesses supplied
+          {usesGooglePlaces ? ' · Google Places references' : ' · Manual intake'}
         </div>
         <Button type="submit" size="lg" disabled={pending}>
           {pending ? (
@@ -423,7 +454,9 @@ export function LeadDiscoveryForm({
           ) : (
             <>
               <Search className="size-4" aria-hidden="true" />
-              Run Lead Discovery
+              {usesGooglePlaces
+                ? 'Run Google Places Discovery'
+                : 'Run Lead Discovery'}
             </>
           )}
         </Button>

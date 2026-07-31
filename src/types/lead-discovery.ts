@@ -35,6 +35,7 @@ export interface LeadDiscoveryCandidateInput {
   businessEmail: string;
   businessPhone: string;
   evidenceNotes: string;
+  externalReference: string;
 }
 
 export interface LeadDiscoveryRun {
@@ -80,6 +81,8 @@ export interface LeadDiscoveryCandidate {
   business_email: string | null;
   business_phone: string | null;
   evidence_notes: string | null;
+  external_provider: 'google_places' | null;
+  external_reference: string | null;
   status: LeadDiscoveryCandidateStatus;
   matched_lead_id: string | null;
   duplicate_of_candidate_id: string | null;

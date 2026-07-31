@@ -6,7 +6,7 @@ Primary implementation workspace: `C:\Users\SANSKAR\COLDINGROD IMPLEMENTATION\co
 
 ## Current phase
 
-Phase 3.6 (Analytics and Optimization) is implemented, deployed to the linked Supabase project, and validated. Phase 2 and the complete Phase 3 AI Automation roadmap are now complete.
+Phase 4.1 (Provider Integrations and Google Places) is implemented, deployed to the linked Supabase project, and validated. Phases 1–4 of the agreed roadmap are complete; Phase 5 production hardening and release is in progress.
 
 All eight Phase 3 production agents are transparent and deterministic. They use only stored qualification evidence and verified research a workspace member supplies, preserve unknowns, require human selection before lead creation, and do not require an external AI-provider key.
 
@@ -23,9 +23,10 @@ All eight Phase 3 production agents are transparent and deterministic. They use 
 | Phase 3.5 Follow-Up Automation | 100% | 0% |
 | Phase 3.6 Analytics & Optimization | 100% | 0% |
 | Phase 3 overall | 100% | 0% |
-| Full currently discussed product plan | approximately 92% | approximately 8% |
+| Phase 4 Provider Integrations | 100% | 0% |
+| Full currently discussed product plan | approximately 96% | approximately 4% |
 
-These are planning estimates. Phase 4 covers provider integrations such as Google Maps/Places, and Phase 5 covers production hardening and release.
+These are planning estimates. Phase 5 now covers the remaining production hardening, CI, operational documentation, and release verification.
 
 ## Phase 3.1 delivered
 
@@ -97,10 +98,21 @@ These are planning estimates. Phase 4 covers provider integrations such as Googl
 - A seven-stage lead-to-client funnel, exact rates capped at 100%, and deterministic bottleneck recommendations that never invent outcomes or claim causation.
 - Completed linked AI actions, AI-authored activities, member notifications, and safe routing between analytics, action history, and notification views.
 - A responsive analytics dashboard with eight headline metrics, funnel stages, priority guidance, immutable history, permission-aware execution, and a Phase 3-complete AI Center.
+## Phase 4 delivered
+
+- A secure workspace integration lifecycle with permission-gated enable/disable controls, health timestamps, human audit activities, and member notifications.
+- Database constraints that reject common credential and token keys from integration metadata; provider credentials remain server environment values.
+- A complete Integrations route replacing the previously broken sidebar destination, with honest operational/configuration status and adapter registry boundaries.
+- A server-only Google Places API (New) search action using a strict field mask, request timeout, no browser key exposure, and no response caching.
+- Google Maps attribution, ranking disclosure, public Terms and Privacy routes, and an explicit provider-content retention boundary.
+- Ephemeral Places results that persist only a selected Place ID; company and contact details remain independently observed, human-entered discovery evidence.
+- A trusted Google Places discovery bridge that preserves duplicate checks, explicit human selection, AI/action audit links, and no automatic lead creation.
+- Read-only lead external references captured atomically only after an approved discovery import.
+- A tracked `.env.local.example` documenting the server-only `GOOGLE_PLACES_API_KEY` without exposing the real `.env.local`.
 ## Hosted database verification
 
-- Local and remote migration histories match through `020_analytics_and_optimization.sql`.
-- The rollback-only Phase 3.1 through Phase 3.6 acceptance suites pass.
+- Local and remote migration histories match through `021_provider_integrations_and_google_places.sql`.
+- The rollback-only Phase 3.1 through Phase 3.6 and Phase 4.1 acceptance suites pass.
 - Phase 2.8 authorization, Phase 2.9 asset, and Phase 2.10 notification regression suites still pass.
 - Acceptance coverage includes authentication, dual permissions, workspace and lead/run isolation, agent scoping, strict input allowlisting, deterministic scoring, duplicate traceability, atomic human-approved import, research prerequisites, source validation, pain-point mapping, grounded outreach, exact approval snapshots, atomic approval/rejection, audit suppression, activity delivery, and notification delivery.
 - Direct authenticated writes to lead scores, discovery tables, and research reports are denied; trusted RPCs own scoring, discovery, research, personalization, and review transitions.
@@ -124,6 +136,7 @@ These are planning estimates. Phase 4 covers provider integrations such as Googl
 - Phase 3.4 TypeScript, targeted ESLint, the full hosted seven-suite regression matrix, and the production build pass; the acceptance test verifies exact message snapshots, atomic decisions, permissions, RLS isolation, and zero automatic delivery.
 - Phase 3.5 TypeScript, targeted ESLint, the complete eight-suite hosted regression matrix, and the production build pass; response detection prevents further drafts and every acceptance fixture rolls back.
 - Phase 3.6 TypeScript, targeted ESLint, the complete nine-suite hosted regression matrix, and the production build pass; the live signed-in analytics page renders with no browser errors.
+- Phase 4.1 TypeScript, targeted ESLint, the complete ten-suite hosted regression matrix, and the production build pass; the live signed-in Integrations page renders with no browser errors.
 
 ## TypeScript approach
 
@@ -138,4 +151,4 @@ The project keeps TypeScript where it protects database, authorization, and UI c
 
 ## Next work
 
-Implement Phase 4 provider integrations, including Google Maps/Places feeding the existing discovery pipeline, then complete Phase 5 production hardening and release.
+Complete Phase 5 production hardening, CI, operational documentation, final security checks, and release verification.
