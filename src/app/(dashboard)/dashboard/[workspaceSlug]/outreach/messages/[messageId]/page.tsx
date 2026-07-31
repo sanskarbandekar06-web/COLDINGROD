@@ -12,6 +12,7 @@ import { ChannelPreview } from '@/components/outreach/ChannelPreview';
 import { MessageVersionHistory } from '@/components/outreach/MessageVersionHistory';
 import { SendReadinessPanel } from '@/components/outreach/SendReadinessPanel';
 import { OutreachActivityTimeline } from '@/components/outreach/OutreachActivityTimeline';
+import { FollowUpSequencePanel } from '@/components/outreach/FollowUpSequencePanel';
 import { EditMessageDialog } from '@/components/outreach/EditMessageDialog';
 import { CopyButton } from '@/components/outreach/CopyButton';
 import { ArchiveRestoreButton } from '@/components/outreach/ArchiveRestoreButton';
@@ -22,6 +23,7 @@ import { Activity } from '@/types/lead';
 import { ArrowLeft, Bot, User, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
+import { getFollowUpSequenceForMessage } from '@/services/follow-up.service';
 
 export default async function MessageDetailPage(props: {
   params: Promise<{ workspaceSlug: string; messageId: string }>;
@@ -32,9 +34,10 @@ export default async function MessageDetailPage(props: {
 
   const { workspace } = context;
 
-  const [message, versions] = await Promise.all([
+  const [message, versions, followUpSequence] = await Promise.all([
     getOutreachMessageDetail(workspace.id, params.messageId),
     getMessageVersions(workspace.id, params.messageId, 20),
+    getFollowUpSequenceForMessage(workspace.id, params.messageId),
   ]);
 
   if (!message) notFound();
@@ -383,6 +386,23 @@ export default async function MessageDetailPage(props: {
           {/* Send Readiness */}
           <SectionCard title="Send Readiness">
             <SendReadinessPanel summary={readiness} />
+          </SectionCard>
+
+          <SectionCard
+            title="Follow-Up Automation"
+            description="Response-aware timing with mandatory review for every draft."
+          >
+            <FollowUpSequencePanel
+              workspaceSlug={params.workspaceSlug}
+              currentMessageId={message.id}
+              messageStatus={message.status}
+              approvalDecision={approvalDecision}
+              isAiGenerated={isAiGenerated}
+              canManage={
+                canManage && context.permissions.includes('manage_ai')
+              }
+              sequence={followUpSequence}
+            />
           </SectionCard>
 
           {/* Metadata */}

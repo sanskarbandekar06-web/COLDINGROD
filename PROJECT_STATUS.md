@@ -6,9 +6,9 @@ Primary implementation workspace: `C:\Users\SANSKAR\COLDINGROD IMPLEMENTATION\co
 
 ## Current phase
 
-Phase 3.4 (Personalized Outreach and Compliance Review) is implemented, deployed to the linked Supabase project, and validated. Phase 2 remains complete, and Phase 3 AI Automation is in progress.
+Phase 3.5 (Response-Aware Follow-Up Automation) is implemented, deployed to the linked Supabase project, and validated. Phase 2 remains complete, and Phase 3 AI Automation is in progress.
 
-The first six production agents are transparent and deterministic. They use only stored qualification evidence and verified research a workspace member supplies, preserve unknowns, require human selection before lead creation, and do not require an external AI-provider key.
+The first seven production agents are transparent and deterministic. They use only stored qualification evidence and verified research a workspace member supplies, preserve unknowns, require human selection before lead creation, and do not require an external AI-provider key.
 
 ## Progress estimate
 
@@ -20,10 +20,11 @@ The first six production agents are transparent and deterministic. They use only
 | Phase 3.2 Lead Discovery Intake | 100% | 0% |
 | Phase 3.3 Research & Pain Points | 100% | 0% |
 | Phase 3.4 Personalization & Compliance | 100% | 0% |
-| Phase 3 overall | approximately 70% | approximately 30% |
-| Full currently discussed product plan | approximately 87% | approximately 13% |
+| Phase 3.5 Follow-Up Automation | 100% | 0% |
+| Phase 3 overall | approximately 85% | approximately 15% |
+| Full currently discussed product plan | approximately 90% | approximately 10% |
 
-These are planning estimates. Phase 3 still includes follow-up automation and analytics. Phase 4 covers integrations such as Google Maps/Places, and Phase 5 covers production hardening and release.
+These are planning estimates. Phase 3 still includes the analytics and optimization agent. Phase 4 covers integrations such as Google Maps/Places, and Phase 5 covers production hardening and release.
 
 ## Phase 3.1 delivered
 
@@ -75,10 +76,21 @@ These are planning estimates. Phase 3 still includes follow-up automation and an
 - Replaced the prior multi-step approval action that could partially fail with the atomic RPC; duplicate decisions and short rejection reasons are rejected.
 - A responsive lead-detail generation dialog, channel-aware contact filtering, message-detail handoff, Approval Center integration, and safe AI-action routing back to outreach messages.
 
+## Phase 3.5 delivered
+
+- A global `Follow-Up Agent` registered as `coldingrod-rules-v1`.
+- Read-only sequence and step tables with active-workspace RLS; all planning, preparation, and state changes belong to trusted RPCs.
+- Sequence creation requires an approved AI message with verified `sent` or `delivered` state, a real `sent_at`, an active lead/contact, and both AI and lead permissions.
+- Strict one-to-three-step cadences with increasing 1–30 day offsets measured from the original verified delivery time.
+- Response-aware stopping for inbound messages, replied outreach, and terminal lead states; every remaining planned step is cancelled atomically.
+- Due-step preparation waits for prior delivery, rechecks channel reachability and current research, creates a grounded follow-up plus exact version, and routes it through compliance and human approval without sending.
+- Transparent outcomes for not-due, waiting, paused, stopped, and completed states, plus pause/resume/cancel controls and full activity/notification delivery.
+- A responsive follow-up panel on message details with cadence selection, step status/due times, prepared-draft links, and explicit delivery safety guidance.
+
 ## Hosted database verification
 
-- Local and remote migration histories match through `018_personalized_outreach_and_atomic_approvals.sql`.
-- The rollback-only Phase 3.1, Phase 3.2, Phase 3.3, and Phase 3.4 acceptance suites pass.
+- Local and remote migration histories match through `019_follow_up_automation.sql`.
+- The rollback-only Phase 3.1 through Phase 3.5 acceptance suites pass.
 - Phase 2.8 authorization, Phase 2.9 asset, and Phase 2.10 notification regression suites still pass.
 - Acceptance coverage includes authentication, dual permissions, workspace and lead/run isolation, agent scoping, strict input allowlisting, deterministic scoring, duplicate traceability, atomic human-approved import, research prerequisites, source validation, pain-point mapping, grounded outreach, exact approval snapshots, atomic approval/rejection, audit suppression, activity delivery, and notification delivery.
 - Direct authenticated writes to lead scores, discovery tables, and research reports are denied; trusted RPCs own scoring, discovery, research, personalization, and review transitions.
@@ -89,7 +101,7 @@ These are planning estimates. Phase 3 still includes follow-up automation and an
 
 - `.env.local` is configured and ignored by Git.
 - `npx tsc --noEmit` passes.
-- Phases 3.1–3.4 and related navigation files pass targeted ESLint with zero findings.
+- Phases 3.1–3.5 and related navigation files pass targeted ESLint with zero findings.
 - A signed-in desktop lifecycle passed: create a lead, record seven observed signals, run qualification, verify 94/100 and 100% confidence, inspect the linked AI action, and confirm AI Center statistics.
 - Lead status advanced from `new` to `analyzed`, and the three highest-value opportunities rendered correctly.
 - Lead drawer “View Full Details” now uses the workspace slug and reaches the correct lead page.
@@ -100,6 +112,7 @@ These are planning estimates. Phase 3 still includes follow-up automation and an
 - Every temporary browser-test run, candidate, action, notification, and lead was deleted and verified at zero remaining rows.
 - A live Phase 3.3 lifecycle produced a 4-field/1-source report at 88% confidence with all seven exact pain-point mappings; its temporary lead, report, actions, activities, and notifications were deleted and verified at zero.
 - Phase 3.4 TypeScript, targeted ESLint, the full hosted seven-suite regression matrix, and the production build pass; the acceptance test verifies exact message snapshots, atomic decisions, permissions, RLS isolation, and zero automatic delivery.
+- Phase 3.5 TypeScript, targeted ESLint, the complete eight-suite hosted regression matrix, and the production build pass; response detection prevents further drafts and every acceptance fixture rolls back.
 
 ## TypeScript approach
 
@@ -114,4 +127,4 @@ The project keeps TypeScript where it protects database, authorization, and UI c
 
 ## Next work
 
-Continue Phase 3 with follow-up automation and analytics. Google Maps/Places remains in the agreed Phase 4 integration scope and will feed the same discovery pipeline.
+Complete Phase 3 with analytics and optimization, then continue into Phase 4 provider integrations. Google Maps/Places remains in the agreed Phase 4 integration scope and will feed the same discovery pipeline.
