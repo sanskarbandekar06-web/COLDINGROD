@@ -6,9 +6,9 @@ Primary implementation workspace: `C:\Users\SANSKAR\COLDINGROD IMPLEMENTATION\co
 
 ## Current phase
 
-Phase 3.3 (Business Research and Pain-Point Analysis) is implemented, deployed to the linked Supabase project, and validated. Phase 2 remains complete, and Phase 3 AI Automation is in progress.
+Phase 3.4 (Personalized Outreach and Compliance Review) is implemented, deployed to the linked Supabase project, and validated. Phase 2 remains complete, and Phase 3 AI Automation is in progress.
 
-The first four production agents are transparent and deterministic. They use only stored qualification evidence and verified research a workspace member supplies, preserve unknowns, require human selection before lead creation, and do not require an external AI-provider key.
+The first six production agents are transparent and deterministic. They use only stored qualification evidence and verified research a workspace member supplies, preserve unknowns, require human selection before lead creation, and do not require an external AI-provider key.
 
 ## Progress estimate
 
@@ -19,10 +19,11 @@ The first four production agents are transparent and deterministic. They use onl
 | Phase 3.1 Lead Qualification Agent | 100% | 0% |
 | Phase 3.2 Lead Discovery Intake | 100% | 0% |
 | Phase 3.3 Research & Pain Points | 100% | 0% |
-| Phase 3 overall | approximately 50% | approximately 50% |
-| Full currently discussed product plan | approximately 83% | approximately 17% |
+| Phase 3.4 Personalization & Compliance | 100% | 0% |
+| Phase 3 overall | approximately 70% | approximately 30% |
+| Full currently discussed product plan | approximately 87% | approximately 13% |
 
-These are planning estimates. Phase 3 still includes personalization, compliant message generation, follow-up automation, and analytics. Phase 4 covers integrations such as Google Maps/Places, and Phase 5 covers production hardening and release.
+These are planning estimates. Phase 3 still includes follow-up automation and analytics. Phase 4 covers integrations such as Google Maps/Places, and Phase 5 covers production hardening and release.
 
 ## Phase 3.1 delivered
 
@@ -62,13 +63,25 @@ These are planning estimates. Phase 3 still includes personalization, compliant 
 - Separate completed research and pain-analysis AI actions, one final AI activity, member notifications, confidence scoring, and immutable report/action links.
 - A responsive lead-detail research dialog and transparent pain-point panel with source and AI-action links.
 - Exact compatibility with Phase 3.1 factor keys (`website`, `social`, `seo`, `rating`, `reviews`, `cta`, and `booking`) for clean and already-hosted databases.
+## Phase 3.4 delivered
+
+- Global `Personalization Agent` and `Outreach Compliance Agent` registrations using `coldingrod-rules-v1`.
+- A trusted `generate_personalized_outreach` RPC requiring active membership, `manage_ai`, `manage_leads`, an active same-workspace lead, a same-lead reachable contact, and a latest research report with an evidence-backed service opportunity.
+- Strict allowlists for channel, tone, goal, and input fields; cross-lead contacts, unreachable channels, unsupported Facebook recipients, unresearched leads, and ungrounded opportunities are rejected.
+- Deterministic, research-grounded copy with contact/company context, a selected service opportunity, safe calls to action, opt-out language, and no invented private facts or claimed delivery.
+- Every generated message remains `pending_approval`, has `sent_at = NULL`, and receives an exact append-only version snapshot.
+- A transparent six-check compliance result covering research grounding, channel reachability, private-claim avoidance, opt-out language, mandatory human review, and non-delivery.
+- A trusted `decide_ai_action` RPC that locks the pending action and atomically saves the decision, action transition, human activity, and exact approved message/version snapshot.
+- Replaced the prior multi-step approval action that could partially fail with the atomic RPC; duplicate decisions and short rejection reasons are rejected.
+- A responsive lead-detail generation dialog, channel-aware contact filtering, message-detail handoff, Approval Center integration, and safe AI-action routing back to outreach messages.
+
 ## Hosted database verification
 
-- Local and remote migration histories match through `017_research_factor_key_compatibility.sql`.
-- The rollback-only Phase 3.1, Phase 3.2, and Phase 3.3 acceptance suites pass.
+- Local and remote migration histories match through `018_personalized_outreach_and_atomic_approvals.sql`.
+- The rollback-only Phase 3.1, Phase 3.2, Phase 3.3, and Phase 3.4 acceptance suites pass.
 - Phase 2.8 authorization, Phase 2.9 asset, and Phase 2.10 notification regression suites still pass.
-- Acceptance coverage includes authentication, dual permissions, workspace and lead/run isolation, agent scoping, strict input allowlisting, deterministic scoring, duplicate traceability, atomic human-approved import, research prerequisites, source validation, pain-point mapping, audit suppression, activity delivery, and notification delivery.
-- Direct authenticated writes to lead scores, discovery tables, and research reports are denied; trusted RPCs own score, run, candidate, and batch-import mutations.
+- Acceptance coverage includes authentication, dual permissions, workspace and lead/run isolation, agent scoping, strict input allowlisting, deterministic scoring, duplicate traceability, atomic human-approved import, research prerequisites, source validation, pain-point mapping, grounded outreach, exact approval snapshots, atomic approval/rejection, audit suppression, activity delivery, and notification delivery.
+- Direct authenticated writes to lead scores, discovery tables, and research reports are denied; trusted RPCs own scoring, discovery, research, personalization, and review transitions.
 - All synthetic SQL fixtures were rolled back.
 - The real browser lifecycle produced a temporary lead, 94/100 score, completed AI action, activities, and notifications; every temporary record was then deleted and verified at zero.
 
@@ -76,7 +89,7 @@ These are planning estimates. Phase 3 still includes personalization, compliant 
 
 - `.env.local` is configured and ignored by Git.
 - `npx tsc --noEmit` passes.
-- Phases 3.1–3.3 and related navigation files pass targeted ESLint with zero findings.
+- Phases 3.1–3.4 and related navigation files pass targeted ESLint with zero findings.
 - A signed-in desktop lifecycle passed: create a lead, record seven observed signals, run qualification, verify 94/100 and 100% confidence, inspect the linked AI action, and confirm AI Center statistics.
 - Lead status advanced from `new` to `analyzed`, and the three highest-value opportunities rendered correctly.
 - Lead drawer “View Full Details” now uses the workspace slug and reaches the correct lead page.
@@ -86,6 +99,7 @@ These are planning estimates. Phase 3 still includes personalization, compliant 
 - Browser console verification found and drove a fix for non-deterministic candidate field IDs; the final deterministic implementation passes lint, TypeScript, and production build checks.
 - Every temporary browser-test run, candidate, action, notification, and lead was deleted and verified at zero remaining rows.
 - A live Phase 3.3 lifecycle produced a 4-field/1-source report at 88% confidence with all seven exact pain-point mappings; its temporary lead, report, actions, activities, and notifications were deleted and verified at zero.
+- Phase 3.4 TypeScript, targeted ESLint, the full hosted seven-suite regression matrix, and the production build pass; the acceptance test verifies exact message snapshots, atomic decisions, permissions, RLS isolation, and zero automatic delivery.
 
 ## TypeScript approach
 
@@ -100,4 +114,4 @@ The project keeps TypeScript where it protects database, authorization, and UI c
 
 ## Next work
 
-Continue Phase 3 with personalization and compliant outreach generation, followed by follow-up automation and analytics. Google Maps/Places remains in the agreed Phase 4 integration scope and will feed the same discovery pipeline.
+Continue Phase 3 with follow-up automation and analytics. Google Maps/Places remains in the agreed Phase 4 integration scope and will feed the same discovery pipeline.

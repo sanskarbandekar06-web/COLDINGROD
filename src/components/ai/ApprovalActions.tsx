@@ -26,7 +26,7 @@ export function ApprovalActions({ workspaceId, actionId, workspaceSlug }: Approv
       return;
     }
     startTransition(async () => {
-      const result = await approveAiRequestAction(workspaceId, actionId);
+      const result = await approveAiRequestAction(workspaceId, actionId, workspaceSlug);
       if (!result?.success) {
         // Refresh on stale state so the UI updates to reflect the current state
         if (result?.code === 'STALE_APPROVAL') {
@@ -54,7 +54,7 @@ export function ApprovalActions({ workspaceId, actionId, workspaceSlug }: Approv
       return;
     }
     startTransition(async () => {
-      const result = await rejectAiRequestAction(workspaceId, actionId, trimmed);
+      const result = await rejectAiRequestAction(workspaceId, actionId, workspaceSlug, trimmed);
       if (!result?.success) {
         if (result?.code === 'STALE_APPROVAL') {
           toast.error(result.error || 'This request has already been reviewed.');

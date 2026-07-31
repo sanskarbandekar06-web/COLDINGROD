@@ -8,6 +8,7 @@ import { ContactsList } from '@/components/leads/ContactsList';
 import { LeadActionsMenu } from '@/components/leads/LeadActionsMenu';
 import { LeadQualificationPanel } from '@/components/leads/LeadQualificationPanel';
 import { LeadResearchPanel } from '@/components/leads/LeadResearchPanel';
+import { PersonalizedOutreachPanel } from '@/components/leads/PersonalizedOutreachPanel';
 import { LeadStatusSelector } from '@/components/leads/LeadStatusSelector';
 import { getLeadActivities } from '@/services/lead-activity.service';
 import { getLeadQualificationHistory } from '@/services/lead-qualification.service';
@@ -187,6 +188,22 @@ export default async function LeadDetailsPage({
               canRun={canRunQualification}
               isQualified={qualifications.length > 0}
               latest={researchReports[0] ?? null}
+            />
+          </SectionCard>
+
+          <SectionCard
+            title="Personalized Outreach"
+            description="Grounded drafts checked for compliance before human review."
+          >
+            <PersonalizedOutreachPanel
+              workspaceSlug={workspaceSlug}
+              leadId={lead.id}
+              contacts={contacts}
+              canGenerate={canRunQualification}
+              hasResearch={researchReports.length > 0}
+              hasOpportunity={
+                (researchReports[0]?.pain_points.length ?? 0) > 0
+              }
             />
           </SectionCard>
         </div>
