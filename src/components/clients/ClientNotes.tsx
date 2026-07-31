@@ -8,8 +8,9 @@ import { addClientNoteAction, deleteClientNoteAction } from '@/actions/clients';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { Trash2 } from 'lucide-react';
+import type { Activity } from '@/types/lead';
 
-export function ClientNotes({ notes, workspaceId, clientId }: { notes: any[], workspaceId: string, clientId: string }) {
+export function ClientNotes({ notes, workspaceId, clientId }: { notes: Activity[], workspaceId: string, clientId: string }) {
   const [newNote, setNewNote] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -62,9 +63,8 @@ export function ClientNotes({ notes, workspaceId, clientId }: { notes: any[], wo
             <p className="text-sm text-muted-foreground text-center">No notes yet.</p>
           ) : (
             notes.map(note => {
-              const actorName = note.actor_user 
-                ? (Array.isArray(note.actor_user) ? note.actor_user[0]?.full_name : (note.actor_user as any)?.full_name) 
-                : 'Unknown';
+              const actor = Array.isArray(note.actor_user) ? note.actor_user[0] : note.actor_user;
+              const actorName = actor?.full_name ?? 'Unknown';
               return (
                 <div key={note.id} className="bg-muted/30 p-4 rounded-lg relative group">
                   <div className="flex justify-between items-start mb-2">

@@ -16,9 +16,10 @@ interface ClientsTableProps {
   totalPages: number;
   currentPage: number;
   workspaceId: string;
+  workspaceSlug: string;
 }
 
-export function ClientsTable({ clients, totalPages, currentPage, workspaceId }: ClientsTableProps) {
+export function ClientsTable({ clients, totalPages, currentPage, workspaceId, workspaceSlug }: ClientsTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentSearch = searchParams.get('search') || '';
@@ -162,6 +163,7 @@ export function ClientsTable({ clients, totalPages, currentPage, workspaceId }: 
           isOpen={drawerClientId !== null}
           onClose={() => setDrawerClientId(null)}
           workspaceId={workspaceId}
+          workspaceSlug={workspaceSlug}
           clientId={drawerClientId}
         />
       )}

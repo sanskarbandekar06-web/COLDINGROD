@@ -3,11 +3,14 @@ import { notFound } from 'next/navigation';
 import { PageHeader } from '@/components/dashboard/PageHeader';
 import { TrashTable } from '@/components/leads/TrashTable';
 import { createClient } from '@/lib/supabase/server';
-import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import type { Lead } from '@/types/lead';
 
-export default async function LeadsTrashPage(props: { params: Promise<{ workspaceSlug: string }> }) {
+export default async function LeadsTrashPage(props: {
+  params: Promise<{ workspaceSlug: string }>;
+}) {
   const params = await props.params;
   const context = await getWorkspaceContext(params.workspaceSlug);
   if (!context) {
@@ -25,16 +28,23 @@ export default async function LeadsTrashPage(props: { params: Promise<{ workspac
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => window.location.href = `/dashboard/${params.workspaceSlug}/leads`}>
+        <Link
+          href={`/dashboard/${params.workspaceSlug}/leads`}
+          aria-label="Return to leads"
+          className={buttonVariants({ variant: 'ghost', size: 'icon' })}
+        >
           <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <PageHeader 
-          title="Trash" 
-          description="Soft-deleted leads can be restored here." 
+        </Link>
+        <PageHeader
+          title="Trash"
+          description="Soft-deleted leads can be restored here."
         />
       </div>
 
-      <TrashTable leads={leads as any || []} workspaceId={context.workspace.id} />
+      <TrashTable
+        leads={(leads || []) as unknown as Lead[]}
+        workspaceId={context.workspace.id}
+      />
     </div>
   );
 }

@@ -16,7 +16,11 @@ export function CompanyProfileForm({
   hasPermission 
 }: { 
   workspace: Workspace;
-  companyData: any;
+  companyData: {
+    legal_name: string | null;
+    website: string | null;
+    address: string | null;
+  } | null;
   hasPermission: boolean;
 }) {
   const [state, formAction, isPending] = useActionState(updateCompanyProfile, null);

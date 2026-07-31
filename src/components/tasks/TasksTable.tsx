@@ -27,7 +27,7 @@ interface TasksTableProps {
   defaultProjectId?: string;
 }
 
-export function TasksTable({ tasks, totalPages, currentPage, workspaceId, projects, members, userId, hideProject, defaultProjectId }: TasksTableProps) {
+export function TasksTable({ tasks, totalPages, currentPage, workspaceId, projects, members, hideProject, defaultProjectId }: TasksTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentSearch = searchParams.get('search') || '';

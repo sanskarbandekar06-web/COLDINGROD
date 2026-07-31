@@ -78,8 +78,15 @@ export interface Activity {
   workspace_member_id: string | null;
   actor_agent_id: string | null;
   action: string;
-  metadata: Record<string, unknown> | null;
+  metadata: {
+    content?: string;
+    new_status?: string;
+    contact_name?: string;
+    status?: string;
+    [key: string]: unknown;
+  } | null;
   created_at: string;
+  actor_user?: LeadAssignedUser | LeadAssignedUser[] | null;
 }
 export interface LeadAssignedUser {
   id: string;

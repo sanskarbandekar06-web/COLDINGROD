@@ -1,8 +1,8 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { getAppUrl } from '@/lib/app-url';
 
 export type AuthActionState = {
   error?: string;
@@ -12,7 +12,7 @@ export type AuthActionState = {
 } | null | undefined;
 
 function getEmailRedirectTo() {
-  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '');
+  const appUrl = getAppUrl();
   return `${appUrl}/auth/callback?next=/dashboard`;
 }
 
@@ -116,12 +116,12 @@ export async function logout() {
   redirect('/login');
 }
 
-export async function loginWithGoogle(formData?: FormData) {
+export async function loginWithGoogle(_formData?: FormData) {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/callback`,
+      redirectTo: `${getAppUrl()}/auth/callback`,
     },
   });
 

@@ -22,8 +22,8 @@ export async function getRecentActivities(workspaceId: string, limit = 10, offse
   const userIds = activities.filter(a => a.actor_type === 'human' && a.actor_user_id).map(a => a.actor_user_id);
   const agentIds = activities.filter(a => a.actor_type === 'ai_agent' && a.actor_agent_id).map(a => a.actor_agent_id);
 
-  let usersMap: Record<string, string> = {};
-  let agentsMap: Record<string, string> = {};
+  const usersMap: Record<string, string> = {};
+  const agentsMap: Record<string, string> = {};
 
   if (userIds.length > 0) {
     const { data: usersData } = await supabase

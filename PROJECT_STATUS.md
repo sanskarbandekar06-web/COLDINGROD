@@ -6,7 +6,7 @@ Primary implementation workspace: `C:\Users\SANSKAR\COLDINGROD IMPLEMENTATION\co
 
 ## Current phase
 
-Phase 4.1 (Provider Integrations and Google Places) is implemented, deployed to the linked Supabase project, and validated. Phases 1–4 of the agreed roadmap are complete; Phase 5 production hardening and release is in progress.
+Phase 5 production hardening and release preparation is implemented and validated. Phases 1–5 of the agreed roadmap are complete, the linked Supabase database is current through migration 022, and the repository is ready for the owner-controlled production deployment.
 
 All eight Phase 3 production agents are transparent and deterministic. They use only stored qualification evidence and verified research a workspace member supplies, preserve unknowns, require human selection before lead creation, and do not require an external AI-provider key.
 
@@ -24,9 +24,10 @@ All eight Phase 3 production agents are transparent and deterministic. They use 
 | Phase 3.6 Analytics & Optimization | 100% | 0% |
 | Phase 3 overall | 100% | 0% |
 | Phase 4 Provider Integrations | 100% | 0% |
-| Full currently discussed product plan | approximately 96% | approximately 4% |
+| Phase 5 Production Hardening | 100% | 0% |
+| Full currently discussed product plan | 100% | 0% |
 
-These are planning estimates. Phase 5 now covers the remaining production hardening, CI, operational documentation, and release verification.
+Developer implementation is complete. The only remaining release actions require the owner's external account access: connect the GitHub repository to Vercel, enter production environment variables, configure Supabase production URLs, and optionally configure Google Places.
 
 ## Phase 3.1 delivered
 
@@ -109,10 +110,20 @@ These are planning estimates. Phase 5 now covers the remaining production harden
 - A trusted Google Places discovery bridge that preserves duplicate checks, explicit human selection, AI/action audit links, and no automatic lead creation.
 - Read-only lead external references captured atomically only after an approved discovery import.
 - A tracked `.env.local.example` documenting the server-only `GOOGLE_PLACES_API_KEY` without exposing the real `.env.local`.
+## Phase 5 delivered
+
+- Full-repository TypeScript and ESLint cleanup with zero lint findings and no product or design changes.
+- Next.js 16 `proxy` routing, strict production environment validation, standalone builds, a health endpoint, robots metadata, global error handling, and branded not-found handling.
+- Production security headers, disabled framework disclosure, strict mode, and no-store health responses.
+- CI on GitHub Actions for clean installation, type checking, linting, production build, and production dependency audit.
+- Database migration 022 consolidating duplicate policies, optimizing authenticated RLS checks, and removing schema-lint warnings without weakening access rules.
+- Complete deployment, database, Google Places, operations, security, and beginner setup documentation.
+- Runtime fixes for workspace preference persistence, lead trash navigation, client/profile routing, member drawer state, and mobile breakpoint subscription.
+- A clean production dependency audit with zero known vulnerabilities.
 ## Hosted database verification
 
-- Local and remote migration histories match through `021_provider_integrations_and_google_places.sql`.
-- The rollback-only Phase 3.1 through Phase 3.6 and Phase 4.1 acceptance suites pass.
+- Local and remote migration histories match through `022_production_hardening.sql`.
+- All eleven rollback-only acceptance suites pass: Phase 2.8, 2.9, 2.10, Phase 3.1–3.6, Phase 4.1, and Phase 5.1.
 - Phase 2.8 authorization, Phase 2.9 asset, and Phase 2.10 notification regression suites still pass.
 - Acceptance coverage includes authentication, dual permissions, workspace and lead/run isolation, agent scoping, strict input allowlisting, deterministic scoring, duplicate traceability, atomic human-approved import, research prerequisites, source validation, pain-point mapping, grounded outreach, exact approval snapshots, atomic approval/rejection, audit suppression, activity delivery, and notification delivery.
 - Direct authenticated writes to lead scores, discovery tables, and research reports are denied; trusted RPCs own scoring, discovery, research, personalization, and review transitions.
@@ -137,18 +148,21 @@ These are planning estimates. Phase 5 now covers the remaining production harden
 - Phase 3.5 TypeScript, targeted ESLint, the complete eight-suite hosted regression matrix, and the production build pass; response detection prevents further drafts and every acceptance fixture rolls back.
 - Phase 3.6 TypeScript, targeted ESLint, the complete nine-suite hosted regression matrix, and the production build pass; the live signed-in analytics page renders with no browser errors.
 - Phase 4.1 TypeScript, targeted ESLint, the complete ten-suite hosted regression matrix, and the production build pass; the live signed-in Integrations page renders with no browser errors.
+- Full-repository `npm run check` passes: TypeScript, ESLint, and the Next.js production build.
+- `npm audit --omit=dev` reports zero production vulnerabilities.
+- Supabase schema lint and the performance advisor report no issues after migration 022.
+- The signed-in dashboard, Terms, Privacy, and health endpoint render on localhost with no browser errors; unauthenticated dashboard requests redirect to login.
+- Security headers are present on public, authenticated, redirect, and health responses.
 
 ## TypeScript approach
 
 The project keeps TypeScript where it protects database, authorization, and UI contracts. Ordinary implementation details rely on inference, and touched list/drawer paths no longer use explicit `any`. Converting core Next.js files to JavaScript would increase regression risk without changing the agreed product or design, so future work will continue using the lightest useful typing.
 
-## Known follow-up work
+## Owner-controlled production launch
 
-- Full-repository ESLint has a pre-existing backlog outside the files touched for Phases 3.1–3.3, mainly old explicit `any` types, unused imports, and React hook-rule findings.
-- `npm audit --omit=dev` still reports transitive advisories in Next-bundled and CLI-oriented dependencies; these should be upgraded separately with regression testing.
-- Next.js emits the non-blocking warning that the `middleware` convention is deprecated in favor of `proxy`.
-- Supabase performance-advisor RLS recommendations remain optimization work, not failed authorization checks.
+- Import the GitHub repository into Vercel and add the documented production environment variables.
+- Add the Vercel origin to Supabase Auth site and redirect URLs.
+- Add a restricted server-side Google Places key only if the optional live provider search is required.
+- Enable leaked-password protection if the Supabase project is on a plan that includes it.
 
-## Next work
-
-Complete Phase 5 production hardening, CI, operational documentation, final security checks, and release verification.
+No remaining application or database implementation is required for the agreed plan.

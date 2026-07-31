@@ -1,5 +1,6 @@
 import { getWorkspaceContext } from '@/services/workspace.service';
 import { getPendingApprovalActions, getAiApprovals } from '@/services/ai-approval.service';
+import type { ApprovalWithAction } from '@/services/ai-approval.service';
 import { redirect } from 'next/navigation';
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -65,6 +66,12 @@ export default async function ApprovalsPage({
     ? approvedResult
     : rejectedResult;
 
+  const decidedApprovals: ApprovalWithAction[] = tab === 'approved'
+    ? approvedResult.data
+    : tab === 'rejected'
+      ? rejectedResult.data
+      : [];
+
   return (
     <div className="flex-1 space-y-6 p-8 pt-6">
       <div className="flex items-center justify-between">
@@ -128,7 +135,7 @@ export default async function ApprovalsPage({
           </div>
         )}
 
-        {tab === 'pending' && pendingResult.data.map((action: any) => (
+        {tab === 'pending' && pendingResult.data.map((action) => (
           <div key={action.id} className="flex items-center justify-between p-4 hover:bg-muted/20">
             <div className="flex items-center gap-4 min-w-0">
               <div className="rounded-lg bg-amber-100 dark:bg-amber-950/50 p-2 flex-shrink-0">
@@ -175,7 +182,7 @@ export default async function ApprovalsPage({
         ))}
 
         {/* Decided approvals */}
-        {(tab === 'approved' || tab === 'rejected') && currentData.data.map((approval: any) => (
+        {decidedApprovals.map((approval) => (
           <div key={approval.id} className="flex items-center justify-between p-4 hover:bg-muted/20">
             <div className="flex items-center gap-4 min-w-0">
               <div className={`rounded-lg p-2 flex-shrink-0 ${
@@ -197,7 +204,7 @@ export default async function ApprovalsPage({
                   {approval.reason && (
                     <>
                       <span className="text-xs text-muted-foreground">·</span>
-                      <span className="text-xs text-muted-foreground italic line-clamp-1">"{approval.reason}"</span>
+                      <span className="text-xs text-muted-foreground italic line-clamp-1">&ldquo;{approval.reason}&rdquo;</span>
                     </>
                   )}
                 </div>
@@ -216,7 +223,7 @@ export default async function ApprovalsPage({
           </div>
         ))}
 
-        {(tab === 'approved' || tab === 'rejected') && currentData.data.length === 0 && (
+        {(tab === 'approved' || tab === 'rejected') && decidedApprovals.length === 0 && (
           <div className="flex items-center justify-center py-16 text-sm text-muted-foreground">
             No {tab} approvals found.
           </div>

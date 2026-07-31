@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TaskBoard } from '@/components/tasks/TaskBoard';
 import { TasksTable } from '@/components/tasks/TasksTable';
 import { ProjectTimeline } from './ProjectTimeline';
 import { Project } from '@/types/project';
 import { Task } from '@/types/task';
+import type { ProjectTimelineActivity } from './ProjectTimeline';
 import { LayoutList, Kanban, Clock } from 'lucide-react';
 
 interface ProjectViewTabsProps {
@@ -17,7 +18,7 @@ interface ProjectViewTabsProps {
   tasks: (Task & {
     assignee?: { full_name: string, avatar_url: string | null } | null
   })[];
-  activities: any[];
+  activities: ProjectTimelineActivity[];
   projects: { id: string, name: string }[];
   members: { id: string, full_name: string }[];
   userId: string;

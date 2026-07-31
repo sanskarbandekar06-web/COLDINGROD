@@ -7,12 +7,20 @@ import { Input } from '@/components/ui/input';
 import { useFormStatus } from 'react-dom';
 import { addProjectNoteAction } from '@/actions/projects';
 import { toast } from 'sonner';
-import { FileText, Plus, CheckCircle, Clock } from 'lucide-react';
+import { FileText, Plus, Clock } from 'lucide-react';
+
+export interface ProjectTimelineActivity {
+  id: string;
+  action: string;
+  created_at: string;
+  metadata: { content?: string; status?: string } | null;
+  actor_user: { full_name: string | null } | { full_name: string | null }[] | null;
+}
 
 interface ProjectTimelineProps {
   workspaceId: string;
   projectId: string;
-  activities: any[];
+  activities: ProjectTimelineActivity[];
 }
 
 function SubmitNoteButton() {
@@ -91,7 +99,11 @@ export function ProjectTimeline({ workspaceId, projectId, activities }: ProjectT
                   ) : activity.metadata?.status ? (
                     <p>Status changed to <span className="font-medium text-foreground">{activity.metadata.status}</span></p>
                   ) : (
-                    <p>By {activity.actor_user?.full_name || 'System'}</p>
+                    <p>
+                      By {(Array.isArray(activity.actor_user)
+                        ? activity.actor_user[0]?.full_name
+                        : activity.actor_user?.full_name) || 'System'}
+                    </p>
                   )}
                 </div>
               </div>

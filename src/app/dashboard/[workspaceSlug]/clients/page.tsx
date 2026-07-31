@@ -12,7 +12,7 @@ export default async function ClientsPage({
 }) {
   const context = await getWorkspaceContext(params.workspaceSlug);
   const workspace = context?.workspace;
-  
+
   if (!workspace) {
     notFound();
   }
@@ -32,11 +32,12 @@ export default async function ClientsPage({
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">Clients</h2>
       </div>
-      <ClientsTable 
-        clients={clients} 
-        totalPages={totalPages} 
-        currentPage={page} 
-        workspaceId={workspace.id} 
+      <ClientsTable
+        clients={clients}
+        totalPages={totalPages}
+        currentPage={page}
+        workspaceId={workspace.id}
+        workspaceSlug={params.workspaceSlug}
       />
     </div>
   );

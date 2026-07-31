@@ -145,7 +145,7 @@ export default async function AiActionsPage({
                 </td>
               </tr>
             ) : (
-              actionsResult.data.map((action: any) => (
+              actionsResult.data.map((action) => (
                 <tr key={action.id} className="hover:bg-muted/30">
                   <td className="p-4">
                     <Link

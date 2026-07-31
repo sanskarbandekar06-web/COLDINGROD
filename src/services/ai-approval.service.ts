@@ -16,6 +16,19 @@ export type ApprovalWithAction = AiApproval & {
   approver: { full_name: string | null } | null;
 };
 
+export interface PendingApprovalAction {
+  id: string;
+  action_type: string;
+  entity_type: string;
+  entity_id: string | null;
+  status: string;
+  priority: string;
+  created_at: string;
+  agent_id: string | null;
+  agent: { name: string } | null;
+  creator: { full_name: string | null } | null;
+}
+
 export interface GetApprovalsParams {
   workspaceId: string;
   page?: number;
@@ -170,7 +183,7 @@ export const getPendingApprovalActions = cache(async (workspaceId: string, page 
   }
 
   return {
-    data: data || [],
+    data: (data || []) as unknown as PendingApprovalAction[],
     count: count || 0,
     page,
     limit,

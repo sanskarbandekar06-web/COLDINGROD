@@ -1,13 +1,21 @@
 import { updateSession } from '@/lib/supabase/middleware';
 import { type NextRequest } from 'next/server';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Update session and get user info
   const { supabaseResponse, user } = await updateSession(request);
   const path = request.nextUrl.pathname;
 
-  // Public paths that don't require auth
-  const isPublicPath = path === '/login' || path === '/signup' || path === '/' || path.startsWith('/auth/callback');
+  const isAuthPath = path === '/login' || path === '/signup';
+  const isPublicPath =
+    isAuthPath ||
+    path === '/' ||
+    path === '/terms' ||
+    path === '/privacy' ||
+    path === '/robots.txt' ||
+    path === '/api/health' ||
+    path.startsWith('/auth/callback') ||
+    path.startsWith('/invite/');
 
   if (!user && !isPublicPath) {
     // Redirect to login if accessing private path without auth
@@ -16,7 +24,7 @@ export async function middleware(request: NextRequest) {
     return Response.redirect(loginUrl);
   }
 
-  if (user && isPublicPath && path !== '/') {
+  if (user && isAuthPath) {
     // Redirect to dashboard if accessing auth pages while logged in
     const dashboardUrl = request.nextUrl.clone();
     dashboardUrl.pathname = '/dashboard';

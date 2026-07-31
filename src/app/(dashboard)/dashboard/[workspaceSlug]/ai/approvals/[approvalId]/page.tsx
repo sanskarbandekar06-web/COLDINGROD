@@ -160,7 +160,7 @@ export default async function ApprovalDetailPage({
                 {approval.reason && (
                   <div>
                     <p className="text-xs text-muted-foreground">Reason</p>
-                    <p className="italic">"{approval.reason}"</p>
+                    <p className="italic">&ldquo;{approval.reason}&rdquo;</p>
                   </div>
                 )}
               </div>

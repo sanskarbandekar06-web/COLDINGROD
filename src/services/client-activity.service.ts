@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { cache } from 'react';
+import type { Activity } from '@/types/lead';
 
 export const getClientActivities = cache(async (workspaceId: string, clientId: string) => {
   const supabase = await createClient();
@@ -20,5 +21,5 @@ export const getClientActivities = cache(async (workspaceId: string, clientId: s
     throw new Error('Failed to fetch client activities');
   }
 
-  return data as any[];
+  return data as unknown as Activity[];
 });

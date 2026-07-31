@@ -3,8 +3,8 @@
 import { LeadContact } from '@/types/lead';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Mail, Phone, Building, Briefcase, Plus, Link2, Trash2 } from 'lucide-react';
-import { useState, useTransition } from 'react';
+import { Mail, Phone, Briefcase, Plus, Link2, Trash2 } from 'lucide-react';
+import { useTransition } from 'react';
 import { deleteContact } from '@/actions/contact';
 
 export function ContactsList({ contacts, leadId, workspaceId }: { contacts: LeadContact[], leadId: string, workspaceId: string }) {

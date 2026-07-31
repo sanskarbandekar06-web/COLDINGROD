@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { hasJoinedPermission } from '@/lib/permission-utils';
 import { ProjectStatus } from '@/types/project';
 
 async function checkManageProjectsPermission(workspaceId: string) {
@@ -22,11 +23,10 @@ async function checkManageProjectsPermission(workspaceId: string) {
 
   if (error || !data) return false;
 
-  const perms = (data.workspace_permissions as any[]) || [];
-  return perms.some(p => p.permissions?.key === 'manage_projects' || p.permissions?.key === 'admin');
+  return hasJoinedPermission(data.workspace_permissions, ['admin', 'manage_projects']);
 }
 
-export async function createProjectAction(workspaceId: string, prevState: any, formData: FormData) {
+export async function createProjectAction(workspaceId: string, _prevState: unknown, formData: FormData) {
   const hasPerm = await checkManageProjectsPermission(workspaceId);
   if (!hasPerm) return { error: 'Permission denied. Must have manage_projects permission.' };
 
@@ -96,7 +96,7 @@ export async function createProjectAction(workspaceId: string, prevState: any, f
   return { success: true, projectId: project.id };
 }
 
-export async function updateProjectAction(workspaceId: string, projectId: string, prevState: any, formData: FormData) {
+export async function updateProjectAction(workspaceId: string, projectId: string, _prevState: unknown, formData: FormData) {
   const hasPerm = await checkManageProjectsPermission(workspaceId);
   if (!hasPerm) return { error: 'Permission denied.' };
 

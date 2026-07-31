@@ -1,12 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Project } from '@/types/project';
 import { Meeting } from '@/types/meeting';
-import { Activity } from '@/types/dashboard';
+
 
 interface ClientHealthCardProps {
   projects: Project[];
   meetings: Meeting[];
-  activities: Activity[];
+  activities: { created_at: string }[];
 }
 
 export function ClientHealthCard({ projects, meetings, activities }: ClientHealthCardProps) {

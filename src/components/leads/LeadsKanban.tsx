@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { Lead } from '@/types/lead';
+import { Lead, type LeadStatus } from '@/types/lead';
 import { changeLeadStatus } from '@/actions/lead';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
 
-const COLUMNS = [
+const COLUMNS: { id: LeadStatus; label: string }[] = [
   { id: 'new', label: 'New' },
   { id: 'analyzed', label: 'Analyzed' },
   { id: 'contacted', label: 'Contacted' },
@@ -25,7 +25,7 @@ export function LeadsKanban({
   workspaceId: string 
 }) {
   const [leads, setLeads] = useState<Lead[]>(initialLeads);
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   const handleDragStart = (e: React.DragEvent, leadId: string) => {
     e.dataTransfer.setData('leadId', leadId);
@@ -35,7 +35,7 @@ export function LeadsKanban({
     e.preventDefault();
   };
 
-  const handleDrop = (e: React.DragEvent, statusId: string) => {
+  const handleDrop = (e: React.DragEvent, statusId: LeadStatus) => {
     e.preventDefault();
     const leadId = e.dataTransfer.getData('leadId');
     if (!leadId) return;
@@ -45,12 +45,12 @@ export function LeadsKanban({
 
     // Optimistic UI update
     setLeads(current => current.map(l => 
-      l.id === leadId ? { ...l, status: statusId as any } : l
+      l.id === leadId ? { ...l, status: statusId } : l
     ));
 
     // Server update
     startTransition(async () => {
-      await changeLeadStatus(workspaceId, leadId, statusId as any);
+      await changeLeadStatus(workspaceId, leadId, statusId);
     });
   };
 

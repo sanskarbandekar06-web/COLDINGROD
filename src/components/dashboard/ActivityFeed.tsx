@@ -1,5 +1,5 @@
 import { Activity } from '@/types/dashboard';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
 import { formatDistanceToNow } from 'date-fns';
 import { User, Bot, Server } from 'lucide-react';
 import { EmptyState } from './EmptyState';

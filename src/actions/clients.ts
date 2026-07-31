@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { hasJoinedPermission } from '@/lib/permission-utils';
 
 async function checkManageClientsPermission(workspaceId: string) {
   const supabase = await createClient();
@@ -21,11 +22,10 @@ async function checkManageClientsPermission(workspaceId: string) {
 
   if (error || !data) return false;
 
-  const perms = (data.workspace_permissions as any[]) || [];
-  return perms.some(p => p.permissions?.key === 'manage_clients' || p.permissions?.key === 'admin');
+  return hasJoinedPermission(data.workspace_permissions, ['admin', 'manage_clients']);
 }
 
-export async function createClientAction(workspaceId: string, prevState: any, formData: FormData) {
+export async function createClientAction(workspaceId: string, _prevState: unknown, formData: FormData) {
   const hasPerm = await checkManageClientsPermission(workspaceId);
   if (!hasPerm) return { error: 'Permission denied. Must have manage_clients permission.' };
 
@@ -71,7 +71,7 @@ export async function createClientAction(workspaceId: string, prevState: any, fo
   return { success: true, clientId: client.id };
 }
 
-export async function updateClientAction(workspaceId: string, clientId: string, prevState: any, formData: FormData) {
+export async function updateClientAction(workspaceId: string, clientId: string, _prevState: unknown, formData: FormData) {
   const hasPerm = await checkManageClientsPermission(workspaceId);
   if (!hasPerm) return { error: 'Permission denied.' };
 

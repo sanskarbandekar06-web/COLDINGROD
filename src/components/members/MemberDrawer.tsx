@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { format } from 'date-fns';
 import { ShieldAlert, Trash2, UserMinus } from 'lucide-react';
 import { toast } from 'sonner';
@@ -28,7 +28,17 @@ interface MemberDrawerProps {
   currentMemberId: string;
 }
 
-export function MemberDrawer({
+export function MemberDrawer(props: MemberDrawerProps) {
+  if (!props.member) return null;
+
+  return <MemberDrawerContent key={props.member.id} {...props} member={props.member} />;
+}
+
+type MemberDrawerContentProps = Omit<MemberDrawerProps, 'member'> & {
+  member: MemberData;
+};
+
+function MemberDrawerContent({
   member,
   isOpen,
   onClose,
@@ -36,13 +46,10 @@ export function MemberDrawer({
   canManage,
   workspaceId,
   currentMemberId,
-}: MemberDrawerProps) {
-  const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
+}: MemberDrawerContentProps) {
+  const [selectedPermissions, setSelectedPermissions] = useState<string[]>(member.permissions);
   const [isPending, startTransition] = useTransition();
 
-  useEffect(() => {
-    setSelectedPermissions(member?.permissions ?? []);
-  }, [member]);
 
   const handleSavePermissions = () => {
     if (!member) return;

@@ -5,7 +5,7 @@ import { redirect, notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { format } from 'date-fns';
-import { Bot, Globe, Activity, Clock, ChevronRight } from 'lucide-react';
+import { Bot, Globe, Activity, ChevronRight } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Agent Details | Coldingrod',
@@ -125,7 +125,7 @@ export default async function AgentDetailPage({
                 No actions recorded for this agent.
               </div>
             ) : (
-              actionsResult.data.map((action: any) => (
+              actionsResult.data.map((action) => (
                 <Link
                   key={action.id}
                   href={`/dashboard/${params.workspaceSlug}/ai/actions/${action.id}`}

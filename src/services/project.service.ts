@@ -70,8 +70,9 @@ export const getProjects = cache(async (params: GetProjectsParams): Promise<Pagi
   }
 
   // To get progress without N+1
-  const projectIds = data.map((p: any) => p.id);
-  let taskStats: Record<string, { total: number, completed: number }> = {};
+  const projects = data as unknown as PaginatedProjects['data'];
+  const projectIds = projects.map((project) => project.id);
+  const taskStats: Record<string, { total: number, completed: number }> = {};
   
   if (projectIds.length > 0) {
     const { data: tasksData } = await supabase
@@ -89,9 +90,9 @@ export const getProjects = cache(async (params: GetProjectsParams): Promise<Pagi
     }
   }
 
-  const enhancedData = data.map((p: any) => ({
-    ...p,
-    taskStats: taskStats[p.id] || { total: 0, completed: 0 }
+  const enhancedData = projects.map((project) => ({
+    ...project,
+    taskStats: taskStats[project.id] || { total: 0, completed: 0 }
   }));
 
   return {

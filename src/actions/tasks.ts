@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { hasJoinedPermission } from '@/lib/permission-utils';
 import { TaskStatus } from '@/types/task';
 
 async function checkManageTasksPermission(workspaceId: string) {
@@ -22,11 +23,10 @@ async function checkManageTasksPermission(workspaceId: string) {
 
   if (error || !data) return false;
 
-  const perms = (data.workspace_permissions as any[]) || [];
-  return perms.some(p => p.permissions?.key === 'manage_tasks' || p.permissions?.key === 'admin');
+  return hasJoinedPermission(data.workspace_permissions, ['admin', 'manage_tasks']);
 }
 
-export async function createTaskAction(workspaceId: string, projectId: string, prevState: any, formData: FormData) {
+export async function createTaskAction(workspaceId: string, projectId: string, _prevState: unknown, formData: FormData) {
   const hasPerm = await checkManageTasksPermission(workspaceId);
   if (!hasPerm) return { error: 'Permission denied. Must have manage_tasks permission.' };
 
@@ -103,7 +103,7 @@ export async function createTaskAction(workspaceId: string, projectId: string, p
   return { success: true, taskId: task.id };
 }
 
-export async function updateTaskAction(workspaceId: string, taskId: string, prevState: any, formData: FormData) {
+export async function updateTaskAction(workspaceId: string, taskId: string, _prevState: unknown, formData: FormData) {
   const hasPerm = await checkManageTasksPermission(workspaceId);
   if (!hasPerm) return { error: 'Permission denied.' };
 

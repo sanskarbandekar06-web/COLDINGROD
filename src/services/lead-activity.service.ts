@@ -21,5 +21,5 @@ export const getLeadActivities = cache(async (workspaceId: string, leadId: strin
     throw new Error('Failed to fetch lead activities');
   }
 
-  return data as any[];
+  return data as unknown as Activity[];
 });

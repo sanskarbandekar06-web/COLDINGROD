@@ -1,8 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { Activity as ActivityIcon } from 'lucide-react';
+import type { Activity } from '@/types/lead';
 
-export function ClientTimeline({ activities }: { activities: any[] }) {
+export function ClientTimeline({ activities }: { activities: Activity[] }) {
   return (
     <Card className="h-full border-0 shadow-none sm:border sm:shadow-sm">
       <CardHeader>
@@ -18,11 +19,12 @@ export function ClientTimeline({ activities }: { activities: any[] }) {
           </div>
         ) : (
           <div className="relative border-l border-muted ml-3 space-y-6">
-            {activities.map((activity, index) => {
+            {activities.map((activity) => {
               const date = new Date(activity.created_at);
-              const actorName = activity.actor_user 
-                ? (Array.isArray(activity.actor_user) ? activity.actor_user[0]?.full_name : (activity.actor_user as any)?.full_name) 
-                : 'System';
+              const actor = Array.isArray(activity.actor_user)
+                ? activity.actor_user[0]
+                : activity.actor_user;
+              const actorName = actor?.full_name ?? 'System';
 
               return (
                 <div key={activity.id} className="relative pl-6">

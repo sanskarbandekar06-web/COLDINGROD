@@ -4,6 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Check, ChevronsUpDown, Building, User } from 'lucide-react';
 import { Workspace } from '@/types/workspace';
+import { setLastActiveWorkspace } from '@/actions/workspace-preference';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,9 +23,9 @@ export function WorkspaceSwitcher({ workspaces, activeWorkspace }: WorkspaceSwit
   const router = useRouter();
 
   const onWorkspaceSelect = (workspace: Workspace) => {
-    // Set a cookie so the server knows our last preference
-    document.cookie = `last_active_workspace_slug=${workspace.slug}; path=/; max-age=31536000`;
-    router.push(`/dashboard/${workspace.slug}`);
+    void setLastActiveWorkspace(workspace.slug).finally(() => {
+      router.push(`/dashboard/${workspace.slug}`);
+    });
   };
 
   return (

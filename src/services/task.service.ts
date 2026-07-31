@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { Task, TaskStatus } from '@/types/task';
 import { cache } from 'react';
-import { startOfDay, endOfDay, isBefore, isAfter, parseISO } from 'date-fns';
+import { startOfDay, endOfDay } from 'date-fns';
 
 export type DueState = 'overdue' | 'due_today' | 'upcoming' | 'no_date';
 
@@ -122,7 +122,7 @@ export const getTasks = cache(async (params: GetTasksParams): Promise<PaginatedT
   }
 
   return {
-    data: data as any,
+    data: data as unknown as PaginatedTasks['data'],
     count: count || 0,
     page,
     limit,

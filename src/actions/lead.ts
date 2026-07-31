@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { LeadStatus } from '@/types/lead';
 
-export async function createLead(workspaceId: string, prevState: any, formData: FormData) {
+export async function createLead(workspaceId: string, _prevState: unknown, formData: FormData) {
   const supabase = await createClient();
   
   const companyName = formData.get('companyName') as string;
@@ -66,7 +66,7 @@ export async function createLead(workspaceId: string, prevState: any, formData: 
   return { success: true, leadId: lead.id };
 }
 
-export async function updateLead(workspaceId: string, leadId: string, prevState: any, formData: FormData) {
+export async function updateLead(workspaceId: string, leadId: string, _prevState: unknown, formData: FormData) {
   const supabase = await createClient();
   
   const companyName = formData.get('companyName') as string;

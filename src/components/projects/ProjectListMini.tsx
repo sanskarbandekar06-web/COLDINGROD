@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Project } from '@/types/project';
 import { Briefcase } from 'lucide-react';
-import { format } from 'date-fns';
+
 import Link from 'next/link';
 import { buttonVariants } from '@/components/ui/button';
 

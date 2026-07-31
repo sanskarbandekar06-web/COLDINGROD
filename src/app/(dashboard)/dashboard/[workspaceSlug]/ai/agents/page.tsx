@@ -1,10 +1,10 @@
 import { getWorkspaceContext } from '@/services/workspace.service';
 import { getAgents } from '@/services/ai-agent.service';
-import { notFound, redirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { format } from 'date-fns';
-import { Bot, Search, ChevronLeft, ChevronRight, Activity, Globe } from 'lucide-react';
+import { Bot, ChevronLeft, ChevronRight, Activity, Globe } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'AI Agents | Coldingrod',
