@@ -7,9 +7,11 @@ import { ActivityTimeline } from '@/components/leads/ActivityTimeline';
 import { ContactsList } from '@/components/leads/ContactsList';
 import { LeadActionsMenu } from '@/components/leads/LeadActionsMenu';
 import { LeadQualificationPanel } from '@/components/leads/LeadQualificationPanel';
+import { LeadResearchPanel } from '@/components/leads/LeadResearchPanel';
 import { LeadStatusSelector } from '@/components/leads/LeadStatusSelector';
 import { getLeadActivities } from '@/services/lead-activity.service';
 import { getLeadQualificationHistory } from '@/services/lead-qualification.service';
+import { getLeadResearchHistory } from '@/services/lead-research.service';
 import { getLeadDetails } from '@/services/lead.service';
 import { getLeadContacts } from '@/services/contact.service';
 import { getWorkspaceContext } from '@/services/workspace.service';
@@ -23,11 +25,12 @@ export default async function LeadDetailsPage({
   const context = await getWorkspaceContext(workspaceSlug);
   if (!context) notFound();
 
-  const [lead, contacts, activities, qualifications] = await Promise.all([
+  const [lead, contacts, activities, qualifications, researchReports] = await Promise.all([
     getLeadDetails(context.workspace.id, leadId),
     getLeadContacts(leadId),
     getLeadActivities(context.workspace.id, leadId),
     getLeadQualificationHistory(context.workspace.id, leadId),
+    getLeadResearchHistory(context.workspace.id, leadId),
   ]);
 
   if (!lead) notFound();
@@ -171,6 +174,19 @@ export default async function LeadDetailsPage({
               leadId={lead.id}
               canRun={canRunQualification}
               latest={qualifications[0] ?? null}
+            />
+          </SectionCard>
+
+          <SectionCard
+            title="Research & Pain Points"
+            description="Evidence-backed business context and service opportunities."
+          >
+            <LeadResearchPanel
+              workspaceSlug={workspaceSlug}
+              leadId={lead.id}
+              canRun={canRunQualification}
+              isQualified={qualifications.length > 0}
+              latest={researchReports[0] ?? null}
             />
           </SectionCard>
         </div>
