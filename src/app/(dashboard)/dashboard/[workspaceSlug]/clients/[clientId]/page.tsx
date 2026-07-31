@@ -38,7 +38,7 @@ export default async function ClientProfilePage({
   );
 
   return (
-    <div className="flex-1 space-y-6 p-8 pt-6">
+    <div className="space-y-6">
       <ClientHeader client={client} workspaceId={workspace.id} />
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">

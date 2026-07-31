@@ -86,7 +86,7 @@ export function LeadsTable({ leads, totalPages, currentPage, workspaceId, worksp
         </div>
       </div>
 
-      <div className="rounded-md border bg-card">
+      <div className="coldingrod-card overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>

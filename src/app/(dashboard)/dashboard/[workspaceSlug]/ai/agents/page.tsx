@@ -11,13 +11,14 @@ export const metadata: Metadata = {
   description: 'Registered AI agents in your workspace',
 };
 
-export default async function AgentsPage({
-  params,
-  searchParams,
-}: {
-  params: { workspaceSlug: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+export default async function AgentsPage(props: {
+  params: Promise<{ workspaceSlug: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const [params, searchParams] = await Promise.all([
+    props.params,
+    props.searchParams,
+  ]);
   const context = await getWorkspaceContext(params.workspaceSlug);
   if (!context) redirect('/dashboard');
 
@@ -31,7 +32,7 @@ export default async function AgentsPage({
   });
 
   return (
-    <div className="flex-1 space-y-6 p-8 pt-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">

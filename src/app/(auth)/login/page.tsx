@@ -2,12 +2,13 @@
 
 import React, { useActionState } from 'react';
 import Link from 'next/link';
+import { ArrowRight, KeyRound } from 'lucide-react';
 import { login, loginWithGoogle, resendSignupConfirmation } from '@/actions/auth';
+import { AuthTrustNote, AuthVisualPanel, ColdingrodBrandMark, GoogleMark } from '@/components/auth/AuthVisualPanel';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(login, undefined);
@@ -17,114 +18,139 @@ export default function LoginPage() {
   );
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50/50">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold tracking-tight">Welcome back</CardTitle>
-          <CardDescription>
-            Enter your email and password to access your workspace.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form action={formAction} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email address</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="name@agency.com"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <Link
-                  href="/forgot-password"
-                  className="text-sm font-medium text-blue-600 hover:underline"
-                >
-                  Forgot password?
-                </Link>
-              </div>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="••••••••"
-                required
-              />
-            </div>
+    <main className="flex min-h-svh overflow-hidden bg-brand-canvas">
+      <AuthVisualPanel />
 
-            {state?.error && (
-              <Alert variant="destructive">
-                <AlertTitle>Unable to sign in</AlertTitle>
-                <AlertDescription>{state.error}</AlertDescription>
+      <section className="relative flex min-h-svh w-full items-center justify-center overflow-y-auto px-4 py-10 sm:px-8 lg:w-1/2 lg:px-12">
+        <div aria-hidden="true" className="coldingrod-dot-grid absolute inset-0 opacity-25" />
+
+        <div className="relative z-10 w-full max-w-md">
+          <header className="mb-8 text-center">
+            <ColdingrodBrandMark className="mb-6" />
+            <h1 className="text-3xl font-semibold tracking-[-0.025em] text-brand-navy sm:text-4xl">
+              Welcome to Coldingrod
+            </h1>
+            <p className="mt-2 text-base text-slate-600">
+              Log in to your Business OS to continue.
+            </p>
+          </header>
+
+          <div className="coldingrod-card p-6 sm:p-8">
+            <form action={formAction} className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium text-slate-700">
+                  Email address
+                </Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="name@company.com"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-4">
+                  <Label htmlFor="password" className="text-sm font-medium text-slate-700">
+                    Password
+                  </Label>
+                  <Link
+                    href="/forgot-password"
+                    className="text-sm font-medium text-brand-indigo hover:text-brand-indigo-strong hover:underline"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  placeholder="Enter your password"
+                  required
+                />
+              </div>
+
+              {state?.error && (
+                <Alert variant="destructive" role="alert">
+                  <AlertTitle>Unable to sign in</AlertTitle>
+                  <AlertDescription>{state.error}</AlertDescription>
+                </Alert>
+              )}
+
+              <Button type="submit" size="lg" className="w-full" disabled={isPending}>
+                {isPending ? 'Signing in…' : 'Sign in'}
+                {!isPending && <ArrowRight className="size-4" />}
+              </Button>
+            </form>
+
+            {state?.emailNotConfirmed && state.email && (
+              <form action={resendAction} className="mt-3">
+                <input type="hidden" name="email" value={state.email} />
+                <Button
+                  type="submit"
+                  variant="outline"
+                  size="lg"
+                  className="w-full"
+                  disabled={isResending}
+                >
+                  {isResending ? 'Sending…' : 'Resend confirmation email'}
+                </Button>
+              </form>
+            )}
+
+            {resendState?.success && (
+              <Alert className="mt-4">
+                <AlertTitle>Email sent</AlertTitle>
+                <AlertDescription>{resendState.success}</AlertDescription>
               </Alert>
             )}
 
-            <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? 'Signing in...' : 'Sign In'}
-            </Button>
-          </form>
+            {resendState?.error && (
+              <Alert variant="destructive" className="mt-4" role="alert">
+                <AlertTitle>Email could not be sent</AlertTitle>
+                <AlertDescription>{resendState.error}</AlertDescription>
+              </Alert>
+            )}
 
-          {state?.emailNotConfirmed && state.email && (
-            <form action={resendAction} className="mt-3">
-              <input type="hidden" name="email" value={state.email} />
-              <Button
-                type="submit"
-                variant="outline"
-                className="w-full"
-                disabled={isResending}
-              >
-                {isResending ? 'Sending...' : 'Resend confirmation email'}
+            <div className="my-6 flex items-center gap-4" aria-hidden="true">
+              <span className="h-px flex-1 bg-border" />
+              <span className="coldingrod-label">Or</span>
+              <span className="h-px flex-1 bg-border" />
+            </div>
+
+            <form action={loginWithGoogle}>
+              <Button variant="outline" type="submit" size="lg" className="w-full">
+                <GoogleMark />
+                Continue with Google
               </Button>
             </form>
-          )}
 
-          {resendState?.success && (
-            <Alert className="mt-3">
-              <AlertTitle>Email sent</AlertTitle>
-              <AlertDescription>{resendState.success}</AlertDescription>
-            </Alert>
-          )}
-
-          {resendState?.error && (
-            <Alert variant="destructive" className="mt-3">
-              <AlertTitle>Email could not be sent</AlertTitle>
-              <AlertDescription>{resendState.error}</AlertDescription>
-            </Alert>
-          )}
-
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
+            <div className="mt-3 flex h-11 items-center justify-center gap-2 rounded-lg border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500">
+              <KeyRound className="size-4" />
+              Enterprise SSO coming later
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                Or continue with
-              </span>
-            </div>
+
+            <AuthTrustNote />
           </div>
 
-          <form action={loginWithGoogle}>
-            <Button variant="outline" type="submit" className="w-full">
-              Sign in with Google
-            </Button>
-          </form>
-        </CardContent>
-        <CardFooter className="flex justify-center">
-          <p className="text-sm text-muted-foreground">
-            Don&apos;t have an account?{' '}
-            <Link
-              href="/signup"
-              className="font-medium text-blue-600 hover:underline"
-            >
-              Sign up
-            </Link>
-          </p>
-        </CardFooter>
-      </Card>
-    </div>
+          <footer className="mt-7 text-center">
+            <p className="text-sm text-slate-600">
+              Don&apos;t have an account?{' '}
+              <Link href="/signup" className="font-semibold text-brand-indigo hover:underline">
+                Sign up
+              </Link>
+            </p>
+            <div className="mt-5 flex items-center justify-center gap-3 text-xs font-medium tracking-wide text-slate-500">
+              <Link href="/privacy" className="hover:text-brand-navy">Privacy Policy</Link>
+              <span aria-hidden="true">·</span>
+              <Link href="/terms" className="hover:text-brand-navy">Terms of Use</Link>
+            </div>
+          </footer>
+        </div>
+      </section>
+    </main>
   );
 }

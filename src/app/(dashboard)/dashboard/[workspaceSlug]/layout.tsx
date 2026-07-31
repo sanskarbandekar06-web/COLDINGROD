@@ -1,4 +1,4 @@
-import React from 'react';
+import type { ReactNode } from 'react';
 import { redirect } from 'next/navigation';
 import { AppSidebar } from '@/components/layout/AppSidebar';
 import { Topbar } from '@/components/layout/Topbar';
@@ -10,7 +10,7 @@ import {
 } from '@/services/workspace.service';
 
 export default async function DashboardWorkspaceLayout(props: {
-  children: React.ReactNode;
+  children: ReactNode;
   params: Promise<{ workspaceSlug: string }>;
 }) {
   const params = await props.params;
@@ -28,20 +28,29 @@ export default async function DashboardWorkspaceLayout(props: {
   ]);
 
   return (
-    <SidebarProvider>
+    <SidebarProvider
+      style={
+        {
+          '--sidebar-width': '17.5rem',
+          '--sidebar-width-icon': '4.25rem',
+        } as React.CSSProperties
+      }
+    >
       <AppSidebar
         workspaces={workspaces}
         activeWorkspace={context.workspace}
         permissions={context.permissions}
+        user={context.user}
       />
-      <SidebarInset>
+      <SidebarInset className="min-w-0 bg-brand-canvas">
         <Topbar
           activeWorkspace={context.workspace}
           memberId={context.member.id}
           notificationSummary={notificationSummary}
+          user={context.user}
         />
-        <main className="flex flex-1 flex-col overflow-y-auto bg-background p-4 sm:p-6 lg:p-8">
-          {props.children}
+        <main className="flex flex-1 flex-col overflow-y-auto bg-brand-canvas px-4 py-6 sm:px-6 lg:px-8 lg:py-9">
+          <div className="mx-auto w-full max-w-[1480px]">{props.children}</div>
         </main>
       </SidebarInset>
     </SidebarProvider>

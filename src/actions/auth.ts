@@ -49,10 +49,19 @@ export async function login(prevState: AuthActionState, formData: FormData): Pro
 export async function signup(prevState: AuthActionState, formData: FormData): Promise<AuthActionState> {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
+  const confirmPassword = formData.get('confirmPassword') as string;
   const fullName = formData.get('fullName') as string;
 
   if (!email || !password || !fullName) {
     return { error: 'Email, password, and full name are required' };
+  }
+
+  if (password.length < 8) {
+    return { error: 'Password must be at least 8 characters.' };
+  }
+
+  if (confirmPassword && password !== confirmPassword) {
+    return { error: 'Passwords do not match.' };
   }
 
   const supabase = await createClient();

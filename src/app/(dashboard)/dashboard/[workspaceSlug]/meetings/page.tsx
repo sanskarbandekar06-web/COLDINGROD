@@ -68,13 +68,14 @@ export default async function MeetingsPage({
   );
 
   return (
-    <div className="flex-1 space-y-6 p-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
+          <p className="coldingrod-label mb-2">Calendar workspace</p>
+          <h1 className="text-4xl font-bold tracking-[-0.045em] text-brand-navy sm:text-5xl">
             {showArchived ? 'Archived Meetings' : 'Meetings'}
           </h1>
-          <p className="mt-1 text-muted-foreground">
+          <p className="mt-2 text-muted-foreground">
             {showArchived
               ? 'Review and restore archived meeting records.'
               : 'Manage your schedule, personal availability, and upcoming client calls.'}

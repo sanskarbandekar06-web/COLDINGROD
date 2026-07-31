@@ -96,12 +96,19 @@ export default async function AiOverviewPage({
   ];
 
   return (
-    <div className="flex-1 space-y-6 p-4 sm:p-6 lg:p-8 lg:pt-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">AI Center</h2>
-          <p className="text-muted-foreground mt-1">
-            Overview of AI agents, actions, and human approval workflows.
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-4xl font-bold tracking-[-0.05em] text-brand-navy sm:text-5xl">
+              AI Command Center
+            </h1>
+            <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+              Human-controlled
+            </span>
+          </div>
+          <p className="mt-2 text-muted-foreground">
+            Manage agents, monitor workflows, and review automated intelligence tasks.
           </p>
         </div>
       </div>

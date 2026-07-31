@@ -3,13 +3,14 @@ import { getWorkspaceContext } from '@/services/workspace.service';
 import { notFound } from 'next/navigation';
 import { ClientsTable } from '@/components/clients/ClientsTable';
 
-export default async function ClientsPage({
-  params,
-  searchParams,
-}: {
-  params: { workspaceSlug: string };
-  searchParams: { page?: string; search?: string };
+export default async function ClientsPage(props: {
+  params: Promise<{ workspaceSlug: string }>;
+  searchParams: Promise<{ page?: string; search?: string }>;
 }) {
+  const [params, searchParams] = await Promise.all([
+    props.params,
+    props.searchParams,
+  ]);
   const context = await getWorkspaceContext(params.workspaceSlug);
   const workspace = context?.workspace;
 
@@ -28,9 +29,13 @@ export default async function ClientsPage({
   });
 
   return (
-    <div className="flex-1 space-y-6 p-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Clients</h2>
+    <div className="space-y-6">
+      <div>
+        <p className="coldingrod-label mb-2">Client workspace</p>
+        <h1 className="text-4xl font-bold tracking-[-0.045em]">Clients</h1>
+        <p className="mt-2 text-muted-foreground">
+          Manage client relationships and connected delivery work.
+        </p>
       </div>
       <ClientsTable
         clients={clients}

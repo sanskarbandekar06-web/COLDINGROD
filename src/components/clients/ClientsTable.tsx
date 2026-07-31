@@ -71,7 +71,7 @@ export function ClientsTable({ clients, totalPages, currentPage, workspaceId, wo
         </div>
       </div>
 
-      <div className="rounded-md border bg-card overflow-x-auto">
+      <div className="coldingrod-card overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>

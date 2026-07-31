@@ -59,7 +59,7 @@ export default async function MeetingDetailsPage({ params }: MeetingDetailsPageP
     meeting.status !== 'no_show';
 
   return (
-    <div className="flex-1 space-y-6 p-6">
+    <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Button
           variant="outline"

@@ -7,7 +7,11 @@ import type { Workspace } from '@/types/workspace';
 export interface WorkspaceContextData {
   workspace: Workspace;
   permissions: string[];
-  user: { id: string };
+  user: {
+    id: string;
+    email: string;
+    fullName: string;
+  };
   member: { id: string };
 }
 
@@ -53,13 +57,24 @@ export const getWorkspaceContext = cache(
       }
     }
 
+    const metadataName =
+      typeof user.user_metadata?.full_name === 'string'
+        ? user.user_metadata.full_name
+        : typeof user.user_metadata?.name === 'string'
+          ? user.user_metadata.name
+          : '';
+
     return {
       workspace,
       permissions,
-      user: { id: user.id },
+      user: {
+        id: user.id,
+        email: user.email ?? '',
+        fullName: metadataName,
+      },
       member: { id: member.id },
     };
-  }
+  },
 );
 
 export const getUserWorkspaces = cache(async (): Promise<Workspace[]> => {

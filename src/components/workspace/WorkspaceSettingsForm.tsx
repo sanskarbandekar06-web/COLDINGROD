@@ -15,7 +15,7 @@ export function WorkspaceSettingsForm({ workspace, hasPermission }: { workspace:
   const [state, formAction, isPending] = useActionState(updateWorkspaceSettings, null);
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-6">
       <SectionCard title="General Settings" description="Manage your workspace identity.">
         <form action={formAction} className="space-y-6">
           <input type="hidden" name="workspaceId" value={workspace.id} />

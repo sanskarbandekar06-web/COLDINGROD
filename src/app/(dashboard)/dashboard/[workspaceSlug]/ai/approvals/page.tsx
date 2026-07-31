@@ -14,13 +14,14 @@ export const metadata: Metadata = {
 
 type TabValue = 'pending' | 'approved' | 'rejected';
 
-export default async function ApprovalsPage({
-  params,
-  searchParams,
-}: {
-  params: { workspaceSlug: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+export default async function ApprovalsPage(props: {
+  params: Promise<{ workspaceSlug: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const [params, searchParams] = await Promise.all([
+    props.params,
+    props.searchParams,
+  ]);
   const context = await getWorkspaceContext(params.workspaceSlug);
   if (!context) redirect('/dashboard');
 
@@ -73,7 +74,7 @@ export default async function ApprovalsPage({
       : [];
 
   return (
-    <div className="flex-1 space-y-6 p-8 pt-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">

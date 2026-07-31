@@ -13,13 +13,14 @@ export const metadata: Metadata = {
   description: 'View project details and tasks'
 };
 
-export default async function ProjectProfilePage({
-  params,
-  searchParams
-}: {
-  params: { workspaceSlug: string; projectId: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+export default async function ProjectProfilePage(props: {
+  params: Promise<{ workspaceSlug: string; projectId: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const [params, searchParams] = await Promise.all([
+    props.params,
+    props.searchParams,
+  ]);
   const context = await getWorkspaceContext(params.workspaceSlug);
   if (!context) notFound();
 
@@ -51,7 +52,7 @@ export default async function ProjectProfilePage({
     .limit(50);
 
   return (
-    <div className="flex-1 space-y-6 p-8 pt-6">
+    <div className="space-y-6">
       <ProjectHeader project={project} workspaceId={context.workspace.id} />
       
       <div className="pt-2">

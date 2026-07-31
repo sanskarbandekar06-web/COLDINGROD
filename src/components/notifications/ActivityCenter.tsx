@@ -146,7 +146,7 @@ export function ActivityCenter({
         ))}
       </div>
 
-      <div className="flex flex-col gap-3 rounded-xl border bg-card p-3 lg:flex-row lg:items-center lg:justify-between">
+      <div className="coldingrod-card flex flex-col gap-3 p-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex rounded-lg bg-muted p-1">
           <Button
             type="button"
@@ -233,7 +233,7 @@ export function ActivityCenter({
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl border bg-card">
+      <div className="coldingrod-card overflow-hidden">
         {result.data.length === 0 ? (
           <div className="flex min-h-80 flex-col items-center justify-center px-6 text-center">
             <div className="flex size-12 items-center justify-center rounded-full bg-muted">

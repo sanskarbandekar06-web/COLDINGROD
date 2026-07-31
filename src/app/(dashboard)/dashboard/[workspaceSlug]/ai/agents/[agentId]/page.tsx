@@ -12,11 +12,10 @@ export const metadata: Metadata = {
   description: 'AI agent details and recent actions',
 };
 
-export default async function AgentDetailPage({
-  params,
-}: {
-  params: { workspaceSlug: string; agentId: string };
+export default async function AgentDetailPage(props: {
+  params: Promise<{ workspaceSlug: string; agentId: string }>;
 }) {
+  const params = await props.params;
   const context = await getWorkspaceContext(params.workspaceSlug);
   if (!context) redirect('/dashboard');
 
@@ -34,7 +33,7 @@ export default async function AgentDetailPage({
   const isSystemAgent = !agent.workspace_id;
 
   return (
-    <div className="flex-1 space-y-6 p-8 pt-6">
+    <div className="space-y-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Link href={`/dashboard/${params.workspaceSlug}/ai`} className="hover:underline">AI Center</Link>

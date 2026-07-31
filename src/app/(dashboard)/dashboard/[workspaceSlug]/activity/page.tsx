@@ -63,12 +63,13 @@ export default async function ActivityPage({
   ]);
 
   return (
-    <div className="flex-1 space-y-6 p-4 sm:p-6">
+    <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+        <p className="coldingrod-label mb-2">Reports</p>
+        <h1 className="text-4xl font-bold tracking-[-0.045em] text-brand-navy">
           Activity Center
         </h1>
-        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
           Follow important workspace changes, team actions and AI events in one
           place. Read status is private to your account.
         </p>

@@ -42,7 +42,7 @@ export default async function ApprovalDetailPage({
     : null;
 
   return (
-    <div className="flex-1 space-y-6 p-8 pt-6">
+    <div className="space-y-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Link href={`/dashboard/${workspaceSlug}/ai`} className="hover:underline">AI Center</Link>

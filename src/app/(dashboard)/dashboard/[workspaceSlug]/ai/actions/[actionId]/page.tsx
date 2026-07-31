@@ -72,7 +72,7 @@ export default async function AiActionDetailPage({
   const sanitizedResultData = action.result_data ? sanitizeConfig(action.result_data) as Record<string, unknown> : null;
 
   return (
-    <div className="flex-1 space-y-6 p-4 sm:p-6 lg:p-8 lg:pt-6">
+    <div className="space-y-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Link href={`/dashboard/${workspaceSlug}/ai`} className="hover:underline">AI Center</Link>

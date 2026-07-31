@@ -12,13 +12,14 @@ export const metadata: Metadata = {
   description: 'Manage your workspace projects'
 };
 
-export default async function ProjectsPage({
-  params,
-  searchParams
-}: {
-  params: { workspaceSlug: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+export default async function ProjectsPage(props: {
+  params: Promise<{ workspaceSlug: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const [params, searchParams] = await Promise.all([
+    props.params,
+    props.searchParams,
+  ]);
   const context = await getWorkspaceContext(params.workspaceSlug);
   if (!context) notFound();
 
@@ -38,9 +39,13 @@ export default async function ProjectsPage({
   ]);
 
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Projects</h2>
+    <div className="space-y-6">
+      <div>
+        <p className="coldingrod-label mb-2">Delivery workspace</p>
+        <h1 className="text-4xl font-bold tracking-[-0.045em]">Projects</h1>
+        <p className="mt-2 text-muted-foreground">
+          Track delivery, ownership, and project progress.
+        </p>
       </div>
       <ProjectsTable 
         projects={projectsResult.data}

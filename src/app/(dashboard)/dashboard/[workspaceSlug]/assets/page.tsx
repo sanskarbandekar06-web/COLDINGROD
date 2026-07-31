@@ -105,7 +105,7 @@ export default async function AssetsPage({
   ];
 
   return (
-    <div className="flex-1 space-y-6 p-4 sm:p-6">
+    <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
