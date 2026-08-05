@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Bot } from 'lucide-react';
 import { DynamicBreadcrumbs } from './DynamicBreadcrumbs';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { WorkspaceSearch } from './WorkspaceSearch';
@@ -20,7 +21,7 @@ export function Topbar({
   activeWorkspace: Workspace;
   memberId: string;
   notificationSummary: NotificationSummary;
-  user: { email: string; fullName: string };
+  user: { email: string; fullName: string; avatarUrl: string | null };
 }) {
   const pathname = usePathname();
   const basePath = `/dashboard/${activeWorkspace.slug}`;
@@ -112,13 +113,19 @@ export function Topbar({
           memberId={memberId}
           summary={notificationSummary}
         />
-        <div
-          className="ml-1 flex size-9 items-center justify-center rounded-full border-2 border-white bg-brand-navy text-xs font-bold text-white shadow-sm"
+        <Link
+          href={`${basePath}/settings/profile`}
+          className="ml-1 rounded-full outline-none ring-offset-2 focus-visible:ring-2 focus-visible:ring-brand-indigo"
           aria-label={user.fullName || user.email}
           title={user.fullName || user.email}
         >
-          {initials}
-        </div>
+          <Avatar className="size-9 border-2 border-white bg-brand-navy shadow-sm after:border-transparent">
+            {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt="" />}
+            <AvatarFallback className="bg-brand-navy text-xs font-bold text-white">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+        </Link>
       </div>
     </header>
   );

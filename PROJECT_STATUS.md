@@ -6,7 +6,7 @@ Primary implementation workspace: `C:\Users\SANSKAR\COLDINGROD IMPLEMENTATION\co
 
 ## Current phase
 
-Phases 1–5 of the agreed roadmap are complete. The linked Supabase database is current through migration 023, all 12 rollback-only hosted acceptance suites pass, and the post-release functionality repairs are implemented and locally verified. Production deployment verification is in progress.
+Phases 1–5 of the agreed roadmap are complete. The linked Supabase database is current through migration 024, all 13 rollback-only hosted acceptance suites pass, and the post-release functionality repairs are implemented and locally verified. Production deployment verification is complete.
 
 All eight Phase 3 production agents are transparent and deterministic. They use only stored qualification evidence and verified research a workspace member supplies, preserve unknowns, require human selection before lead creation, and do not require an external AI-provider key.
 
@@ -41,7 +41,19 @@ GitHub, Vercel, and Supabase are connected. Google email/password and Google OAu
 - Added active/archived client, project, and task views with working restoration; added project/task editing and project descriptions.
 - Added lead reassignment and atomic, idempotent lead-to-client conversion with visible success/error feedback.
 - Replaced unsafe direct activity deletion with permission-checked note editing and audit-preserving redaction.
-- Reverified migration parity 001–023, zero linked schema-lint findings, all 12 hosted SQL suites, lint, typecheck, and the production build.
+- Reverified migration parity 001–024, zero linked schema-lint findings, all 13 hosted SQL suites, lint, typecheck, and the production build.
+
+## 2026-08-05 profile, invitations, and browser companion repair
+
+- Fixed the Base UI workspace-switcher crash by grouping both menu labels with their required menu items.
+- Removed team-only Members, Invitations, and Permissions controls from personal workspace navigation, with safe direct-route redirects to personal profile settings.
+- Corrected the invitation dialog trigger composition while preserving company-workspace invitations and the existing secure invite/RLS behavior.
+- Added the Stitch-designed personal Profile Settings route with editable avatar, full name, role, timezone, language/region, email/product communication, and AI-assistance preferences.
+- Added a public, 2 MB image-only avatar bucket whose RLS policies restrict upload, update, and deletion paths to the authenticated user's own UUID folder.
+- Connected profile avatars and identity to the top bar and sidebar, with a distinct log-out control.
+- Added the Manifest V3 Coldingrod Lead Capture browser companion. It stores only the app URL and workspace slug, requests no host access, and prefills the human-reviewed Lead Discovery workflow from the active page.
+- Applied migration 024, passed all 13 hosted rollback-only suites, passed linked schema lint, TypeScript, ESLint, extension syntax checks, and the Next.js production build.
+
 ## Phase 3.1 delivered
 
 - A global system `Lead Qualification Agent` registered as `coldingrod-rules-v1`.
@@ -135,8 +147,8 @@ GitHub, Vercel, and Supabase are connected. Google email/password and Google OAu
 - A clean production dependency audit with zero known vulnerabilities.
 ## Hosted database verification
 
-- Local and remote migration histories match through `023_functionality_repairs.sql`.
-- All twelve rollback-only acceptance suites pass: Phase 2.8, 2.9, 2.10, Phase 3.1–3.6, Phase 4.1, Phase 5.1, and Phase 5.2.
+- Local and remote migration histories match through `024_personal_profile_preferences.sql`.
+- All thirteen rollback-only acceptance suites pass: Phase 2.8, 2.9, 2.10, Phase 3.1–3.6, Phase 4.1, Phase 5.1, Phase 5.2, and Phase 5.3.
 - Phase 2.8 authorization, Phase 2.9 asset, and Phase 2.10 notification regression suites still pass.
 - Acceptance coverage includes authentication, dual permissions, workspace and lead/run isolation, agent scoping, strict input allowlisting, deterministic scoring, duplicate traceability, atomic human-approved import, research prerequisites, source validation, pain-point mapping, grounded outreach, exact approval snapshots, atomic approval/rejection, audit suppression, activity delivery, and notification delivery.
 - Direct authenticated writes to lead scores, discovery tables, and research reports are denied; trusted RPCs own scoring, discovery, research, personalization, and review transitions.
@@ -162,8 +174,9 @@ GitHub, Vercel, and Supabase are connected. Google email/password and Google OAu
 - Phase 3.6 TypeScript, targeted ESLint, the complete nine-suite hosted regression matrix, and the production build pass; the live signed-in analytics page renders with no browser errors.
 - Phase 4.1 TypeScript, targeted ESLint, the complete ten-suite hosted regression matrix, and the production build pass; the live signed-in Integrations page renders with no browser errors.
 - Full-repository `npm run check` passes: TypeScript, ESLint, and the Next.js production build.
+- The personal profile UI and new browser companion use JavaScript where safe, limiting new TypeScript to existing typed routing and layout contracts.
 - `npm audit --omit=dev` reports zero production vulnerabilities.
-- Supabase schema lint and the performance advisor report no issues after migration 023. The security advisor reports only the intentional authenticated RPC boundaries plus the owner-configurable leaked-password setting.
+- Supabase schema lint and the performance advisor report no issues after migration 024. The security advisor reports only the intentional authenticated RPC boundaries plus the owner-configurable leaked-password setting.
 - The signed-in dashboard, Terms, Privacy, and health endpoint render on localhost with no browser errors; unauthenticated dashboard requests redirect to login.
 - Security headers are present on public, authenticated, redirect, and health responses.
 

@@ -8,11 +8,13 @@ The implementation follows a human-control rule: automation may analyze, prepare
 
 - Email/password and Google authentication through Supabase Auth
 - Personal and company workspaces with invitations and granular permissions
+- Editable personal profiles, avatar storage, timezone/locale, communication, and AI preferences
 - Leads, contacts, clients, projects, tasks, meetings, files, activity, and notifications
 - Lead qualification, discovery, research, pain-point analysis, outreach drafting, follow-up planning, approvals, and analytics
 - Google Places Text Search (New) with a server-only API key and Place-ID-only persistence
 - Row Level Security, trusted permission-checking RPCs, immutable audit data, and rollback-only hosted acceptance tests
 - Production health endpoint, security headers, error boundaries, CI, and deployment runbooks
+- A token-free Chrome/Edge browser companion for capturing pages into human-reviewed Lead Discovery
 
 ## Requirements
 
@@ -67,7 +69,7 @@ The implementation follows a human-control rule: automation may analyze, prepare
 
 7. Open [http://localhost:3000](http://localhost:3000).
 
-The linked project already has migrations 001–023. For a new clean Supabase project, linking it and running `db push` applies all migrations in order.
+The linked project already has migrations 001–024. For a new clean Supabase project, linking it and running `db push` applies all migrations in order.
 
 ## Environment variables
 
@@ -95,6 +97,7 @@ The GitHub Actions workflow runs the same application checks on pushes and pull 
 ## Documentation
 
 - [Database and acceptance tests](docs/DATABASE.md)
+- [Browser companion installation](browser-extension/README.md)
 - [Production deployment](docs/DEPLOYMENT.md)
 - [Google Places setup](docs/GOOGLE_PLACES.md)
 - [Operations and rollback](docs/OPERATIONS.md)

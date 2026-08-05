@@ -7,6 +7,7 @@ import {
   KeyRound,
   Plug,
   Settings2,
+  UserRound,
   UsersRound,
 } from 'lucide-react';
 import { WorkspaceSettingsForm } from '@/components/workspace/WorkspaceSettingsForm';
@@ -23,21 +24,18 @@ export default async function SettingsPage(props: {
   const hasPermission = context.permissions.includes('manage_settings');
   const basePath = `/dashboard/${workspaceSlug}`;
   const settingsLinks = [
+    { label: 'My profile', href: `${basePath}/settings/profile`, icon: UserRound },
     { label: 'General', href: `${basePath}/settings`, icon: Settings2, active: true },
-    { label: 'Team management', href: `${basePath}/members`, icon: UsersRound },
-    { label: 'Workspace access', href: `${basePath}/permissions`, icon: KeyRound },
+    ...(!context.workspace.is_personal
+      ? [
+          { label: 'Company profile', href: `${basePath}/settings/company`, icon: Building2 },
+          { label: 'Team management', href: `${basePath}/members`, icon: UsersRound },
+          { label: 'Workspace access', href: `${basePath}/permissions`, icon: KeyRound },
+        ]
+      : []),
     { label: 'Integrations', href: `${basePath}/integrations`, icon: Plug },
     { label: 'AI settings', href: `${basePath}/ai`, icon: Bot },
     { label: 'Notifications', href: `${basePath}/activity`, icon: BellRing },
-    ...(!context.workspace.is_personal
-      ? [
-          {
-            label: 'Company profile',
-            href: `${basePath}/settings/company`,
-            icon: Building2,
-          },
-        ]
-      : []),
   ];
 
   return (

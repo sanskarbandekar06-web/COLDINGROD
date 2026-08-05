@@ -6,6 +6,7 @@ import { setLastActiveWorkspace } from '@/actions/workspace-preference';
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -74,11 +75,15 @@ export function WorkspaceSwitcher({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-64" align="start">
-        <DropdownMenuLabel>Personal workspace</DropdownMenuLabel>
-        {workspaces.filter((workspace) => workspace.is_personal).map(workspaceRow)}
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Personal workspace</DropdownMenuLabel>
+          {workspaces.filter((workspace) => workspace.is_personal).map(workspaceRow)}
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuLabel>Team workspaces</DropdownMenuLabel>
-        {workspaces.filter((workspace) => !workspace.is_personal).map(workspaceRow)}
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Team workspaces</DropdownMenuLabel>
+          {workspaces.filter((workspace) => !workspace.is_personal).map(workspaceRow)}
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => router.push('/dashboard/create')}

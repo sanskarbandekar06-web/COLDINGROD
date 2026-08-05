@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Coldingrod Lead Capture",
+  "description": "Capture the current business page into Coldingrod Lead Discovery for human review.",
+  "version": "0.1.0",
+  "permissions": ["activeTab", "storage"],
+  "action": {
+    "default_title": "Capture lead in Coldingrod",
+    "default_popup": "popup.html"
+  }
+}

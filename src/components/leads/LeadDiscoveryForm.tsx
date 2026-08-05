@@ -28,9 +28,13 @@ const EMPTY_CANDIDATE: LeadDiscoveryCandidateInput = {
   externalReference: '',
 };
 
-function createCandidate(key: string): CandidateDraft {
+function createCandidate(
+  key: string,
+  initial?: Partial<LeadDiscoveryCandidateInput>,
+): CandidateDraft {
   return {
     ...EMPTY_CANDIDATE,
+    ...initial,
     key,
   };
 }
@@ -51,19 +55,23 @@ function candidateInput(candidate: CandidateDraft): LeadDiscoveryCandidateInput 
 
 export function LeadDiscoveryForm({
   workspaceSlug,
+  initialRunName = '',
+  initialCandidate,
 }: {
   workspaceSlug: string;
+  initialRunName?: string;
+  initialCandidate?: Partial<LeadDiscoveryCandidateInput>;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const nextCandidateKey = useRef(2);
-  const [runName, setRunName] = useState('');
+  const [runName, setRunName] = useState(initialRunName);
   const [market, setMarket] = useState('');
   const [location, setLocation] = useState('');
   const [serviceFocus, setServiceFocus] = useState('');
   const [notes, setNotes] = useState('');
   const [candidates, setCandidates] = useState<CandidateDraft[]>(() => [
-    createCandidate('candidate-1'),
+    createCandidate('candidate-1', initialCandidate),
   ]);
 
   function updateCandidate(

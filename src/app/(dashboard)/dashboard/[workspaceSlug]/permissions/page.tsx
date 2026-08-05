@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { ShieldCheck } from 'lucide-react';
 import { PageHeader } from '@/components/dashboard/PageHeader';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +15,9 @@ export default async function PermissionsPage({
   const { workspaceSlug } = await params;
   const context = await getWorkspaceContext(workspaceSlug);
   if (!context || !context.permissions.includes('manage_members')) notFound();
+  if (context.workspace.is_personal) {
+    redirect(`/dashboard/${workspaceSlug}/settings/profile`);
+  }
 
   const [permissions, members] = await Promise.all([
     getAvailablePermissions(),

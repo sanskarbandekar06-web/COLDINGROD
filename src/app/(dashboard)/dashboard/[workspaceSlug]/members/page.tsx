@@ -1,6 +1,6 @@
 import { getWorkspaceContext } from '@/services/workspace.service';
 import { getWorkspaceMembers, getAvailablePermissions } from '@/services/member.service';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { PageHeader } from '@/components/dashboard/PageHeader';
 import { MembersTable } from '@/components/members/MembersTable';
 import { InviteMemberModal } from '@/components/members/InviteMemberModal';
@@ -11,6 +11,9 @@ export default async function MembersPage(props: { params: Promise<{ workspaceSl
   
   if (!context) {
     notFound();
+  }
+  if (context.workspace.is_personal) {
+    redirect(`/dashboard/${params.workspaceSlug}/settings/profile`);
   }
 
   const hasPermission = context.permissions.includes('manage_members');

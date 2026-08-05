@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { getAppUrl } from '@/lib/app-url';
 import { PageHeader } from '@/components/dashboard/PageHeader';
 import { InviteMemberModal } from '@/components/members/InviteMemberModal';
@@ -15,6 +15,9 @@ export default async function InvitationsPage({
   const { workspaceSlug } = await params;
   const context = await getWorkspaceContext(workspaceSlug);
   if (!context || !context.permissions.includes('manage_members')) notFound();
+  if (context.workspace.is_personal) {
+    redirect(`/dashboard/${workspaceSlug}/settings/profile`);
+  }
 
   const [invitations, permissions] = await Promise.all([
     getWorkspaceInvitations(context.workspace.id),

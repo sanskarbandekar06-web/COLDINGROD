@@ -26,10 +26,16 @@ import { getWorkspaceContext } from '@/services/workspace.service';
 
 export default async function LeadDiscoveryPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ workspaceSlug: string }>;
+  searchParams: Promise<{ sourceUrl?: string; title?: string; capture?: string }>;
 }) {
   const { workspaceSlug } = await params;
+  const captured = await searchParams;
+  const capturedSourceUrl = typeof captured.sourceUrl === 'string' ? captured.sourceUrl.slice(0, 500) : '';
+  const capturedTitle = typeof captured.title === 'string' ? captured.title.slice(0, 200) : '';
+  const fromExtension = captured.capture === 'extension' && capturedSourceUrl.startsWith('http');
   const context = await getWorkspaceContext(workspaceSlug);
   if (!context) notFound();
 
@@ -117,7 +123,18 @@ export default async function LeadDiscoveryPage({
         />
       )}
 
-      {canRun && <LeadDiscoveryForm workspaceSlug={workspaceSlug} />}
+      {canRun && (
+        <LeadDiscoveryForm
+          workspaceSlug={workspaceSlug}
+          initialRunName={fromExtension ? `Captured: ${(capturedTitle || 'business page').slice(0, 140)}` : ''}
+          initialCandidate={fromExtension ? {
+            companyName: capturedTitle,
+            websiteUrl: capturedSourceUrl,
+            sourceUrl: capturedSourceUrl,
+            evidenceNotes: 'Captured with the Coldingrod browser companion. Review all details before importing.',
+          } : undefined}
+        />
+      )}
 
       <section className="space-y-4" aria-labelledby="recent-discovery-runs">
         <div>

@@ -27,6 +27,7 @@ import {
   UsersRound,
 } from 'lucide-react';
 import { logout } from '@/actions/auth';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Sidebar,
   SidebarContent,
@@ -50,6 +51,7 @@ interface AppSidebarProps {
   user: {
     email: string;
     fullName: string;
+    avatarUrl: string | null;
   };
 }
 
@@ -104,13 +106,13 @@ export function AppSidebar({
     ...(hasSettingPerm && !activeWorkspace.is_personal
       ? [{ name: 'Company', href: `${basePath}/settings/company`, icon: Building }]
       : []),
-    ...(hasMemberPerm
+    ...(hasMemberPerm && !activeWorkspace.is_personal
       ? [{ name: 'Members', href: `${basePath}/members`, icon: UsersRound }]
       : []),
-    ...(hasMemberPerm
+    ...(hasMemberPerm && !activeWorkspace.is_personal
       ? [{ name: 'Invites', href: `${basePath}/invites`, icon: UserPlus }]
       : []),
-    ...(hasMemberPerm
+    ...(hasMemberPerm && !activeWorkspace.is_personal
       ? [{ name: 'Permissions', href: `${basePath}/permissions`, icon: ShieldAlert }]
       : []),
   ];
@@ -205,25 +207,35 @@ export function AppSidebar({
               <span>Help & settings</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
-          <SidebarMenuItem>
-            <form action={logout}>
+          <SidebarMenuItem className="flex items-center gap-1">
+            <SidebarMenuButton
+              render={<Link href={`${basePath}/settings/profile`} />}
+              tooltip="My profile"
+              className="h-11 flex-1 px-3 text-sidebar-foreground/60 hover:bg-white/8 hover:text-white"
+            >
+              <Avatar size="sm" className="size-7 border-0 after:border-white/10">
+                {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt="" />}
+                <AvatarFallback className="bg-white/10 text-[10px] font-bold text-white">
+                  {initials(user.fullName, user.email)}
+                </AvatarFallback>
+              </Avatar>
+              <span className="min-w-0 flex-1 text-left">
+                <span className="block truncate text-xs font-semibold text-white">
+                  {user.fullName || 'Account'}
+                </span>
+                <span className="block truncate text-[10px] text-sidebar-foreground/45">
+                  Edit personal profile
+                </span>
+              </span>
+            </SidebarMenuButton>
+            <form action={logout} className="shrink-0">
               <SidebarMenuButton
                 type="submit"
                 tooltip="Log out"
-                className="h-11 px-3 text-sidebar-foreground/60 hover:bg-white/8 hover:text-white"
+                className="size-9 justify-center px-0 text-sidebar-foreground/60 hover:bg-white/8 hover:text-white"
               >
-                <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-[10px] font-bold text-white">
-                  {initials(user.fullName, user.email)}
-                </span>
-                <span className="min-w-0 flex-1 text-left">
-                  <span className="block truncate text-xs font-semibold text-white">
-                    {user.fullName || 'Account'}
-                  </span>
-                  <span className="block truncate text-[10px] text-sidebar-foreground/45">
-                    {user.email}
-                  </span>
-                </span>
-                <LogOut className="ml-auto" />
+                <LogOut />
+                <span className="sr-only">Log out</span>
               </SidebarMenuButton>
             </form>
           </SidebarMenuItem>

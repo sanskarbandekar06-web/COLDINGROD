@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Coldingrod Lead Capture</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <span class="brand-mark">C</span>
+        <div>
+          <h1>Coldingrod</h1>
+          <p>Lead Capture</p>
+        </div>
+      </header>
+
+      <section class="page-card" aria-live="polite">
+        <span class="eyebrow">Current page</span>
+        <strong id="page-title">Reading active tab…</strong>
+        <span id="page-url"></span>
+      </section>
+
+      <form id="capture-form">
+        <label for="app-url">Coldingrod app URL</label>
+        <input id="app-url" name="appUrl" type="url" value="https://coldingrod.vercel.app" required />
+
+        <label for="workspace-slug">Workspace slug</label>
+        <input id="workspace-slug" name="workspaceSlug" placeholder="your-workspace" pattern="[a-z0-9][a-z0-9-]*" required />
+        <small>Find it in your dashboard address after <code>/dashboard/</code>.</small>
+
+        <p id="message" role="status"></p>
+        <button id="capture-button" type="submit">Capture for review</button>
+      </form>
+
+      <footer>No passwords or Supabase session tokens are stored.</footer>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

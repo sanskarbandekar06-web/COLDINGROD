@@ -11,6 +11,7 @@ export interface WorkspaceContextData {
     id: string;
     email: string;
     fullName: string;
+    avatarUrl: string | null;
   };
   member: { id: string };
 }
@@ -57,6 +58,12 @@ export const getWorkspaceContext = cache(
       }
     }
 
+    const { data: profile } = await supabase
+      .from('users')
+      .select('full_name, avatar_url')
+      .eq('id', user.id)
+      .maybeSingle();
+
     const metadataName =
       typeof user.user_metadata?.full_name === 'string'
         ? user.user_metadata.full_name
@@ -70,7 +77,12 @@ export const getWorkspaceContext = cache(
       user: {
         id: user.id,
         email: user.email ?? '',
-        fullName: metadataName,
+        fullName: profile?.full_name || metadataName,
+        avatarUrl:
+          profile?.avatar_url ||
+          (typeof user.user_metadata?.avatar_url === 'string'
+            ? user.user_metadata.avatar_url
+            : null),
       },
       member: { id: member.id },
     };

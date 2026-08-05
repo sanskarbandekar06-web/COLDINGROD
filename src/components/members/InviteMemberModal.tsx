@@ -64,7 +64,7 @@ function InviteMemberModalSession({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => { setOpen(nextOpen); if (!nextOpen) onReset(); }}>
-      <DialogTrigger render={<Button>Invite Member</Button>} />
+      <DialogTrigger render={<Button />}>Invite Member</DialogTrigger>
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Invite to Workspace</DialogTitle>
