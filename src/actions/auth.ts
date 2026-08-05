@@ -16,9 +16,17 @@ function getEmailRedirectTo() {
   return `${appUrl}/auth/callback?next=/dashboard`;
 }
 
+function safeNextPath(value: FormDataEntryValue | null): string {
+  if (typeof value !== 'string' || !value.startsWith('/') || value.startsWith('//')) {
+    return '/dashboard';
+  }
+  return value;
+}
+
 export async function login(prevState: AuthActionState, formData: FormData): Promise<AuthActionState> {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
+  const next = safeNextPath(formData.get('next'));
 
   if (!email || !password) {
     return { error: 'Email and password are required' };
@@ -43,7 +51,7 @@ export async function login(prevState: AuthActionState, formData: FormData): Pro
     return { error: error.message };
   }
 
-  redirect('/dashboard');
+  redirect(next);
 }
 
 export async function signup(prevState: AuthActionState, formData: FormData): Promise<AuthActionState> {

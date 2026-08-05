@@ -20,6 +20,7 @@ interface TasksTableProps {
   totalPages: number;
   currentPage: number;
   workspaceId: string;
+  workspaceSlug: string;
   projects: { id: string, name: string }[];
   members: { id: string, full_name: string }[];
   userId: string;
@@ -27,7 +28,7 @@ interface TasksTableProps {
   defaultProjectId?: string;
 }
 
-export function TasksTable({ tasks, totalPages, currentPage, workspaceId, projects, members, hideProject, defaultProjectId }: TasksTableProps) {
+export function TasksTable({ tasks, totalPages, currentPage, workspaceId, workspaceSlug, projects, members, hideProject, defaultProjectId }: TasksTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentSearch = searchParams.get('search') || '';
@@ -141,7 +142,7 @@ export function TasksTable({ tasks, totalPages, currentPage, workspaceId, projec
                     {!hideProject && (
                       <TableCell className="text-sm text-muted-foreground">
                         {task.project?.name ? (
-                          <Link href={`/dashboard/${workspaceId}/projects/${task.project_id}`} className="hover:underline">
+                          <Link href={`/dashboard/${workspaceSlug}/projects/${task.project_id}`} className="hover:underline">
                             {task.project.name}
                           </Link>
                         ) : '--'}

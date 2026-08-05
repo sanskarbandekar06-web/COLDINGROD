@@ -4,12 +4,15 @@ import { randomBytes } from 'node:crypto';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { getAppUrl } from '@/lib/app-url';
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 
-interface MemberActionResult {
+export interface MemberActionResult {
   success?: boolean;
   error?: string;
+  invitationId?: string;
+  inviteUrl?: string;
 }
 
 interface WorkspaceManager {
@@ -179,12 +182,13 @@ export async function inviteMember(
 
     const expiresAt = new Date();
     expiresAt.setUTCDate(expiresAt.getUTCDate() + expirationDays);
+    const token = randomBytes(32).toString('hex');
     const { data: invite, error: inviteError } = await supabase
       .from('workspace_invites')
       .insert({
         workspace_id: workspaceId,
         email,
-        token: randomBytes(32).toString('hex'),
+        token,
         granted_permissions: permissions,
         invited_by: actor.userId,
         expires_at: expiresAt.toISOString(),
@@ -209,7 +213,12 @@ export async function inviteMember(
     }
 
     revalidateMembers(actor.workspaceSlug);
-    return { success: true };
+    revalidatePath(`/dashboard/${actor.workspaceSlug}/invites`);
+    return {
+      success: true,
+      invitationId: invite.id,
+      inviteUrl: `${getAppUrl()}/invite/${token}`,
+    };
   } catch (error: unknown) {
     console.error('Invite member error:', error);
     return { error: errorMessage(error, 'Failed to create the invitation.') };
@@ -364,5 +373,53 @@ export async function removeMember(
   } catch (error: unknown) {
     console.error('Remove member error:', error);
     return { error: errorMessage(error, 'Failed to remove member.') };
+  }
+}
+
+export async function revokeWorkspaceInvite(
+  workspaceId: string,
+  inviteId: string,
+): Promise<MemberActionResult> {
+  try {
+    const supabase = await createClient();
+    const actor = await requireWorkspaceManager(supabase, workspaceId);
+    const { data: invite, error: inviteError } = await supabase
+      .from('workspace_invites')
+      .select('id, email')
+      .eq('id', inviteId)
+      .eq('workspace_id', workspaceId)
+      .eq('status', 'pending')
+      .is('revoked_at', null)
+      .maybeSingle();
+    if (inviteError || !invite) throw new Error('Active invitation not found.');
+
+    const { error: revokeError } = await supabase
+      .from('workspace_invites')
+      .update({
+        status: 'expired',
+        revoked_at: new Date().toISOString(),
+      })
+      .eq('id', inviteId)
+      .eq('workspace_id', workspaceId);
+    if (revokeError) throw new Error(revokeError.message || 'Failed to revoke invitation.');
+
+    const { error: activityError } = await supabase.from('activities').insert({
+      workspace_id: workspaceId,
+      entity_type: 'member_invite',
+      entity_id: inviteId,
+      actor_type: 'human',
+      actor_user_id: actor.userId,
+      workspace_member_id: actor.memberId,
+      action: 'revoked',
+      metadata: { email: invite.email },
+    });
+    if (activityError) console.error('Failed to log invite revocation:', activityError);
+
+    revalidateMembers(actor.workspaceSlug);
+    revalidatePath(`/dashboard/${actor.workspaceSlug}/invites`);
+    return { success: true };
+  } catch (error: unknown) {
+    console.error('Revoke invitation error:', error);
+    return { error: errorMessage(error, 'Failed to revoke invitation.') };
   }
 }

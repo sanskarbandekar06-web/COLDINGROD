@@ -52,6 +52,7 @@ export default async function ProjectsPage(props: {
         totalPages={projectsResult.totalPages}
         currentPage={projectsResult.page}
         workspaceId={context.workspace.id}
+        workspaceSlug={params.workspaceSlug}
         clients={clientsResult.data}
         members={membersResult.map(m => ({ id: m.user_id, full_name: m.user.full_name || m.user.email }))}
       />

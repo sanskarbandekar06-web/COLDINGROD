@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Bot, Search } from 'lucide-react';
+import { Bot } from 'lucide-react';
 import { DynamicBreadcrumbs } from './DynamicBreadcrumbs';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { WorkspaceSearch } from './WorkspaceSearch';
 import type { NotificationSummary } from '@/types/notification';
 import type { Workspace } from '@/types/workspace';
 
@@ -102,15 +103,10 @@ export function Topbar({
           AI Assistant
         </Button>
         <span className="mx-2 hidden h-8 w-px bg-border sm:block" />
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          aria-label="Search workspace"
-          title="Search workspace"
-        >
-          <Search className="size-5" />
-        </Button>
+        <WorkspaceSearch
+          workspaceId={activeWorkspace.id}
+          workspaceSlug={activeWorkspace.slug}
+        />
         <NotificationBell
           workspaceSlug={activeWorkspace.slug}
           memberId={memberId}

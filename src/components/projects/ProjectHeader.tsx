@@ -13,6 +13,7 @@ interface ProjectHeaderProps {
     owner?: { id: string, full_name: string } | null
   };
   workspaceId: string;
+  workspaceSlug: string;
 }
 
 const statusOptions: { value: ProjectStatus; label: string }[] = [
@@ -23,7 +24,7 @@ const statusOptions: { value: ProjectStatus; label: string }[] = [
   { value: 'cancelled', label: 'Cancelled' },
 ];
 
-export function ProjectHeader({ project, workspaceId }: ProjectHeaderProps) {
+export function ProjectHeader({ project, workspaceId, workspaceSlug }: ProjectHeaderProps) {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
 
@@ -49,7 +50,7 @@ export function ProjectHeader({ project, workspaceId }: ProjectHeaderProps) {
       setIsPending(false);
     } else {
       toast.success('Project archived');
-      router.push(`/dashboard/${workspaceId}/projects`);
+      router.push(`/dashboard/${workspaceSlug}/projects`);
     }
   };
 

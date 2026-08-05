@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { getClientDrawerData } from '@/actions/client-drawer';
 import { Button } from '@/components/ui/button';
 import {
@@ -41,6 +42,7 @@ export function ClientDrawer({
   workspaceSlug: string;
   clientId: string | null;
 }) {
+  const router = useRouter();
   const [drawerState, setDrawerState] = useState<DrawerState | null>(null);
 
   useEffect(() => {
@@ -189,7 +191,7 @@ export function ClientDrawer({
               <Button
                 className="w-full"
                 onClick={() => {
-                  window.location.href = `/dashboard/${workspaceSlug}/clients/${clientId}`;
+                  router.push(`/dashboard/${workspaceSlug}/clients/${clientId}`);
                 }}
               >
                 View Full Profile <ExternalLink className="ml-2 h-4 w-4" />

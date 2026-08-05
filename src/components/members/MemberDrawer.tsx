@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useTransition } from 'react';
-import { format } from 'date-fns';
+import { useEffect, useState, useTransition } from 'react';
+import { format, formatDistanceToNow } from 'date-fns';
 import { ShieldAlert, Trash2, UserMinus } from 'lucide-react';
 import { toast } from 'sonner';
 import { removeMember, updateMemberPermissions } from '@/actions/member';
+import { getMemberWorkspaceOverviewAction, type MemberWorkspaceOverview } from '@/actions/member-overview';
 import type { MemberData, PermissionItem } from '@/services/member.service';
 import { PermissionMatrix } from './PermissionMatrix';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -48,8 +49,22 @@ function MemberDrawerContent({
   currentMemberId,
 }: MemberDrawerContentProps) {
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>(member.permissions);
+  const [overview, setOverview] = useState<MemberWorkspaceOverview | null>(null);
+  const [overviewError, setOverviewError] = useState<string | null>(null);
+  const [overviewLoading, setOverviewLoading] = useState(true);
   const [isPending, startTransition] = useTransition();
 
+  useEffect(() => {
+    if (!isOpen) return;
+    let cancelled = false;
+    void getMemberWorkspaceOverviewAction(workspaceId, member.user_id).then((result) => {
+      if (cancelled) return;
+      setOverview(result.data ?? null);
+      setOverviewError(result.error ?? null);
+      setOverviewLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, [isOpen, member.user_id, workspaceId]);
 
   const handleSavePermissions = () => {
     if (!member) return;
@@ -174,10 +189,41 @@ function MemberDrawerContent({
             )}
           </TabsContent>
 
-          <TabsContent value="activity" className="mt-4">
-            <div className="rounded-lg border bg-muted/20 py-12 text-center text-sm text-muted-foreground">
-              Individual member activity and assignments will appear here.
-            </div>
+          <TabsContent value="activity" className="mt-4 space-y-6">
+            {overviewLoading ? (
+              <div className="rounded-lg border bg-muted/20 py-12 text-center text-sm text-muted-foreground">Loading member activity…</div>
+            ) : overviewError ? (
+              <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">{overviewError}</div>
+            ) : overview ? (
+              <>
+                <section>
+                  <h4 className="mb-3 text-sm font-semibold">Current assignments</h4>
+                  {overview.assignments.length ? (
+                    <div className="space-y-2">
+                      {overview.assignments.map((assignment) => (
+                        <div key={`${assignment.kind}-${assignment.id}`} className="flex items-center justify-between gap-3 rounded-lg border p-3">
+                          <div className="min-w-0"><p className="truncate text-sm font-medium">{assignment.title}</p><p className="text-xs text-muted-foreground">{assignment.kind}</p></div>
+                          <span className="shrink-0 rounded-full bg-muted px-2 py-1 text-[10px] font-semibold capitalize">{assignment.status.replaceAll('_', ' ')}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : <p className="rounded-lg border bg-muted/20 p-4 text-sm text-muted-foreground">No active assignments.</p>}
+                </section>
+                <section>
+                  <h4 className="mb-3 text-sm font-semibold">Recent activity</h4>
+                  {overview.activities.length ? (
+                    <div className="space-y-3">
+                      {overview.activities.map((activity) => (
+                        <div key={activity.id} className="border-l-2 border-brand-indigo/30 pl-3">
+                          <p className="text-sm capitalize">{activity.action.replaceAll('_', ' ')}</p>
+                          <p className="text-xs text-muted-foreground capitalize">{activity.entityType.replaceAll('_', ' ')} · {formatDistanceToNow(new Date(activity.createdAt), { addSuffix: true })}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : <p className="rounded-lg border bg-muted/20 p-4 text-sm text-muted-foreground">No recent activity.</p>}
+                </section>
+              </>
+            ) : null}
           </TabsContent>
         </Tabs>
       </SheetContent>

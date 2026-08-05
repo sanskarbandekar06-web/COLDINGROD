@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import type { LeadListItem } from '@/types/lead';
+import type { LeadListItem, LeadStatus } from '@/types/lead';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, ChevronLeft, ChevronRight, SlidersHorizontal, Plus } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { format } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { CreateLeadModal } from './CreateLeadModal';
@@ -35,6 +35,7 @@ export function LeadsTable({ leads, totalPages, currentPage, workspaceId, worksp
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentSearch = searchParams.get('search') || '';
+  const currentStatus = searchParams.get('status') || 'all';
   
   const [searchInput, setSearchInput] = useState(currentSearch);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -47,6 +48,17 @@ export function LeadsTable({ leads, totalPages, currentPage, workspaceId, worksp
       params.set('search', searchInput);
     } else {
       params.delete('search');
+    }
+    params.set('page', '1');
+    router.push(`?${params.toString()}`);
+  };
+
+  const handleStatusChange = (status: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (status === 'all') {
+      params.delete('status');
+    } else {
+      params.set('status', status as LeadStatus);
     }
     params.set('page', '1');
     router.push(`?${params.toString()}`);
@@ -75,9 +87,21 @@ export function LeadsTable({ leads, totalPages, currentPage, workspaceId, worksp
               onChange={(e) => setSearchInput(e.target.value)}
             />
           </div>
-          <Button type="button" variant="outline" size="icon">
-            <SlidersHorizontal className="h-4 w-4" />
-          </Button>
+          <select
+            aria-label="Filter leads by status"
+            value={currentStatus}
+            onChange={(event) => handleStatusChange(event.target.value)}
+            className="h-10 rounded-lg border border-input bg-background px-3 text-sm outline-none focus:border-brand-indigo focus:ring-3 focus:ring-brand-indigo/10"
+          >
+            <option value="all">All statuses</option>
+            <option value="new">New</option>
+            <option value="analyzed">Analyzed</option>
+            <option value="contacted">Contacted</option>
+            <option value="responded">Responded</option>
+            <option value="meeting_scheduled">Meeting scheduled</option>
+            <option value="won">Won</option>
+            <option value="lost">Lost</option>
+          </select>
         </form>
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <Button onClick={() => setIsCreateOpen(true)} className="w-full sm:w-auto">

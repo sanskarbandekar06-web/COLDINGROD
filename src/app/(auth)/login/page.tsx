@@ -1,16 +1,20 @@
 'use client';
 
-import React, { useActionState } from 'react';
+import React, { Suspense, useActionState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, KeyRound } from 'lucide-react';
-import { login, loginWithGoogle, resendSignupConfirmation } from '@/actions/auth';
+import { useSearchParams } from 'next/navigation';
+import { ArrowRight } from 'lucide-react';
+import { login, resendSignupConfirmation } from '@/actions/auth';
 import { AuthTrustNote, AuthVisualPanel, ColdingrodBrandMark, GoogleMark } from '@/components/auth/AuthVisualPanel';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-export default function LoginPage() {
+function LoginContent() {
+  const searchParams = useSearchParams();
+  const queryError = searchParams.get('error');
+  const queryMessage = searchParams.get('message');
   const [state, formAction, isPending] = useActionState(login, undefined);
   const [resendState, resendAction, isResending] = useActionState(
     resendSignupConfirmation,
@@ -37,6 +41,7 @@ export default function LoginPage() {
 
           <div className="coldingrod-card p-6 sm:p-8">
             <form action={formAction} className="space-y-5">
+              <input type="hidden" name="next" value={searchParams.get('next') ?? '/dashboard'} />
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium text-slate-700">
                   Email address
@@ -115,23 +120,36 @@ export default function LoginPage() {
               </Alert>
             )}
 
+            {queryError && (
+              <Alert variant="destructive" className="mt-4" role="alert">
+                <AlertTitle>Google sign-in unavailable</AlertTitle>
+                <AlertDescription>{queryError}</AlertDescription>
+              </Alert>
+            )}
+
+            {queryMessage && (
+              <Alert className="mt-4">
+                <AlertTitle>Success</AlertTitle>
+                <AlertDescription>{queryMessage}</AlertDescription>
+              </Alert>
+            )}
+
             <div className="my-6 flex items-center gap-4" aria-hidden="true">
               <span className="h-px flex-1 bg-border" />
               <span className="coldingrod-label">Or</span>
               <span className="h-px flex-1 bg-border" />
             </div>
 
-            <form action={loginWithGoogle}>
-              <Button variant="outline" type="submit" size="lg" className="w-full">
-                <GoogleMark />
-                Continue with Google
-              </Button>
-            </form>
+            <Button
+              render={<Link href="/auth/google" />}
+              variant="outline"
+              size="lg"
+              className="w-full"
+            >
+              <GoogleMark />
+              Continue with Google
+            </Button>
 
-            <div className="mt-3 flex h-11 items-center justify-center gap-2 rounded-lg border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500">
-              <KeyRound className="size-4" />
-              Enterprise SSO coming later
-            </div>
 
             <AuthTrustNote />
           </div>
@@ -152,5 +170,19 @@ export default function LoginPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-svh items-center justify-center bg-brand-canvas text-sm text-muted-foreground">
+          Loading sign in…
+        </main>
+      }
+    >
+      <LoginContent />
+    </Suspense>
   );
 }

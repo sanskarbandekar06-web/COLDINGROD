@@ -53,11 +53,12 @@ export default async function ProjectProfilePage(props: {
 
   return (
     <div className="space-y-6">
-      <ProjectHeader project={project} workspaceId={context.workspace.id} />
+      <ProjectHeader project={project} workspaceId={context.workspace.id} workspaceSlug={params.workspaceSlug} />
       
       <div className="pt-2">
         <ProjectViewTabs 
           workspaceId={context.workspace.id}
+          workspaceSlug={params.workspaceSlug}
           project={project}
           tasks={tasksResult.data}
           activities={activities || []}

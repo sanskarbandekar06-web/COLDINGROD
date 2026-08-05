@@ -1,12 +1,12 @@
 # Coldingrod Project Status
 
-Last verified: 2026-07-31
+Last verified: 2026-08-05
 
 Primary implementation workspace: `C:\Users\SANSKAR\COLDINGROD IMPLEMENTATION\coldingrod`
 
 ## Current phase
 
-Phase 5 production hardening and release preparation is implemented and validated. Phases 1–5 of the agreed roadmap are complete, the linked Supabase database is current through migration 022, and the repository is ready for the owner-controlled production deployment.
+Phases 1–5 of the agreed roadmap are complete. The linked Supabase database is current through migration 022, all 11 rollback-only hosted acceptance suites pass, and the application now includes the post-release functionality repairs listed below. Release verification is in progress.
 
 All eight Phase 3 production agents are transparent and deterministic. They use only stored qualification evidence and verified research a workspace member supplies, preserve unknowns, require human selection before lead creation, and do not require an external AI-provider key.
 
@@ -27,8 +27,18 @@ All eight Phase 3 production agents are transparent and deterministic. They use 
 | Phase 5 Production Hardening | 100% | 0% |
 | Full currently discussed product plan | 100% | 0% |
 
-Developer implementation is complete. The only remaining release actions require the owner's external account access: connect the GitHub repository to Vercel, enter production environment variables, configure Supabase production URLs, and optionally configure Google Places.
+GitHub, Vercel, and Supabase are connected. Google email/password auth is active. Google OAuth remains disabled in Supabase until the owner supplies a Google OAuth Client ID and Client Secret; Google Places also requires `GOOGLE_PLACES_API_KEY` when provider-backed discovery is desired.
 
+## 2026-08-05 functionality repair
+
+- Repaired Google OAuth routing, safe callback handling, branded provider errors, and the proxy rules that previously looped `/auth/google` back to `/login`.
+- Added complete forgot-password and reset-password flows with safe return-path handling.
+- Added functional workspace-wide search across leads, clients, projects, tasks, meetings, and assets.
+- Added Invitations and Permissions routes, secure invitation-link copy/email/revoke management, and repeat-invitation support.
+- Replaced the member activity placeholder with live assignments and activity.
+- Connected Add Contact, lead status filtering, and contact activity logging.
+- Corrected UUID-versus-slug navigation failures in client, project, task, and meeting links.
+- Reverified migration parity 001–022, zero linked schema-lint findings, all 11 hosted SQL suites, lint, typecheck, and the production build.
 ## Phase 3.1 delivered
 
 - A global system `Lead Qualification Agent` registered as `coldingrod-rules-v1`.

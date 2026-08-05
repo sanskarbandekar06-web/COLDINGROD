@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-export function ClientHeader({ client, workspaceId }: { client: Client; workspaceId: string }) {
+export function ClientHeader({ client, workspaceId, workspaceSlug }: { client: Client; workspaceId: string; workspaceSlug: string }) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const router = useRouter();
 
@@ -27,7 +27,7 @@ export function ClientHeader({ client, workspaceId }: { client: Client; workspac
       toast.error(res.error);
     } else {
       toast.success('Client archived');
-      router.push(`/dashboard/${workspaceId}/clients`);
+      router.push(`/dashboard/${workspaceSlug}/clients`);
     }
   };
 
@@ -36,7 +36,7 @@ export function ClientHeader({ client, workspaceId }: { client: Client; workspac
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-            <Link href={`/dashboard/${workspaceId}/clients`} className="hover:text-primary flex items-center">
+            <Link href={`/dashboard/${workspaceSlug}/clients`} className="hover:text-primary flex items-center">
               <ArrowLeft className="h-3 w-3 mr-1" /> Back to Clients
             </Link>
           </div>

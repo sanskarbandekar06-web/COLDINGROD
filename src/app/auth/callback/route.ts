@@ -1,20 +1,41 @@
 import { NextResponse } from 'next/server';
+import { getAppUrl } from '@/lib/app-url';
 import { createClient } from '@/lib/supabase/server';
 
-export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url);
-  const code = searchParams.get('code');
-  // if "next" is in param, use it as the redirect URL
-  const next = searchParams.get('next') ?? '/dashboard';
+function safeNextPath(value: string | null): string {
+  if (!value || !value.startsWith('/') || value.startsWith('//')) {
+    return '/dashboard';
+  }
+  return value;
+}
 
-  if (code) {
-    const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
-    }
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const appUrl = getAppUrl();
+  const next = safeNextPath(url.searchParams.get('next'));
+  const providerError =
+    url.searchParams.get('error_description') || url.searchParams.get('error');
+
+  if (providerError) {
+    return NextResponse.redirect(
+      `${appUrl}/auth/auth-code-error?message=${encodeURIComponent(providerError)}`,
+    );
   }
 
-  // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+  const code = url.searchParams.get('code');
+  if (!code) {
+    return NextResponse.redirect(
+      `${appUrl}/auth/auth-code-error?message=${encodeURIComponent('The sign-in link is incomplete or expired.')}`,
+    );
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
+  if (error) {
+    return NextResponse.redirect(
+      `${appUrl}/auth/auth-code-error?message=${encodeURIComponent(error.message)}`,
+    );
+  }
+
+  return NextResponse.redirect(`${appUrl}${next}`);
 }

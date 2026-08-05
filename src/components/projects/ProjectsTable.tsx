@@ -21,11 +21,12 @@ interface ProjectsTableProps {
   totalPages: number;
   currentPage: number;
   workspaceId: string;
+  workspaceSlug: string;
   clients: { id: string, name: string }[];
   members: { id: string, full_name: string }[];
 }
 
-export function ProjectsTable({ projects, totalPages, currentPage, workspaceId, clients, members }: ProjectsTableProps) {
+export function ProjectsTable({ projects, totalPages, currentPage, workspaceId, workspaceSlug, clients, members }: ProjectsTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentSearch = searchParams.get('search') || '';
@@ -102,7 +103,7 @@ export function ProjectsTable({ projects, totalPages, currentPage, workspaceId, 
                   <TableRow key={project.id} className="hover:bg-muted/50">
                     <TableCell className="font-medium">
                       <Link 
-                        href={`/dashboard/${workspaceId}/projects/${project.id}`}
+                        href={`/dashboard/${workspaceSlug}/projects/${project.id}`}
                         className="hover:underline text-primary"
                       >
                         {project.name}
@@ -136,7 +137,7 @@ export function ProjectsTable({ projects, totalPages, currentPage, workspaceId, 
                     </TableCell>
                     <TableCell className="text-right">
                       <Link 
-                        href={`/dashboard/${workspaceId}/projects/${project.id}`}
+                        href={`/dashboard/${workspaceSlug}/projects/${project.id}`}
                         className={buttonVariants({ variant: 'ghost', size: 'sm' })}
                       >
                         View

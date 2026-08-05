@@ -39,7 +39,7 @@ export default async function ClientProfilePage({
 
   return (
     <div className="space-y-6">
-      <ClientHeader client={client} workspaceId={workspace.id} />
+      <ClientHeader client={client} workspaceId={workspace.id} workspaceSlug={workspaceSlug} />
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <div className="space-y-6 md:col-span-2">
@@ -50,8 +50,8 @@ export default async function ClientProfilePage({
           />
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <ProjectListMini projects={projects} workspaceId={workspace.id} />
-            <MeetingListMini meetings={meetings} workspaceId={workspace.id} />
+            <ProjectListMini projects={projects} workspaceSlug={workspaceSlug} />
+            <MeetingListMini meetings={meetings} workspaceSlug={workspaceSlug} />
           </div>
 
           <AssetListMini assets={assets} workspaceSlug={workspaceSlug} />

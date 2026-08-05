@@ -5,7 +5,7 @@ import { Briefcase } from 'lucide-react';
 import Link from 'next/link';
 import { buttonVariants } from '@/components/ui/button';
 
-export function ProjectListMini({ projects, workspaceId }: { projects: Project[], workspaceId: string }) {
+export function ProjectListMini({ projects, workspaceSlug }: { projects: Project[], workspaceSlug: string }) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -13,7 +13,7 @@ export function ProjectListMini({ projects, workspaceId }: { projects: Project[]
           <Briefcase className="h-4 w-4 text-muted-foreground" />
           Projects
         </CardTitle>
-        <Link href={`/dashboard/${workspaceId}/projects`} className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'h-8 text-xs' })}>View All</Link>
+        <Link href={`/dashboard/${workspaceSlug}/projects`} className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'h-8 text-xs' })}>View All</Link>
       </CardHeader>
       <CardContent>
         {projects.length === 0 ? (
@@ -22,7 +22,7 @@ export function ProjectListMini({ projects, workspaceId }: { projects: Project[]
           <div className="space-y-3">
             {projects.slice(0, 5).map(p => (
               <div key={p.id} className="flex justify-between items-center text-sm">
-                <Link href={`/dashboard/${workspaceId}/projects/${p.id}`} className="font-medium hover:underline hover:text-primary">
+                <Link href={`/dashboard/${workspaceSlug}/projects/${p.id}`} className="font-medium hover:underline hover:text-primary">
                   {p.name}
                 </Link>
                 <div className="flex items-center gap-3">

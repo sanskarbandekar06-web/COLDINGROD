@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import Link from 'next/link';
 import { buttonVariants } from '@/components/ui/button';
 
-export function MeetingListMini({ meetings, workspaceId }: { meetings: Meeting[], workspaceId: string }) {
+export function MeetingListMini({ meetings, workspaceSlug }: { meetings: Meeting[], workspaceSlug: string }) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -13,7 +13,7 @@ export function MeetingListMini({ meetings, workspaceId }: { meetings: Meeting[]
           <Calendar className="h-4 w-4 text-muted-foreground" />
           Meetings
         </CardTitle>
-        <Link href={`/dashboard/${workspaceId}/meetings`} className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'h-8 text-xs' })}>View All</Link>
+        <Link href={`/dashboard/${workspaceSlug}/meetings`} className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'h-8 text-xs' })}>View All</Link>
       </CardHeader>
       <CardContent>
         {meetings.length === 0 ? (

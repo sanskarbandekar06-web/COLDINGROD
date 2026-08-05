@@ -12,6 +12,7 @@ import { LayoutList, Kanban, Clock } from 'lucide-react';
 
 interface ProjectViewTabsProps {
   workspaceId: string;
+  workspaceSlug: string;
   project: Project & {
     taskStats?: { total: number, completed: number }
   };
@@ -24,7 +25,7 @@ interface ProjectViewTabsProps {
   userId: string;
 }
 
-export function ProjectViewTabs({ workspaceId, project, tasks, activities, projects, members, userId }: ProjectViewTabsProps) {
+export function ProjectViewTabs({ workspaceId, workspaceSlug, project, tasks, activities, projects, members, userId }: ProjectViewTabsProps) {
   return (
     <Tabs defaultValue="board" className="w-full">
       <div className="flex items-center justify-between mb-4">
@@ -56,6 +57,7 @@ export function ProjectViewTabs({ workspaceId, project, tasks, activities, proje
           totalPages={1}
           currentPage={1}
           workspaceId={workspaceId}
+          workspaceSlug={workspaceSlug}
           projects={projects}
           members={members}
           userId={userId}

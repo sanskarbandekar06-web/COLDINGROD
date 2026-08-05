@@ -330,24 +330,10 @@ Use a second real test email, called **User B**.
 2. Sign in as User A.
 3. Open the company workspace's **Members** page.
 4. Invite User B with a small permission set, such as `manage_meetings`.
-5. The current project creates the invitation record but does not yet send a real workspace-invitation email.
-6. For development testing only, retrieve the newest token in Supabase SQL Editor:
-
-   ```sql
-   select email, token, expires_at, status
-   from public.workspace_invites
-   where lower(email) = lower('USER_B_EMAIL')
-   order by created_at desc
-   limit 1;
-   ```
-
-7. Copy the token.
-8. Sign in as User B in a different browser profile or private window.
-9. Open:
-
-   ```text
-   http://localhost:3000/invite/COPIED_TOKEN
-   ```
+5. After the invitation is created, click **Copy link** or **Open email**.
+6. You can also open **Invitations** from the sidebar to copy, email, track, or revoke an active link.
+7. Sign in as User B in a different browser profile or private window.
+8. Open the copied invitation link and accept it.
 
 10. Accept the invitation.
 11. Verify User B can open the company workspace.
