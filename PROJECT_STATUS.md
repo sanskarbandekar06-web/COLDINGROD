@@ -6,7 +6,7 @@ Primary implementation workspace: `C:\Users\SANSKAR\COLDINGROD IMPLEMENTATION\co
 
 ## Current phase
 
-Phases 1–5 of the agreed roadmap are complete. The linked Supabase database is current through migration 022, all 11 rollback-only hosted acceptance suites pass, and the application now includes the post-release functionality repairs listed below. Release verification is in progress.
+Phases 1–5 of the agreed roadmap are complete. The linked Supabase database is current through migration 023, all 12 rollback-only hosted acceptance suites pass, and the post-release functionality repairs are implemented and locally verified. Production deployment verification is in progress.
 
 All eight Phase 3 production agents are transparent and deterministic. They use only stored qualification evidence and verified research a workspace member supplies, preserve unknowns, require human selection before lead creation, and do not require an external AI-provider key.
 
@@ -27,7 +27,7 @@ All eight Phase 3 production agents are transparent and deterministic. They use 
 | Phase 5 Production Hardening | 100% | 0% |
 | Full currently discussed product plan | 100% | 0% |
 
-GitHub, Vercel, and Supabase are connected. Google email/password auth is active. Google OAuth remains disabled in Supabase until the owner supplies a Google OAuth Client ID and Client Secret; Google Places also requires `GOOGLE_PLACES_API_KEY` when provider-backed discovery is desired.
+GitHub, Vercel, and Supabase are connected. Google email/password and Google OAuth are active, and the production OAuth chain reaches Google successfully. `GOOGLE_PLACES_API_KEY` is configured in Vercel for Production and Preview; it is intentionally absent from the local `.env.local` unless local Places testing is needed.
 
 ## 2026-08-05 functionality repair
 
@@ -38,7 +38,10 @@ GitHub, Vercel, and Supabase are connected. Google email/password auth is active
 - Replaced the member activity placeholder with live assignments and activity.
 - Connected Add Contact, lead status filtering, and contact activity logging.
 - Corrected UUID-versus-slug navigation failures in client, project, task, and meeting links.
-- Reverified migration parity 001–022, zero linked schema-lint findings, all 11 hosted SQL suites, lint, typecheck, and the production build.
+- Added active/archived client, project, and task views with working restoration; added project/task editing and project descriptions.
+- Added lead reassignment and atomic, idempotent lead-to-client conversion with visible success/error feedback.
+- Replaced unsafe direct activity deletion with permission-checked note editing and audit-preserving redaction.
+- Reverified migration parity 001–023, zero linked schema-lint findings, all 12 hosted SQL suites, lint, typecheck, and the production build.
 ## Phase 3.1 delivered
 
 - A global system `Lead Qualification Agent` registered as `coldingrod-rules-v1`.
@@ -123,7 +126,7 @@ GitHub, Vercel, and Supabase are connected. Google email/password auth is active
 ## Phase 5 delivered
 
 - Full-repository TypeScript and ESLint cleanup with zero lint findings and no product or design changes.
-- Next.js 16 `proxy` routing, strict production environment validation, standalone builds, a health endpoint, robots metadata, global error handling, and branded not-found handling.
+- Next.js 16 `proxy` routing, strict production environment validation, Vercel-compatible production builds, a health endpoint, robots metadata, global error handling, and branded not-found handling.
 - Production security headers, disabled framework disclosure, strict mode, and no-store health responses.
 - CI on GitHub Actions for clean installation, type checking, linting, production build, and production dependency audit.
 - Database migration 022 consolidating duplicate policies, optimizing authenticated RLS checks, and removing schema-lint warnings without weakening access rules.
@@ -132,8 +135,8 @@ GitHub, Vercel, and Supabase are connected. Google email/password auth is active
 - A clean production dependency audit with zero known vulnerabilities.
 ## Hosted database verification
 
-- Local and remote migration histories match through `022_production_hardening.sql`.
-- All eleven rollback-only acceptance suites pass: Phase 2.8, 2.9, 2.10, Phase 3.1–3.6, Phase 4.1, and Phase 5.1.
+- Local and remote migration histories match through `023_functionality_repairs.sql`.
+- All twelve rollback-only acceptance suites pass: Phase 2.8, 2.9, 2.10, Phase 3.1–3.6, Phase 4.1, Phase 5.1, and Phase 5.2.
 - Phase 2.8 authorization, Phase 2.9 asset, and Phase 2.10 notification regression suites still pass.
 - Acceptance coverage includes authentication, dual permissions, workspace and lead/run isolation, agent scoping, strict input allowlisting, deterministic scoring, duplicate traceability, atomic human-approved import, research prerequisites, source validation, pain-point mapping, grounded outreach, exact approval snapshots, atomic approval/rejection, audit suppression, activity delivery, and notification delivery.
 - Direct authenticated writes to lead scores, discovery tables, and research reports are denied; trusted RPCs own scoring, discovery, research, personalization, and review transitions.
@@ -160,7 +163,7 @@ GitHub, Vercel, and Supabase are connected. Google email/password auth is active
 - Phase 4.1 TypeScript, targeted ESLint, the complete ten-suite hosted regression matrix, and the production build pass; the live signed-in Integrations page renders with no browser errors.
 - Full-repository `npm run check` passes: TypeScript, ESLint, and the Next.js production build.
 - `npm audit --omit=dev` reports zero production vulnerabilities.
-- Supabase schema lint and the performance advisor report no issues after migration 022.
+- Supabase schema lint and the performance advisor report no issues after migration 023. The security advisor reports only the intentional authenticated RPC boundaries plus the owner-configurable leaked-password setting.
 - The signed-in dashboard, Terms, Privacy, and health endpoint render on localhost with no browser errors; unauthenticated dashboard requests redirect to login.
 - Security headers are present on public, authenticated, redirect, and health responses.
 
@@ -170,9 +173,9 @@ The project keeps TypeScript where it protects database, authorization, and UI c
 
 ## Owner-controlled production launch
 
-- Import the GitHub repository into Vercel and add the documented production environment variables.
-- Add the Vercel origin to Supabase Auth site and redirect URLs.
-- Add a restricted server-side Google Places key only if the optional live provider search is required.
+- GitHub, Vercel, production environment variables, and Supabase redirect origins are connected.
+- Google OAuth and the restricted server-side Google Places key are configured for production.
+- Copy the Places key into local `.env.local` only when local provider-search testing is required.
 - Enable leaked-password protection if the Supabase project is on a plan that includes it.
 
 No remaining application or database implementation is required for the agreed plan.

@@ -12,7 +12,7 @@ npx supabase db push --linked
 npx supabase migration list --linked
 ```
 
-`migration list` should show the same entries under Local and Remote through `022_production_hardening.sql`.
+`migration list` should show the same entries under Local and Remote through `023_functionality_repairs.sql`.
 
 For a different Supabase project, replace the project reference. Never run `supabase db reset --linked` against a database containing real data; remote reset drops and rebuilds the user-created schema.
 
@@ -32,7 +32,7 @@ foreach ($test in $tests) {
 }
 ```
 
-The eleven suites cover:
+The twelve suites cover:
 
 - Authentication and workspace permission combinations
 - Complete RLS isolation and denied direct writes
@@ -45,6 +45,7 @@ The eleven suites cover:
 - Immutable analytics
 - Integration controls and Google Place-ID retention
 - Production RLS performance hardening
+- Safe activity-note editing/redaction, atomic lead conversion, idempotency, and outsider/anonymous denial
 
 ## Database release checks
 

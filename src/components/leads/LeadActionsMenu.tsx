@@ -2,90 +2,60 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { deleteLead, convertLeadToClient } from '@/actions/lead';
+import { Building, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { convertLeadToClient, deleteLead } from '@/actions/lead';
 import { Button } from '@/components/ui/button';
-import { Trash2, Building, Pencil, MoreHorizontal } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator
-} from '@/components/ui/dropdown-menu';
-import { EditLeadModal } from './EditLeadModal';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { LeadStatus } from '@/types/lead';
+import { EditLeadModal } from './EditLeadModal';
 
-export function LeadActionsMenu({
-  lead,
-  workspaceId,
-  workspaceSlug,
-}: {
-  lead: {
-    id: string;
-    company_name: string;
-    source: string | null;
-    status: LeadStatus;
-  };
+export function LeadActionsMenu({ lead, workspaceId, workspaceSlug, members }: {
+  lead: { id: string; company_name: string; source: string | null; status: LeadStatus; assigned_to: string | null };
   workspaceId: string;
   workspaceSlug: string;
+  members: { id: string; full_name: string }[];
 }) {
   const [isPending, startTransition] = useTransition();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const router = useRouter();
 
   const handleDelete = () => {
-    if (!confirm('Are you sure you want to delete this lead? It will be moved to trash.')) return;
+    if (!confirm('Archive this lead? You can restore it from lead trash.')) return;
     startTransition(async () => {
-      await deleteLead(workspaceId, lead.id);
-      router.push(`/dashboard/${workspaceSlug}/leads`);
+      const result = await deleteLead(workspaceId, lead.id);
+      if (result.error) toast.error(result.error);
+      else {
+        toast.success('Lead archived');
+        router.push(`/dashboard/${workspaceSlug}/leads`);
+      }
     });
   };
 
   const handleConvert = () => {
-    if (!confirm('Convert this lead to a Client? This will mark it as Won.')) return;
+    if (!confirm('Convert this lead into a client and mark it as won?')) return;
     startTransition(async () => {
-      await convertLeadToClient(workspaceId, lead.id);
+      const result = await convertLeadToClient(workspaceId, lead.id);
+      if (result.error || !result.clientId) toast.error(result.error || 'Lead could not be converted.');
+      else {
+        toast.success('Lead converted to client');
+        router.push(`/dashboard/${workspaceSlug}/clients/${result.clientId}`);
+      }
     });
   };
 
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger
-          render={
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={isPending}
-              aria-label="Lead actions"
-            >
-              <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
-            </Button>
-          }
-        />
+        <DropdownMenuTrigger render={<Button variant="outline" size="icon" disabled={isPending} aria-label="Lead actions"><MoreHorizontal className="h-4 w-4" aria-hidden="true" /></Button>} />
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setIsEditOpen(true)} className="cursor-pointer">
-            <Pencil className="mr-2 h-4 w-4" />
-            Edit Lead
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleConvert} className="text-emerald-600 focus:text-emerald-600 focus:bg-emerald-50 cursor-pointer">
-            <Building className="mr-2 h-4 w-4" />
-            Convert to Client
-          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setIsEditOpen(true)} className="cursor-pointer"><Pencil className="mr-2 h-4 w-4" aria-hidden="true" />Edit lead</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleConvert} className="cursor-pointer text-emerald-600 focus:bg-emerald-50 focus:text-emerald-600"><Building className="mr-2 h-4 w-4" aria-hidden="true" />Convert to client</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleDelete} className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer">
-            <Trash2 className="mr-2 h-4 w-4" />
-            Delete Lead
-          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleDelete} className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"><Trash2 className="mr-2 h-4 w-4" aria-hidden="true" />Archive lead</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-
-      <EditLeadModal 
-        isOpen={isEditOpen} 
-        onClose={() => setIsEditOpen(false)} 
-        workspaceId={workspaceId} 
-        lead={lead} 
-      />
+      {isEditOpen && <EditLeadModal isOpen onClose={() => setIsEditOpen(false)} workspaceId={workspaceId} lead={lead} members={members} />}
     </>
   );
 }

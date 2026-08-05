@@ -16,6 +16,7 @@ import { getLeadResearchHistory } from '@/services/lead-research.service';
 import { getLeadDetails } from '@/services/lead.service';
 import { getLeadContacts } from '@/services/contact.service';
 import { getWorkspaceContext } from '@/services/workspace.service';
+import { getWorkspaceMembers } from '@/services/member.service';
 
 export default async function LeadDetailsPage({
   params,
@@ -26,12 +27,13 @@ export default async function LeadDetailsPage({
   const context = await getWorkspaceContext(workspaceSlug);
   if (!context) notFound();
 
-  const [lead, contacts, activities, qualifications, researchReports] = await Promise.all([
+  const [lead, contacts, activities, qualifications, researchReports, members] = await Promise.all([
     getLeadDetails(context.workspace.id, leadId),
     getLeadContacts(leadId),
     getLeadActivities(context.workspace.id, leadId),
     getLeadQualificationHistory(context.workspace.id, leadId),
     getLeadResearchHistory(context.workspace.id, leadId),
+    getWorkspaceMembers(context.workspace.id),
   ]);
 
   if (!lead) notFound();
@@ -70,6 +72,7 @@ export default async function LeadDetailsPage({
             lead={lead}
             workspaceId={context.workspace.id}
             workspaceSlug={workspaceSlug}
+            members={members.map((member) => ({ id: member.user_id, full_name: member.user.full_name || member.user.email }))}
           />
         </div>
       </div>

@@ -67,7 +67,7 @@ The implementation follows a human-control rule: automation may analyze, prepare
 
 7. Open [http://localhost:3000](http://localhost:3000).
 
-The linked project already has migrations 001–022. For a new clean Supabase project, linking it and running `db push` applies all migrations in order.
+The linked project already has migrations 001–023. For a new clean Supabase project, linking it and running `db push` applies all migrations in order.
 
 ## Environment variables
 

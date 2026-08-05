@@ -60,6 +60,7 @@ export default async function ClientProfilePage({
             notes={notes}
             workspaceId={workspace.id}
             clientId={client.id}
+            canManage={context.permissions.includes('manage_clients') || context.permissions.includes('admin')}
           />
         </div>
 

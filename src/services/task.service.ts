@@ -14,6 +14,7 @@ export interface GetTasksParams {
   assigneeId?: string | 'me' | 'unassigned';
   projectId?: string;
   dueState?: DueState;
+  archived?: boolean;
   userId?: string; // used for 'me' filter
   sortBy?: 'created_at' | 'updated_at' | 'due_date' | 'title';
   sortOrder?: 'asc' | 'desc';
@@ -47,11 +48,15 @@ export const getTasks = cache(async (params: GetTasksParams): Promise<PaginatedT
     .from('tasks')
     .select(`
       *,
-      project:projects!tasks_project_id_fkey(name),
+      project:projects!tasks_project_id_fkey!inner(name, deleted_at),
       assignee:users!tasks_assigned_to_fkey(full_name, avatar_url)
     `, { count: 'exact' })
     .eq('workspace_id', params.workspaceId)
-    .is('deleted_at', null);
+    .is('project.deleted_at', null);
+
+  query = params.archived
+    ? query.not('deleted_at', 'is', null)
+    : query.is('deleted_at', null);
 
   if (params.search) {
     query = query.ilike('title', `%${params.search}%`);

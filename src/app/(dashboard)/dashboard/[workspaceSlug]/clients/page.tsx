@@ -1,31 +1,27 @@
-import { getClients } from '@/services/client.service';
-import { getWorkspaceContext } from '@/services/workspace.service';
 import { notFound } from 'next/navigation';
 import { ClientsTable } from '@/components/clients/ClientsTable';
+import { getClients } from '@/services/client.service';
+import { getWorkspaceContext } from '@/services/workspace.service';
 
 export default async function ClientsPage(props: {
   params: Promise<{ workspaceSlug: string }>;
-  searchParams: Promise<{ page?: string; search?: string }>;
+  searchParams: Promise<{ page?: string; search?: string; view?: string }>;
 }) {
-  const [params, searchParams] = await Promise.all([
-    props.params,
-    props.searchParams,
-  ]);
+  const [params, searchParams] = await Promise.all([props.params, props.searchParams]);
   const context = await getWorkspaceContext(params.workspaceSlug);
-  const workspace = context?.workspace;
+  if (!context) notFound();
 
-  if (!workspace) {
-    notFound();
-  }
-
-  const page = searchParams.page ? parseInt(searchParams.page, 10) : 1;
+  const requestedPage = searchParams.page ? Number.parseInt(searchParams.page, 10) : 1;
+  const page = Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
   const search = searchParams.search || '';
+  const archived = searchParams.view === 'archived';
 
   const { data: clients, totalPages } = await getClients({
-    workspaceId: workspace.id,
+    workspaceId: context.workspace.id,
     page,
     limit: 20,
     search,
+    archived,
   });
 
   return (
@@ -41,8 +37,9 @@ export default async function ClientsPage(props: {
         clients={clients}
         totalPages={totalPages}
         currentPage={page}
-        workspaceId={workspace.id}
+        workspaceId={context.workspace.id}
         workspaceSlug={params.workspaceSlug}
+        archived={archived}
       />
     </div>
   );

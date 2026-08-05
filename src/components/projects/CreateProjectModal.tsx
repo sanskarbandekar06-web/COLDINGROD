@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { createProjectAction } from '@/actions/projects';
 
@@ -58,6 +59,11 @@ export function CreateProjectModal({ isOpen, onClose, workspaceId, clients, memb
           <div className="space-y-2">
             <Label htmlFor="name">Project Name <span className="text-rose-500">*</span></Label>
             <Input id="name" name="name" placeholder="Website Redesign" required />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea id="description" name="description" rows={4} maxLength={2000} placeholder="Scope, outcome, or delivery context" />
           </div>
 
           <div className="space-y-2">
