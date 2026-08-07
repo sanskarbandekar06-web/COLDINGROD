@@ -1,11 +1,10 @@
 'use server';
 
 import { cookies } from 'next/headers';
-
-const WORKSPACE_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+import { isValidWorkspaceSlug } from '@/lib/workspace-slug';
 
 export async function setLastActiveWorkspace(slug: string): Promise<void> {
-  if (!WORKSPACE_SLUG_PATTERN.test(slug)) {
+  if (!isValidWorkspaceSlug(slug)) {
     throw new Error('Invalid workspace slug.');
   }
 

@@ -3,18 +3,32 @@
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import {
+  isValidWorkspaceSlug,
+  normalizeWorkspaceSlug,
+} from '@/lib/workspace-slug';
+
+function formText(formData: FormData, key: string): string {
+  const value = formData.get(key);
+  return typeof value === 'string' ? value.trim() : '';
+}
 
 export async function updateWorkspaceSettings(prevState: { error?: string, success?: boolean } | null | undefined, formData: FormData) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Not authenticated' };
 
-  const workspaceId = formData.get('workspaceId') as string;
-  const name = formData.get('name') as string;
-  const slug = formData.get('slug') as string;
-  const logoUrl = formData.get('logo_url') as string;
+  const workspaceId = formText(formData, 'workspaceId');
+  const name = formText(formData, 'name');
+  const slug = normalizeWorkspaceSlug(formText(formData, 'slug'));
+  const logoUrl = formText(formData, 'logo_url');
 
   if (!workspaceId || !name || !slug) return { error: 'Missing required fields' };
+  if (!isValidWorkspaceSlug(slug)) {
+    return {
+      error: 'Use 2–63 lowercase letters, numbers, or hyphens for the workspace slug.',
+    };
+  }
 
   // Update logic with permission check enforced by RLS
   const { error } = await supabase
@@ -120,14 +134,19 @@ export async function leaveWorkspace(workspaceId: string) {
 export async function createCompanyWorkspaceAction(prevState: { error?: string, success?: boolean } | null | undefined, formData: FormData) {
   const supabase = await createClient();
   
-  const name = formData.get('name') as string;
-  const slug = formData.get('slug') as string;
-  const industry = formData.get('industry') as string;
-  const country = formData.get('country') as string;
-  const timezone = formData.get('timezone') as string;
-  const currency = formData.get('currency') as string;
+  const name = formText(formData, 'name');
+  const slug = normalizeWorkspaceSlug(formText(formData, 'slug'));
+  const industry = formText(formData, 'industry');
+  const country = formText(formData, 'country');
+  const timezone = formText(formData, 'timezone');
+  const currency = formText(formData, 'currency');
 
-  if (!name || !slug) return { error: 'Name and Slug are required' };
+  if (!name || !slug) return { error: 'Name and slug are required.' };
+  if (!isValidWorkspaceSlug(slug)) {
+    return {
+      error: 'Use 2–63 lowercase letters, numbers, or hyphens for the workspace slug.',
+    };
+  }
 
   // Call the RPC
   const { data: workspaceId, error: rpcError } = await supabase
@@ -138,6 +157,7 @@ export async function createCompanyWorkspaceAction(prevState: { error?: string, 
 
   if (rpcError || !workspaceId) {
     if (rpcError?.code === '23505') return { error: 'Slug is already in use.' };
+    if (rpcError?.code === '22023') return { error: rpcError.message };
     return { error: rpcError?.message || 'Failed to create workspace' };
   }
 

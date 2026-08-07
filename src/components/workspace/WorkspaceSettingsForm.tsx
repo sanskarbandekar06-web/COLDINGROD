@@ -42,10 +42,18 @@ export function WorkspaceSettingsForm({ workspace, hasPermission }: { workspace:
                 name="slug" 
                 defaultValue={workspace.slug} 
                 disabled={!hasPermission || isPending}
-                required 
+                required
+                minLength={2}
+                maxLength={63}
+                pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
+                autoCapitalize="none"
+                spellCheck={false}
+                aria-describedby="workspace-settings-slug-help"
               />
             </div>
-            <p className="text-xs text-muted-foreground">Changing the slug will invalidate old links to your workspace.</p>
+            <p id="workspace-settings-slug-help" className="text-xs text-muted-foreground">
+              Use lowercase letters, numbers, and hyphens only. Changing the slug will invalidate old links.
+            </p>
           </div>
 
           <div className="grid gap-2">
