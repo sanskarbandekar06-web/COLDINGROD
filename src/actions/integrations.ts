@@ -107,8 +107,13 @@ function safeGoogleResult(value: unknown): GooglePlacesSearchResult | null {
     typeof displayName !== 'string' ||
     typeof value.formattedAddress !== 'string' ||
     typeof value.googleMapsUri !== 'string' ||
-    !/^https:\/\/(?:www\.)?google\.[^/]+\/maps\//i.test(
-      value.googleMapsUri,
+    !(
+      /^https:\/\/(?:www\.)?google\.[^/]+\/maps(?:\/|\?|$)/i.test(
+        value.googleMapsUri,
+      ) ||
+      /^https:\/\/maps\.google\.[^/]+(?:\/|\?|$)/i.test(
+        value.googleMapsUri,
+      )
     ) ||
     !/^[A-Za-z0-9_-]{1,255}$/.test(value.id)
   ) {
