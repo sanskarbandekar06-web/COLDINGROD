@@ -1,7 +1,7 @@
 'use client';
 
 import { Building, Check, ChevronsUpDown, User } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { setLastActiveWorkspace } from '@/actions/workspace-preference';
 import {
   DropdownMenu,
@@ -23,18 +23,18 @@ export function WorkspaceSwitcher({
   workspaces,
   activeWorkspace,
 }: WorkspaceSwitcherProps) {
-  const router = useRouter();
-
   const onWorkspaceSelect = (workspace: Workspace) => {
-    void setLastActiveWorkspace(workspace.slug).finally(() => {
-      router.push(`/dashboard/${workspace.slug}`);
+    void setLastActiveWorkspace(workspace.slug).catch(() => {
+      // Navigation must not depend on saving this optional preference.
     });
   };
 
   const workspaceRow = (workspace: Workspace) => (
     <DropdownMenuItem
       key={workspace.id}
+      render={<Link href={`/dashboard/${workspace.slug}`} />}
       onClick={() => onWorkspaceSelect(workspace)}
+      aria-current={activeWorkspace.id === workspace.id ? 'page' : undefined}
       className="flex cursor-pointer items-center gap-3 p-2.5"
     >
       <span className="flex size-7 items-center justify-center rounded-md bg-brand-blue-soft text-brand-navy">
@@ -86,7 +86,7 @@ export function WorkspaceSwitcher({
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          onClick={() => router.push('/dashboard/create')}
+          render={<Link href="/dashboard/create" />}
           className="flex cursor-pointer items-center gap-3 p-2.5 text-brand-indigo"
         >
           <span className="flex size-7 items-center justify-center rounded-md bg-brand-indigo-soft">
