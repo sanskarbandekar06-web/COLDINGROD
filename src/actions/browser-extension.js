@@ -89,7 +89,6 @@ export async function revokeBrowserExtensionConnectionAction(
     .from('browser_extension_connections')
     .update({ revoked_at: new Date().toISOString() })
     .eq('id', connectionId)
-    .eq('workspace_id', context.workspace.id)
     .eq('user_id', context.user.id)
     .is('revoked_at', null)
     .select('id')

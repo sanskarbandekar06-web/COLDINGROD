@@ -33,7 +33,9 @@ export function IntegrationToggleButton({
             return;
           }
           toast.success(
-            enabled ? 'Google Places disabled.' : 'Google Places enabled.',
+            enabled
+              ? 'Google Places disabled for your account.'
+              : 'Google Places connected to your account.',
           );
           router.refresh();
         });
@@ -44,7 +46,7 @@ export function IntegrationToggleButton({
       ) : (
         <Power className="size-4" aria-hidden="true" />
       )}
-      {enabled ? 'Disable' : 'Enable'}
+      {enabled ? 'Disable for my account' : 'Connect once'}
     </Button>
   );
 }

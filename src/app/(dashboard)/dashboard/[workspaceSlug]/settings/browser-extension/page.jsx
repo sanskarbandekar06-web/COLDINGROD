@@ -28,9 +28,9 @@ export default async function BrowserExtensionSettingsPage({
   const context = await getWorkspaceContext(workspaceSlug);
   if (!context) notFound();
 
-  const connections = await getBrowserExtensionConnections(
-    context.workspace.id,
-    context.user.id,
+  const connections = await getBrowserExtensionConnections(context.user.id);
+  const hasActiveConnection = connections.some(
+    (connection) => connection.is_active,
   );
   const canManage = context.permissions.includes('manage_integrations');
 
@@ -40,14 +40,16 @@ export default async function BrowserExtensionSettingsPage({
         title="Browser Companion"
         description="Research the active business page, manage lead context, draft outreach, approve it, and complete human-controlled delivery without losing your browsing context."
         action={
-          <a
-            href="/downloads/coldingrod-browser-companion.zip"
-            download
-            className={buttonVariants()}
-          >
-            <Download className="size-4" aria-hidden="true" />
-            Download extension
-          </a>
+          hasActiveConnection ? undefined : (
+            <a
+              href="/downloads/coldingrod-browser-companion.zip"
+              download
+              className={buttonVariants()}
+            >
+              <Download className="size-4" aria-hidden="true" />
+              Download extension
+            </a>
+          )
         }
       />
 
@@ -60,9 +62,9 @@ export default async function BrowserExtensionSettingsPage({
           <AlertTitle>Your company workspace is ready</AlertTitle>
           <AlertDescription>
             <p>
-              Add the Browser Companion now to research and message leads beside
-              the sites you visit. You can also skip this and return later from
-              Integrations or Settings.
+              {hasActiveConnection
+                ? 'Your existing Browser Companion is already connected to your account and has switched to this workspace.'
+                : 'Add the Browser Companion now to research and message leads beside the sites you visit. You can also skip this and return later from Integrations or Settings.'}
             </p>
             <Link
               href={`/dashboard/${workspaceSlug}`}
@@ -107,8 +109,9 @@ export default async function BrowserExtensionSettingsPage({
         </div>
       </div>
 
-      <SectionCard
-        title="Install in Chrome or Edge"
+      {!hasActiveConnection && (
+        <SectionCard
+          title="Install in Chrome or Edge"
         description="The current package installs locally while the Chrome Web Store listing is prepared."
       >
         <ol className="grid gap-4 md:grid-cols-2" aria-label="Installation steps">
@@ -157,11 +160,12 @@ export default async function BrowserExtensionSettingsPage({
             <ExternalLink className="size-3.5" aria-hidden="true" />
           </Link>
         </div>
-      </SectionCard>
+        </SectionCard>
+      )}
 
       <SectionCard
-        title="Pair this workspace"
-        description="Create and manage revocable keys for this browser only."
+        title="Account connection"
+        description="Connect once, then use the same browser companion across every workspace you can access."
       >
         <BrowserExtensionSetup
           workspaceSlug={workspaceSlug}

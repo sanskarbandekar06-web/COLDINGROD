@@ -1,6 +1,7 @@
 'use client';
 
 import { useActionState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { createLead } from '@/actions/lead';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,25 +19,29 @@ import {
 export function CreateLeadModal({
   isOpen,
   onClose,
-  workspaceId
+  workspaceId,
+  workspaceSlug,
 }: {
   isOpen: boolean;
   onClose: () => void;
   workspaceId: string;
+  workspaceSlug: string;
 }) {
+  const router = useRouter();
   const [state, formAction, isPending] = useActionState(
-    createLead.bind(null, workspaceId), 
+    createLead.bind(null, workspaceId, workspaceSlug),
     null
   );
 
   useEffect(() => {
     if (state?.success) {
+       router.refresh();
        const timer = setTimeout(() => {
           onClose();
-       }, 1500);
+       }, 700);
        return () => clearTimeout(timer);
     }
-  }, [state, onClose]);
+  }, [state, onClose, router]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

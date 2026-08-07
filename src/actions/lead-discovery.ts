@@ -290,6 +290,28 @@ export async function runLeadDiscoveryAction(
   }));
 
   const supabase = await createClient();
+  if (providerRun) {
+    const { error: integrationError } = await supabase.rpc(
+      'ensure_user_integration_workspace',
+      {
+        check_workspace_id: context.workspace.id,
+        check_provider: 'google',
+      },
+    );
+    if (integrationError) {
+      return {
+        success: false,
+        code:
+          integrationError.code === '42501'
+            ? 'UNAUTHORIZED'
+            : 'INVALID_INPUT',
+        error:
+          integrationError.code === '42501'
+            ? 'You no longer have permission to use Google Places here.'
+            : 'Connect Google Places once from Integrations before running a provider discovery.',
+      };
+    }
+  }
   const rpcName = providerRun
     ? 'run_google_places_discovery_intake'
     : 'run_lead_discovery_intake';

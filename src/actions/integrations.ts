@@ -67,7 +67,7 @@ export async function setGooglePlacesEnabledAction(
 
   const supabase = await createClient();
   const { error } = await supabase.rpc(
-    'set_workspace_integration_enabled',
+    'set_user_integration_enabled',
     {
       check_workspace_id: context.workspace.id,
       check_provider: 'google',
@@ -119,6 +119,11 @@ function safeGoogleResult(value: unknown): GooglePlacesSearchResult | null {
     name: displayName.slice(0, 160),
     address: value.formattedAddress.slice(0, 240),
     googleMapsUri: value.googleMapsUri,
+    websiteUri:
+      typeof value.websiteUri === 'string' &&
+      /^https?:\/\/\S+$/i.test(value.websiteUri)
+        ? value.websiteUri.slice(0, 500)
+        : null,
   };
 }
 
@@ -129,7 +134,7 @@ async function recordHealth(
 ) {
   const supabase = await createClient();
   const { error: healthError } = await supabase.rpc(
-    'record_workspace_integration_health',
+    'record_user_integration_health',
     {
       check_workspace_id: workspaceId,
       check_provider: 'google',
@@ -179,7 +184,7 @@ export async function searchGooglePlacesAction(value: {
       error: 'AI and lead management permissions are required.',
     };
   }
-  const enabled = await getEnabledIntegration(context.workspace.id, 'google');
+  const enabled = await getEnabledIntegration(context.user.id, 'google');
   if (!enabled) {
     return {
       success: false,
@@ -207,7 +212,7 @@ export async function searchGooglePlacesAction(value: {
           'Content-Type': 'application/json',
           'X-Goog-Api-Key': apiKey,
           'X-Goog-FieldMask':
-            'places.id,places.displayName,places.formattedAddress,places.googleMapsUri',
+            'places.id,places.displayName,places.formattedAddress,places.googleMapsUri,places.websiteUri',
         },
         body: JSON.stringify({
           textQuery: value.query.trim(),
@@ -219,16 +224,66 @@ export async function searchGooglePlacesAction(value: {
     );
 
     if (!response.ok) {
+      const providerPayload: unknown = await response.json().catch(() => null);
+      const providerError =
+        recordValue(providerPayload) && recordValue(providerPayload.error)
+          ? providerPayload.error
+          : null;
+      const providerStatus =
+        providerError && typeof providerError.status === 'string'
+          ? providerError.status
+          : '';
+      const providerMessage =
+        providerError && typeof providerError.message === 'string'
+          ? providerError.message
+          : '';
+      const providerDetails =
+        providerError && Array.isArray(providerError.details)
+          ? providerError.details
+          : [];
+      const providerReason = providerDetails
+        .filter(recordValue)
+        .map((detail) =>
+          typeof detail.reason === 'string' ? detail.reason : '',
+        )
+        .find(Boolean);
+
+      let publicError =
+        'Google Places rejected the request. Check API restrictions, quota, and billing.';
+      if (
+        providerReason === 'SERVICE_DISABLED' ||
+        /has not been used|is disabled/i.test(providerMessage)
+      ) {
+        publicError =
+          'Places API (New) is disabled for this Google Cloud project. Enable Places API (New), wait a few minutes, and search again.';
+      } else if (
+        providerReason === 'BILLING_DISABLED' ||
+        /billing/i.test(providerMessage)
+      ) {
+        publicError =
+          'Google Cloud billing is not active for Places API (New). Enable billing and search again.';
+      } else if (
+        /referrer|IP address|application restriction/i.test(providerMessage)
+      ) {
+        publicError =
+          'The Google key restriction blocks server-side Places requests. Use an IP/server-compatible restriction and restrict the key to Places API (New).';
+      } else if (
+        providerStatus === 'PERMISSION_DENIED' &&
+        /API key/i.test(providerMessage)
+      ) {
+        publicError =
+          'The Google Places API key is invalid or does not have Places API (New) permission.';
+      }
+
       await recordHealth(
         context.workspace.id,
         false,
-        `Google Places returned HTTP ${response.status}.`,
+        `Google Places HTTP ${response.status}: ${providerReason || providerStatus || 'provider_error'}`,
       );
       return {
         success: false,
         code: 'PROVIDER_ERROR',
-        error:
-          'Google Places rejected the request. Check API enablement, restrictions, quota, and billing.',
+        error: publicError,
       };
     }
 

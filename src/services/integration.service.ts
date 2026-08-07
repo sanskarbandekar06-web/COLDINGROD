@@ -66,26 +66,63 @@ const PROVIDERS: Array<
   },
 ];
 
+interface UserIntegrationRecord {
+  user_id: string;
+  provider: IntegrationProvider;
+  status: string;
+  connected_at: string | null;
+  disconnected_at: string | null;
+  last_checked_at: string | null;
+  last_error: string | null;
+}
+
 export function isGooglePlacesEnvironmentConfigured() {
   return Boolean(process.env.GOOGLE_PLACES_API_KEY?.trim());
 }
 
 export const getIntegrationCatalog = cache(
-  async (workspaceId: string): Promise<IntegrationCatalogItem[]> => {
+  async (
+    workspaceId: string,
+    userId: string,
+  ): Promise<IntegrationCatalogItem[]> => {
     const supabase = await createClient();
-    const { data, error } = await supabase
-      .from('integrations')
-      .select('*')
-      .eq('workspace_id', workspaceId)
-      .order('created_at', { ascending: true });
+    const [workspaceResult, accountResult] = await Promise.all([
+      supabase
+        .from('integrations')
+        .select('*')
+        .eq('workspace_id', workspaceId)
+        .order('created_at', { ascending: true }),
+      supabase
+        .from('user_integrations')
+        .select(
+          'user_id, provider, status, connected_at, disconnected_at, last_checked_at, last_error',
+        )
+        .eq('user_id', userId),
+    ]);
 
-    if (error) {
-      console.error('Error fetching integrations:', error.message);
+    if (workspaceResult.error) {
+      console.error(
+        'Error fetching integrations:',
+        workspaceResult.error.message,
+      );
       throw new Error('Failed to fetch workspace integrations');
+    }
+    if (accountResult.error) {
+      console.error(
+        'Error fetching account integrations:',
+        accountResult.error.message,
+      );
+      throw new Error('Failed to fetch account integrations');
     }
 
     const records = new Map(
-      ((data ?? []) as IntegrationRecord[]).map((record) => [
+      ((workspaceResult.data ?? []) as IntegrationRecord[]).map((record) => [
+        record.provider,
+        record,
+      ]),
+    );
+    const accountRecords = new Map(
+      ((accountResult.data ?? []) as UserIntegrationRecord[]).map((record) => [
         record.provider,
         record,
       ]),
@@ -94,13 +131,22 @@ export const getIntegrationCatalog = cache(
 
     return PROVIDERS.map((provider) => {
       const record = records.get(provider.provider) ?? null;
-      const enabled =
+      const accountRecord = accountRecords.get(provider.provider) ?? null;
+      const accountConnected =
+        accountRecord?.status === 'enabled' ||
+        accountRecord?.status === 'connected';
+      const workspaceEnabled =
         record?.status === 'enabled' || record?.status === 'connected';
+      const enabled =
+        provider.provider === 'google'
+          ? accountConnected
+          : workspaceEnabled;
       const environmentConfigured =
         provider.provider === 'google' ? googleConfigured : false;
       return {
         ...provider,
         enabled,
+        accountConnected,
         environmentConfigured,
         operational:
           provider.implementation === 'available' &&
@@ -113,21 +159,21 @@ export const getIntegrationCatalog = cache(
 );
 
 export async function getEnabledIntegration(
-  workspaceId: string,
+  userId: string,
   provider: IntegrationProvider,
 ) {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('integrations')
-    .select('*')
-    .eq('workspace_id', workspaceId)
+    .from('user_integrations')
+    .select('user_id, provider, status, connected_at, last_checked_at, last_error')
+    .eq('user_id', userId)
     .eq('provider', provider)
     .in('status', ['enabled', 'connected'])
     .maybeSingle();
 
   if (error) {
-    console.error('Error checking integration:', error.message);
+    console.error('Error checking account integration:', error.message);
     return null;
   }
-  return data as IntegrationRecord | null;
+  return data;
 }

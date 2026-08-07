@@ -5,12 +5,14 @@ import { useRouter } from 'next/navigation';
 import { Building2, Loader2, Plus, Search, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { runLeadDiscoveryAction } from '@/actions/lead-discovery';
+import { searchGooglePlacesAction } from '@/actions/integrations';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import type { LeadDiscoveryCandidateInput } from '@/types/lead-discovery';
+import type { GooglePlacesSearchResult } from '@/types/integration';
 
 interface CandidateDraft extends LeadDiscoveryCandidateInput {
   key: string;
@@ -55,15 +57,18 @@ function candidateInput(candidate: CandidateDraft): LeadDiscoveryCandidateInput 
 
 export function LeadDiscoveryForm({
   workspaceSlug,
+  googleOperational,
   initialRunName = '',
   initialCandidate,
 }: {
   workspaceSlug: string;
+  googleOperational: boolean;
   initialRunName?: string;
   initialCandidate?: Partial<LeadDiscoveryCandidateInput>;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+  const [searchPending, startSearchTransition] = useTransition();
   const nextCandidateKey = useRef(2);
   const [runName, setRunName] = useState(initialRunName);
   const [market, setMarket] = useState('');
@@ -97,6 +102,73 @@ export function LeadDiscoveryForm({
   const usesGooglePlaces = candidates.every(
     (candidate) => candidate.externalReference.trim().length > 0,
   );
+
+  function addPlacesResults(results: GooglePlacesSearchResult[]) {
+    setCandidates((current) => {
+      const onlyBlankCandidate =
+        current.length === 1 &&
+        Object.values(candidateInput(current[0])).every(
+          (value) => value.trim().length === 0,
+        );
+      const base = onlyBlankCandidate ? [] : current;
+      const existingPlaceIds = new Set(
+        base
+          .map((candidate) => candidate.externalReference.trim())
+          .filter(Boolean),
+      );
+      const additions = results
+        .filter((place) => !existingPlaceIds.has(place.placeId))
+        .slice(0, Math.max(0, 50 - base.length))
+        .map((place) =>
+          createCandidate('candidate-' + nextCandidateKey.current++, {
+            companyName: place.name,
+            websiteUrl: place.websiteUri ?? '',
+            industry: market,
+            location: place.address,
+            sourceUrl: place.googleMapsUri,
+            evidenceNotes: 'Found through Google Places and queued for human review.',
+            externalReference: place.placeId,
+          }),
+        );
+      return additions.length > 0 ? [...base, ...additions] : current;
+    });
+  }
+
+  function searchBrief() {
+    const searchQuery = [market.trim() || runName.trim(), location.trim()]
+      .filter(Boolean)
+      .join(' in ');
+    if (searchQuery.length < 3) {
+      toast.error('Enter a market or industry and a target location first.');
+      return;
+    }
+
+    startSearchTransition(async () => {
+      const result = await searchGooglePlacesAction({
+        workspaceSlug,
+        query: searchQuery,
+        pageSize: 10,
+      });
+      if (!result.success) {
+        toast.error(result.error);
+        return;
+      }
+      if (result.results.length === 0) {
+        toast.info('No matching businesses were found. Try a broader market or location.');
+        return;
+      }
+
+      addPlacesResults(result.results);
+      if (!runName.trim()) {
+        setRunName(
+          `${market.trim() || 'Business'} leads${location.trim() ? ` in ${location.trim()}` : ''}`.slice(0, 160),
+        );
+      }
+      toast.success(
+        `${result.results.length} businesses added for review. Run discovery when ready.`,
+      );
+    });
+  }
 
   function submitDiscovery() {
     startTransition(async () => {
@@ -156,7 +228,7 @@ export function LeadDiscoveryForm({
               maxLength={160}
               required
               placeholder="Pune dental studios"
-              disabled={pending}
+              disabled={pending || searchPending}
             />
           </div>
           <div className="space-y-2">
@@ -167,7 +239,7 @@ export function LeadDiscoveryForm({
               onChange={(event) => setMarket(event.target.value)}
               maxLength={160}
               placeholder="Dental clinics"
-              disabled={pending}
+              disabled={pending || searchPending}
             />
           </div>
           <div className="space-y-2">
@@ -178,7 +250,7 @@ export function LeadDiscoveryForm({
               onChange={(event) => setLocation(event.target.value)}
               maxLength={240}
               placeholder="Pune, Maharashtra"
-              disabled={pending}
+              disabled={pending || searchPending}
             />
           </div>
           <div className="space-y-2 sm:col-span-2">
@@ -189,7 +261,7 @@ export function LeadDiscoveryForm({
               onChange={(event) => setServiceFocus(event.target.value)}
               maxLength={240}
               placeholder="Website redesign and local SEO"
-              disabled={pending}
+              disabled={pending || searchPending}
             />
           </div>
           <div className="space-y-2 sm:col-span-2">
@@ -201,7 +273,7 @@ export function LeadDiscoveryForm({
               maxLength={1000}
               rows={3}
               placeholder="Optional search boundaries or evidence standards."
-              disabled={pending}
+              disabled={pending || searchPending}
               aria-describedby="discovery-notes-count"
             />
             <p
@@ -210,6 +282,43 @@ export function LeadDiscoveryForm({
             >
               {notes.length}/1000
             </p>
+          </div>
+          <div className="flex flex-col gap-3 rounded-xl border border-brand-indigo/20 bg-brand-indigo-soft/40 p-4 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-brand-navy">
+                Find businesses from this brief
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Google Places adds matching businesses below. Nothing becomes a lead until you review and run discovery.
+              </p>
+            </div>
+            {googleOperational ? (
+              <Button
+                type="button"
+                onClick={searchBrief}
+                disabled={pending || searchPending}
+                className="shrink-0"
+              >
+                {searchPending ? (
+                  <Loader2
+                    className="size-4 animate-spin motion-reduce:animate-none"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <Search className="size-4" aria-hidden="true" />
+                )}
+                {searchPending ? 'Searching…' : 'Find businesses'}
+              </Button>
+            ) : (
+              <Button
+                render={<a href={`/dashboard/${workspaceSlug}/integrations`} />}
+                type="button"
+                variant="outline"
+                className="shrink-0"
+              >
+                Connect Google Places
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -233,7 +342,7 @@ export function LeadDiscoveryForm({
                 createCandidate('candidate-' + nextCandidateKey.current++),
               ])
             }
-            disabled={pending || candidates.length >= 50}
+            disabled={pending || searchPending || candidates.length >= 50}
           >
             <Plus className="size-4" aria-hidden="true" />
             Add business
@@ -257,7 +366,7 @@ export function LeadDiscoveryForm({
                     variant="ghost"
                     size="icon"
                     onClick={() => removeCandidate(candidate.key)}
-                    disabled={pending || candidates.length === 1}
+                    disabled={pending || searchPending || candidates.length === 1}
                     aria-label={`Remove business ${index + 1}`}
                   >
                     <Trash2 className="size-4" aria-hidden="true" />
@@ -280,7 +389,7 @@ export function LeadDiscoveryForm({
                       maxLength={160}
                       required
                       placeholder="Fresh Growth Studio"
-                      disabled={pending}
+                      disabled={pending || searchPending}
                     />
                   </div>
                   <div className="space-y-2">
@@ -298,7 +407,7 @@ export function LeadDiscoveryForm({
                       }
                       maxLength={500}
                       placeholder="https://example.com"
-                      disabled={pending}
+                      disabled={pending || searchPending}
                     />
                   </div>
                   <div className="space-y-2">
@@ -315,7 +424,7 @@ export function LeadDiscoveryForm({
                       }
                       maxLength={160}
                       placeholder={market || 'Dental'}
-                      disabled={pending}
+                      disabled={pending || searchPending}
                     />
                   </div>
                   <div className="space-y-2">
@@ -332,7 +441,7 @@ export function LeadDiscoveryForm({
                       }
                       maxLength={240}
                       placeholder={location || 'City, region'}
-                      disabled={pending}
+                      disabled={pending || searchPending}
                     />
                   </div>
                   <div className="space-y-2">
@@ -350,7 +459,7 @@ export function LeadDiscoveryForm({
                       }
                       maxLength={320}
                       placeholder="hello@example.com"
-                      disabled={pending}
+                      disabled={pending || searchPending}
                     />
                   </div>
                   <details className="sm:col-span-2">
@@ -373,7 +482,7 @@ export function LeadDiscoveryForm({
                           }
                           maxLength={80}
                           placeholder="+91 90000 00000"
-                          disabled={pending}
+                          disabled={pending || searchPending}
                         />
                       </div>
                       <div className="space-y-2">
@@ -391,7 +500,7 @@ export function LeadDiscoveryForm({
                           }
                           maxLength={500}
                           placeholder="https://directory.example/listing"
-                          disabled={pending}
+                          disabled={pending || searchPending}
                         />
                       </div>
                       <div className="space-y-2 sm:col-span-2">
@@ -410,7 +519,7 @@ export function LeadDiscoveryForm({
                           }
                           maxLength={255}
                           placeholder="Paste the permitted Place ID from search"
-                          disabled={pending}
+                          disabled={pending || searchPending}
                         />
                         <p className="text-xs text-muted-foreground">
                           If one candidate uses a Place ID, every candidate in
@@ -435,7 +544,7 @@ export function LeadDiscoveryForm({
                           maxLength={1000}
                           rows={3}
                           placeholder="What you observed and where."
-                          disabled={pending}
+                          disabled={pending || searchPending}
                         />
                       </div>
                     </div>
@@ -453,7 +562,7 @@ export function LeadDiscoveryForm({
           {candidates.length} of 50 businesses supplied
           {usesGooglePlaces ? ' · Google Places references' : ' · Manual intake'}
         </div>
-        <Button type="submit" size="lg" disabled={pending}>
+        <Button type="submit" size="lg" disabled={pending || searchPending}>
           {pending ? (
             <>
               <Loader2 className="size-4 animate-spin" aria-hidden="true" />

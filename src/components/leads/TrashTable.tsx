@@ -1,6 +1,8 @@
 'use client';
 
 import { useTransition } from 'react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { Lead } from '@/types/lead';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
@@ -8,12 +10,19 @@ import { format } from 'date-fns';
 import { RotateCcw } from 'lucide-react';
 import { restoreLead } from '@/actions/lead';
 
-export function TrashTable({ leads, workspaceId }: { leads: Lead[], workspaceId: string }) {
+export function TrashTable({ leads, workspaceId, workspaceSlug }: { leads: Lead[], workspaceId: string, workspaceSlug: string }) {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const handleRestore = (leadId: string) => {
     startTransition(async () => {
-      await restoreLead(workspaceId, leadId);
+      const result = await restoreLead(workspaceId, leadId, workspaceSlug);
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success('Lead restored');
+      router.refresh();
     });
   };
 

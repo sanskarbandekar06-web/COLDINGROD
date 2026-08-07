@@ -37,6 +37,7 @@ export function BrowserExtensionSetup({
   const [pairingKey, setPairingKey] = useState('');
   const [message, setMessage] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [showPairing, setShowPairing] = useState(false);
   const [pending, startTransition] = useTransition();
 
   function createConnection() {
@@ -119,7 +120,7 @@ export function BrowserExtensionSetup({
         </Alert>
       )}
 
-      {canManage ? (
+      {canManage && (activeConnections.length === 0 || showPairing) ? (
         <div className="rounded-xl border bg-card p-5">
           <div className="flex items-center gap-3">
             <MonitorSmartphone
@@ -200,6 +201,28 @@ export function BrowserExtensionSetup({
             </div>
           )}
         </div>
+      ) : activeConnections.length > 0 ? (
+        <Alert className="border-emerald-500/30 bg-emerald-500/5">
+          <Check className="size-4 text-emerald-600" aria-hidden="true" />
+          <AlertTitle>Already connected to your account</AlertTitle>
+          <AlertDescription>
+            <p>
+              Your existing Browser Companion works in this workspace too. Its active workspace follows the workspace you select in Coldingrod.
+            </p>
+            {canManage && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="mt-3"
+                onClick={() => setShowPairing(true)}
+              >
+                <MonitorSmartphone className="size-4" aria-hidden="true" />
+                Add another browser
+              </Button>
+            )}
+          </AlertDescription>
+        </Alert>
       ) : (
         <Alert>
           <KeyRound className="size-4" aria-hidden="true" />
@@ -216,7 +239,7 @@ export function BrowserExtensionSetup({
           <div>
             <h2 className="font-semibold">Your connected browsers</h2>
             <p className="text-sm text-muted-foreground">
-              Only connections created by your account appear here.
+              These account connections follow you across all accessible workspaces.
             </p>
           </div>
           <Badge variant="outline">

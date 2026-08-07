@@ -23,11 +23,12 @@ export function LeadActionsMenu({ lead, workspaceId, workspaceSlug, members }: {
   const handleDelete = () => {
     if (!confirm('Archive this lead? You can restore it from lead trash.')) return;
     startTransition(async () => {
-      const result = await deleteLead(workspaceId, lead.id);
+      const result = await deleteLead(workspaceId, lead.id, workspaceSlug);
       if (result.error) toast.error(result.error);
       else {
         toast.success('Lead archived');
-        router.push(`/dashboard/${workspaceSlug}/leads`);
+        router.replace(`/dashboard/${workspaceSlug}/leads`);
+        router.refresh();
       }
     });
   };

@@ -211,7 +211,8 @@ export function LeadsTable({ leads, totalPages, currentPage, workspaceId, worksp
       <CreateLeadModal 
         isOpen={isCreateOpen} 
         onClose={() => setIsCreateOpen(false)} 
-        workspaceId={workspaceId} 
+        workspaceId={workspaceId}
+        workspaceSlug={workspaceSlug}
       />
       
       <LeadDrawer 

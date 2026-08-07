@@ -31,6 +31,7 @@ export interface IntegrationCatalogItem {
   enabled: boolean;
   environmentConfigured: boolean;
   operational: boolean;
+  accountConnected: boolean;
   record: IntegrationRecord | null;
 }
 
@@ -39,4 +40,5 @@ export interface GooglePlacesSearchResult {
   name: string;
   address: string;
   googleMapsUri: string;
+  websiteUri: string | null;
 }

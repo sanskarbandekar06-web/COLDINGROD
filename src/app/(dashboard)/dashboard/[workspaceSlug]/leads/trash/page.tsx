@@ -44,6 +44,7 @@ export default async function LeadsTrashPage(props: {
       <TrashTable
         leads={(leads || []) as unknown as Lead[]}
         workspaceId={context.workspace.id}
+        workspaceSlug={params.workspaceSlug}
       />
     </div>
   );

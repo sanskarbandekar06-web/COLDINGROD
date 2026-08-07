@@ -161,6 +161,17 @@ export async function createCompanyWorkspaceAction(prevState: { error?: string, 
     return { error: rpcError?.message || 'Failed to create workspace' };
   }
 
+  const { error: contextError } = await supabase.rpc(
+    'activate_user_workspace_context',
+    { check_workspace_id: workspaceId },
+  );
+  if (contextError) {
+    console.error(
+      'New workspace connection context failed:',
+      contextError.message,
+    );
+  }
+
   // Update additional fields
   await supabase
     .from('workspaces')

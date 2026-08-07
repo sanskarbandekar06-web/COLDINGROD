@@ -15,6 +15,7 @@ import { buttonVariants } from '@/components/ui/button';
 import { PageHeader } from '@/components/dashboard/PageHeader';
 import { SectionCard } from '@/components/dashboard/SectionCard';
 import { getIntegrationCatalog } from '@/services/integration.service';
+import { getBrowserExtensionConnections } from '@/services/browser-extension.service';
 import { getWorkspaceContext } from '@/services/workspace.service';
 
 export default async function IntegrationsPage({
@@ -26,7 +27,13 @@ export default async function IntegrationsPage({
   const context = await getWorkspaceContext(workspaceSlug);
   if (!context) notFound();
 
-  const catalog = await getIntegrationCatalog(context.workspace.id);
+  const [catalog, browserConnections] = await Promise.all([
+    getIntegrationCatalog(context.workspace.id, context.user.id),
+    getBrowserExtensionConnections(context.user.id),
+  ]);
+  const browserConnected = browserConnections.some(
+    (connection) => connection.is_active,
+  );
   const google = catalog.find((item) => item.provider === 'google');
   const otherProviders = catalog.filter((item) => item.provider !== 'google');
   const canManage = context.permissions.includes('manage_integrations');
@@ -35,7 +42,7 @@ export default async function IntegrationsPage({
     <div className="space-y-6">
       <PageHeader
         title="Integrations"
-        description="Server-side provider connections with workspace permissions, health status, and auditable state changes."
+        description="Connect providers and the browser companion once, then use them across every workspace you can access."
       />
 
       <div className="grid gap-4 sm:grid-cols-3">
@@ -50,18 +57,18 @@ export default async function IntegrationsPage({
           <p className="text-xs text-muted-foreground">Never saved in Supabase</p>
         </div>
         <div className="rounded-xl border bg-card p-4">
-          <p className="text-sm text-muted-foreground">Workspace status</p>
+          <p className="text-sm text-muted-foreground">Account status</p>
           <p className="mt-1 text-2xl font-bold">
             {google?.operational ? 'Ready' : 'Setup'}
           </p>
-          <p className="text-xs text-muted-foreground">Permission controlled</p>
+          <p className="text-xs text-muted-foreground">Shared across your workspaces</p>
         </div>
       </div>
 
       {google && (
         <SectionCard
           title="Google Places"
-          description="Live business search for the human-reviewed lead discovery workflow."
+          description="One account connection for live, human-reviewed lead discovery in all your workspaces."
         >
           <div className="grid gap-5 lg:grid-cols-[1fr_auto]">
             <div className="space-y-4">
@@ -132,6 +139,8 @@ export default async function IntegrationsPage({
                   workspaceSlug={workspaceSlug}
                   enabled={google.enabled}
                 />
+              ) : google.accountConnected ? (
+                <Badge>Connected to your account</Badge>
               ) : (
                 <Badge variant="outline">Read-only</Badge>
               )}
@@ -165,25 +174,42 @@ export default async function IntegrationsPage({
               </div>
             </div>
             <p className="text-sm text-muted-foreground">
-              Pairing uses a revocable workspace key. No Supabase credential,
+              Pairing uses one revocable account key that follows your selected workspace. No Supabase credential,
               Google key, or Coldingrod password is stored in the extension.
             </p>
           </div>
-          <div className="flex flex-wrap gap-2 lg:justify-end">
-            <a
-              href="/downloads/coldingrod-browser-companion.zip"
-              download
-              className={buttonVariants({ variant: 'outline' })}
-            >
-              <Download className="size-4" aria-hidden="true" />
-              Download
-            </a>
-            <Link
-              href={`/dashboard/${workspaceSlug}/settings/browser-extension`}
-              className={buttonVariants()}
-            >
-              Install and pair
-            </Link>
+          <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+            {browserConnected ? (
+              <>
+                <Badge className="gap-1.5">
+                  <CheckCircle2 className="size-3.5" aria-hidden="true" />
+                  Connected to your account
+                </Badge>
+                <Link
+                  href={`/dashboard/${workspaceSlug}/settings/browser-extension`}
+                  className={buttonVariants({ variant: 'outline' })}
+                >
+                  Manage browsers
+                </Link>
+              </>
+            ) : (
+              <>
+                <a
+                  href="/downloads/coldingrod-browser-companion.zip"
+                  download
+                  className={buttonVariants({ variant: 'outline' })}
+                >
+                  <Download className="size-4" aria-hidden="true" />
+                  Download
+                </a>
+                <Link
+                  href={`/dashboard/${workspaceSlug}/settings/browser-extension`}
+                  className={buttonVariants()}
+                >
+                  Install and pair once
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </SectionCard>

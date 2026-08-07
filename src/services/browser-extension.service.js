@@ -2,14 +2,13 @@ import 'server-only';
 
 import { createClient } from '@/lib/supabase/server';
 
-export async function getBrowserExtensionConnections(workspaceId, userId) {
+export async function getBrowserExtensionConnections(userId) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('browser_extension_connections')
     .select(
       'id, device_name, created_at, expires_at, last_used_at, revoked_at',
     )
-    .eq('workspace_id', workspaceId)
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
     .limit(20);

@@ -11,7 +11,6 @@ import { notFound } from 'next/navigation';
 import { PageHeader } from '@/components/dashboard/PageHeader';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { LeadDiscoveryForm } from '@/components/leads/LeadDiscoveryForm';
-import { GooglePlacesSearch } from '@/components/integrations/GooglePlacesSearch';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import {
@@ -41,7 +40,7 @@ export default async function LeadDiscoveryPage({
 
   const [recentRuns, integrations] = await Promise.all([
     getRecentLeadDiscoveryRuns(context.workspace.id),
-    getIntegrationCatalog(context.workspace.id),
+    getIntegrationCatalog(context.workspace.id, context.user.id),
   ]);
   const google = integrations.find(
     (integration) => integration.provider === 'google',
@@ -115,17 +114,11 @@ export default async function LeadDiscoveryPage({
         </div>
       )}
 
-      {canRun && google && (
-        <GooglePlacesSearch
-          workspaceSlug={workspaceSlug}
-          enabled={google.enabled}
-          configured={google.environmentConfigured}
-        />
-      )}
 
       {canRun && (
         <LeadDiscoveryForm
           workspaceSlug={workspaceSlug}
+          googleOperational={Boolean(google?.operational)}
           initialRunName={fromExtension ? `Captured: ${(capturedTitle || 'business page').slice(0, 140)}` : ''}
           initialCandidate={fromExtension ? {
             companyName: capturedTitle,

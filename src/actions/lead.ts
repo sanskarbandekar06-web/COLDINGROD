@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { hasJoinedPermission } from '@/lib/permission-utils';
 import { createClient } from '@/lib/supabase/server';
 import type { LeadStatus } from '@/types/lead';
+import { isValidWorkspaceSlug } from '@/lib/workspace-slug';
 
 const LEAD_STATUSES = new Set<LeadStatus>([
   'new',
@@ -51,7 +52,8 @@ async function isWorkspaceAssignee(workspaceId: string, userId: string) {
   return !error && Boolean(data);
 }
 
-export async function createLead(workspaceId: string, _prevState: unknown, formData: FormData) {
+export async function createLead(workspaceId: string, workspaceSlug: string, _prevState: unknown, formData: FormData) {
+  if (!isValidWorkspaceSlug(workspaceSlug)) return { error: 'Invalid workspace.' };
   if (!(await canManageLeads(workspaceId))) {
     return { error: 'Permission denied. Must have manage_leads permission.' };
   }
@@ -112,7 +114,10 @@ export async function createLead(workspaceId: string, _prevState: unknown, formD
     });
   }
 
-  revalidatePath('/dashboard/[workspaceSlug]/leads', 'page');
+  const base = `/dashboard/${workspaceSlug}`;
+  revalidatePath(base);
+  revalidatePath(`${base}/leads`);
+  revalidatePath(`${base}/activity`);
   return { success: true, leadId: lead.id };
 }
 
@@ -208,7 +213,7 @@ export async function changeLeadStatus(workspaceId: string, leadId: string, stat
   return { success: true };
 }
 
-export async function deleteLead(workspaceId: string, leadId: string) {
+export async function deleteLead(workspaceId: string, leadId: string, workspaceSlug: string) {
   if (!(await canManageLeads(workspaceId))) return { error: 'Permission denied.' };
 
   const supabase = await createClient();
@@ -223,12 +228,32 @@ export async function deleteLead(workspaceId: string, leadId: string) {
 
   if (error || !data) return { error: 'Lead not found or could not be moved to trash.' };
 
-  revalidatePath('/dashboard/[workspaceSlug]/leads', 'page');
-  revalidatePath('/dashboard/[workspaceSlug]/leads/trash', 'page');
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) {
+    await supabase.from('activities').insert({
+      workspace_id: workspaceId,
+      entity_type: 'lead',
+      entity_id: leadId,
+      actor_type: 'human',
+      actor_user_id: user.id,
+      action: 'lead_archived',
+      metadata: {},
+    });
+  }
+
+  const base = isValidWorkspaceSlug(workspaceSlug)
+    ? `/dashboard/${workspaceSlug}`
+    : '/dashboard';
+  revalidatePath(base);
+  revalidatePath(`${base}/leads`);
+  revalidatePath(`${base}/leads/trash`);
+  revalidatePath(`${base}/activity`);
   return { success: true };
 }
 
-export async function restoreLead(workspaceId: string, leadId: string) {
+export async function restoreLead(workspaceId: string, leadId: string, workspaceSlug: string) {
   if (!(await canManageLeads(workspaceId))) return { error: 'Permission denied.' };
 
   const supabase = await createClient();
@@ -243,8 +268,13 @@ export async function restoreLead(workspaceId: string, leadId: string) {
 
   if (error || !data) return { error: 'Lead not found or could not be restored.' };
 
-  revalidatePath('/dashboard/[workspaceSlug]/leads', 'page');
-  revalidatePath('/dashboard/[workspaceSlug]/leads/trash', 'page');
+  const base = isValidWorkspaceSlug(workspaceSlug)
+    ? `/dashboard/${workspaceSlug}`
+    : '/dashboard';
+  revalidatePath(base);
+  revalidatePath(`${base}/leads`);
+  revalidatePath(`${base}/leads/trash`);
+  revalidatePath(`${base}/activity`);
   return { success: true };
 }
 
