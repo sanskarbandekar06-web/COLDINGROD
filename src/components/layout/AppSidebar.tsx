@@ -18,6 +18,7 @@ import {
   History,
   LayoutDashboard,
   LogOut,
+  MonitorSmartphone,
   Send,
   Settings,
   ShieldAlert,
@@ -89,6 +90,11 @@ export function AppSidebar({
     { name: 'Assets', href: `${basePath}/assets`, icon: FileBox },
     { name: 'Activity', href: `${basePath}/activity`, icon: BellRing },
     { name: 'Integrations', href: `${basePath}/integrations`, icon: Blocks },
+    {
+      name: 'Browser Companion',
+      href: `${basePath}/settings/browser-extension`,
+      icon: MonitorSmartphone,
+    },
   ];
 
   const aiNav = [

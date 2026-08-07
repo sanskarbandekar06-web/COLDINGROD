@@ -5,6 +5,7 @@ import {
   Bot,
   Building2,
   KeyRound,
+  MonitorSmartphone,
   Plug,
   Settings2,
   UserRound,
@@ -34,6 +35,11 @@ export default async function SettingsPage(props: {
         ]
       : []),
     { label: 'Integrations', href: `${basePath}/integrations`, icon: Plug },
+    {
+      label: 'Browser companion',
+      href: `${basePath}/settings/browser-extension`,
+      icon: MonitorSmartphone,
+    },
     { label: 'AI settings', href: `${basePath}/ai`, icon: Bot },
     { label: 'Notifications', href: `${basePath}/activity`, icon: BellRing },
   ];

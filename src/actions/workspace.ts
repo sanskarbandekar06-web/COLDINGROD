@@ -148,5 +148,7 @@ export async function createCompanyWorkspaceAction(prevState: { error?: string, 
     .eq('id', workspaceId);
 
   revalidatePath('/dashboard');
-  redirect(`/dashboard/${slug}`);
+  redirect(
+    `/dashboard/${slug}/settings/browser-extension?welcome=1`,
+  );
 }

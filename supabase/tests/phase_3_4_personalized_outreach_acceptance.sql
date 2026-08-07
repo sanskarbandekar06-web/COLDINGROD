@@ -545,7 +545,7 @@ SELECT pg_temp.assert_true(
               approval.approved_payload ->> 'version_number'
           )::INTEGER = 1
           AND action.status = 'approved'
-          AND message.status = 'pending_approval'
+          AND message.status = 'scheduled'
           AND message.sent_at IS NULL
     ) = 1,
     'approval atomically stores action decision and exact message snapshot'
@@ -616,7 +616,7 @@ SELECT pg_temp.assert_true(
               'The wording needs a different call to action.'
           AND approval.approved_payload IS NULL
           AND action.status = 'rejected'
-          AND message.status = 'pending_approval'
+          AND message.status = 'failed'
           AND message.sent_at IS NULL
     ) = 1,
     'rejection is atomic and never sends or approves content'

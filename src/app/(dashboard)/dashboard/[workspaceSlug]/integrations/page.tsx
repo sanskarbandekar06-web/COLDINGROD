@@ -3,9 +3,11 @@ import { notFound } from 'next/navigation';
 import {
   Blocks,
   CheckCircle2,
+  Download,
   ExternalLink,
   KeyRound,
   LockKeyhole,
+  MonitorSmartphone,
 } from 'lucide-react';
 import { IntegrationToggleButton } from '@/components/integrations/IntegrationToggleButton';
 import { Badge } from '@/components/ui/badge';
@@ -143,6 +145,48 @@ export default async function IntegrationsPage({
           </div>
         </SectionCard>
       )}
+
+      <SectionCard
+        title="Coldingrod Browser Companion"
+        description="Use lead context and the human-approved outreach workflow beside the business pages you visit."
+      >
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg bg-brand-indigo-soft p-2 text-brand-indigo">
+                <MonitorSmartphone className="size-5" aria-hidden="true" />
+              </div>
+              <div>
+                <p className="font-medium">Chrome and Edge side panel</p>
+                <p className="text-sm text-muted-foreground">
+                  Draft, approve, open the delivery channel, and record sent
+                  status without losing your current browser context.
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Pairing uses a revocable workspace key. No Supabase credential,
+              Google key, or Coldingrod password is stored in the extension.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2 lg:justify-end">
+            <a
+              href="/downloads/coldingrod-browser-companion.zip"
+              download
+              className={buttonVariants({ variant: 'outline' })}
+            >
+              <Download className="size-4" aria-hidden="true" />
+              Download
+            </a>
+            <Link
+              href={`/dashboard/${workspaceSlug}/settings/browser-extension`}
+              className={buttonVariants()}
+            >
+              Install and pair
+            </Link>
+          </div>
+        </div>
+      </SectionCard>
 
       <SectionCard
         title="Provider adapter registry"

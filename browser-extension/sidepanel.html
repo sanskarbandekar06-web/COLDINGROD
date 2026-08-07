@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Coldingrod Browser Companion</title>
+    <link rel="stylesheet" href="sidepanel.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to companion</a>
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">C</span>
+        <div>
+          <h1>Coldingrod</h1>
+          <p>Browser Companion</p>
+        </div>
+      </div>
+      <span id="connection-badge" class="status-dot" title="Not connected">
+        <span class="sr-only">Connection status:</span>
+        <span id="connection-label">Offline</span>
+      </span>
+    </header>
+
+    <main id="main-content">
+      <p id="live-message" class="live-message" role="status" aria-live="polite"></p>
+
+      <section id="setup-view" class="view" aria-labelledby="setup-heading">
+        <div class="hero-card">
+          <span class="eyebrow">Secure workspace pairing</span>
+          <h2 id="setup-heading">Connect this browser</h2>
+          <p>
+            Generate a one-time key from Coldingrod, then paste it below. Your
+            password and Supabase credentials never enter the extension.
+          </p>
+        </div>
+
+        <form id="setup-form" class="stack">
+          <div class="field">
+            <label for="app-url">Coldingrod app</label>
+            <select id="app-url" name="appUrl">
+              <option value="https://coldingrod.vercel.app">
+                Production — coldingrod.vercel.app
+              </option>
+              <option value="http://localhost:3000">
+                Local development — localhost:3000
+              </option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="pairing-key">Pairing key</label>
+            <input
+              id="pairing-key"
+              name="pairingKey"
+              type="password"
+              pattern="cgr_[A-Za-z0-9_-]{43}"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="cgr_…"
+              required
+              aria-describedby="pairing-help"
+            />
+            <small id="pairing-help">
+              In Coldingrod: Settings → Browser Companion → Generate key.
+            </small>
+          </div>
+          <button id="connect-button" class="button primary" type="submit">
+            Connect workspace
+          </button>
+        </form>
+
+        <a
+          id="open-setup-link"
+          class="button secondary"
+          href="https://coldingrod.vercel.app/dashboard"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Open Coldingrod
+        </a>
+      </section>
+
+      <section id="companion-view" class="view hidden" aria-labelledby="workspace-heading">
+        <div class="workspace-strip">
+          <div>
+            <span class="eyebrow">Connected workspace</span>
+            <h2 id="workspace-heading">Loading…</h2>
+          </div>
+          <button
+            id="refresh-button"
+            class="icon-button"
+            type="button"
+            aria-label="Refresh active page and lead context"
+            title="Refresh context"
+          >
+            ↻
+          </button>
+        </div>
+
+        <section class="page-card" aria-labelledby="active-page-heading">
+          <span id="active-page-heading" class="eyebrow">Active page</span>
+          <strong id="page-title">Reading current tab…</strong>
+          <span id="page-url"></span>
+          <button id="capture-button" class="text-button" type="button">
+            Capture as a new lead candidate
+          </button>
+        </section>
+
+        <section class="panel-card" aria-labelledby="lead-heading">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">CRM context</span>
+              <h3 id="lead-heading">Lead and contact</h3>
+            </div>
+            <span id="match-badge" class="pill hidden">Page match</span>
+          </div>
+          <div class="field">
+            <label for="lead-select">Lead</label>
+            <select id="lead-select">
+              <option value="">Choose a lead…</option>
+            </select>
+          </div>
+          <div id="contact-field" class="field hidden">
+            <label for="contact-select">Contact</label>
+            <select id="contact-select">
+              <option value="">Choose a contact…</option>
+            </select>
+          </div>
+          <p id="lead-empty" class="empty-note">
+            No lead matched this page. Choose an existing lead or capture the
+            page for review.
+          </p>
+        </section>
+
+        <section id="compose-section" class="panel-card hidden" aria-labelledby="compose-heading">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">Human-reviewed outreach</span>
+              <h3 id="compose-heading">Create a message</h3>
+            </div>
+            <span class="pill warning">Approval required</span>
+          </div>
+          <form id="compose-form" class="stack">
+            <div class="field">
+              <label for="channel-select">Channel</label>
+              <select id="channel-select" required>
+                <option value="">Choose reachable channel…</option>
+              </select>
+            </div>
+            <div id="subject-field" class="field hidden">
+              <label for="subject-input">Subject</label>
+              <input
+                id="subject-input"
+                maxlength="500"
+                placeholder="A useful idea for your team"
+              />
+            </div>
+            <div class="field">
+              <label for="message-input">Message</label>
+              <textarea
+                id="message-input"
+                rows="7"
+                maxlength="10000"
+                placeholder="Write a personalized message…"
+                required
+              ></textarea>
+              <small>
+                Coldingrod saves a versioned draft. It cannot be delivered
+                until a member with AI approval permission approves it.
+              </small>
+            </div>
+            <button id="draft-button" class="button primary" type="submit">
+              Submit for approval
+            </button>
+          </form>
+        </section>
+
+        <section id="history-section" class="panel-card hidden" aria-labelledby="history-heading">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">Shared history</span>
+              <h3 id="history-heading">Messages</h3>
+            </div>
+            <span id="history-count" class="pill">0</span>
+          </div>
+          <div id="message-list" class="message-list"></div>
+        </section>
+
+        <footer class="companion-footer">
+          <a id="open-workspace-link" href="#" target="_blank" rel="noreferrer">
+            Open workspace
+          </a>
+          <button id="disconnect-button" class="text-button danger" type="button">
+            Disconnect browser
+          </button>
+        </footer>
+      </section>
+    </main>
+    <script src="sidepanel.js"></script>
+  </body>
+</html>

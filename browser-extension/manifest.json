@@ -1,11 +1,21 @@
 {
   "manifest_version": 3,
-  "name": "Coldingrod Lead Capture",
-  "description": "Capture the current business page into Coldingrod Lead Discovery for human review.",
-  "version": "0.1.0",
-  "permissions": ["activeTab", "storage"],
+  "name": "Coldingrod Browser Companion",
+  "description": "Research leads and complete human-approved outreach beside the business pages you visit.",
+  "version": "0.2.0",
+  "minimum_chrome_version": "114",
+  "permissions": ["activeTab", "storage", "sidePanel"],
+  "host_permissions": [
+    "https://coldingrod.vercel.app/*",
+    "http://localhost:3000/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
-    "default_title": "Capture lead in Coldingrod",
-    "default_popup": "popup.html"
+    "default_title": "Open Coldingrod Browser Companion"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
   }
 }

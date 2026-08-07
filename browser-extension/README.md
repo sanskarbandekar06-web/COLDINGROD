@@ -1,29 +1,41 @@
-# Coldingrod Lead Capture browser companion
+# Coldingrod Browser Companion
 
-This Chrome/Edge Manifest V3 extension sends the current website title and URL into Coldingrod's existing Lead Discovery review form. It never stores a password, Supabase access token, or private workspace data.
+A Chrome/Edge Manifest V3 side-panel extension for page-aware lead context and human-controlled outreach.
 
-## Install for development
+## Features
 
-1. Download or clone the COLDINGROD repository.
-2. Open `chrome://extensions` in Chrome (or `edge://extensions` in Edge).
-3. Turn on **Developer mode**.
-4. Click **Load unpacked**.
-5. Select this `browser-extension` folder.
-6. Pin **Coldingrod Lead Capture** from the browser extensions menu.
-7. Open the extension, enter `https://coldingrod.vercel.app` and the workspace slug from the dashboard URL.
+- Reads the active tab title and URL only after the user opens the companion.
+- Matches an existing Coldingrod lead by website or supported social profile.
+- Shows contacts and recent cross-workspace outreach history.
+- Creates versioned outreach drafts that always enter `pending_approval`.
+- Lets an authorized human approve or reject a message from the side panel.
+- Copies approved content and opens email, WhatsApp, LinkedIn, Instagram, or SMS.
+- Records a message as sent only after the user confirms the real send happened.
+- Keeps the original Lead Discovery capture workflow for unmatched pages.
 
-## Use
+## Install
 
-1. Open a business website or directory listing.
-2. Click the Coldingrod extension.
-3. Click **Capture for review**.
-4. Coldingrod opens Lead Discovery with the page title and source URL prefilled.
-5. Review and complete the business details before importing. The extension never auto-creates a lead.
+1. Download `coldingrod-browser-companion.zip` from Coldingrod Settings → Browser Companion.
+2. Extract the ZIP to a folder you will keep.
+3. Open `chrome://extensions` in Chrome or `edge://extensions` in Edge.
+4. Enable **Developer mode**.
+5. Choose **Load unpacked** and select the extracted folder.
+6. Pin **Coldingrod Browser Companion**.
+7. In Coldingrod, open Settings → Browser Companion and generate a pairing key.
+8. Click the extension icon, paste the key, and connect.
+
+Chrome 114 or newer is required for the Side Panel API.
 
 ## Security model
 
-- No host permissions and no background service worker.
-- `activeTab` reads only the tab where the user clicks the extension.
-- `storage` saves only the app URL and workspace slug.
-- Authentication remains in the normal Coldingrod website session.
-- Human review remains mandatory before lead creation.
+- The extension stores a revocable, 90-day pairing key in `chrome.storage.local`.
+- Local storage access is restricted to trusted extension contexts.
+- Coldingrod stores only the SHA-256 hash of the pairing key.
+- The key is scoped to one user, one workspace, active membership, and current permissions.
+- Requests are rate limited and audited. Keys can be revoked from workspace settings.
+- No password, Supabase session, Supabase key, Google Places key, or provider OAuth token is stored.
+- Customer-facing content is never auto-sent. A human approves, performs the final channel send, and confirms delivery.
+
+## Development
+
+Use `https://coldingrod.vercel.app` for production or `http://localhost:3000` for local development. Both origins are declared explicitly in `host_permissions`; the extension does not request access to arbitrary websites for backend requests.

@@ -15,6 +15,8 @@ export async function proxy(request: NextRequest) {
     path === '/privacy' ||
     path === '/robots.txt' ||
     path === '/api/health' ||
+    path === '/api/browser-extension' ||
+    path === '/downloads/coldingrod-browser-companion.zip' ||
     path.startsWith('/auth/callback') ||
     path.startsWith('/auth/google') ||
     path.startsWith('/auth/auth-code-error') ||
