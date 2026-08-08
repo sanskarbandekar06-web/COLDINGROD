@@ -31,6 +31,9 @@ interface EditMessageDialogProps {
   workspaceId: string;
   messageId: string;
   currentContent: string;
+  currentSubject?: string | null;
+  platform: string;
+  defaultOpen?: boolean;
   canEdit: boolean;
   editBlockedReason?: string;
 }
@@ -40,12 +43,16 @@ export function EditMessageDialog({
   workspaceId,
   messageId,
   currentContent,
+  currentSubject = null,
+  platform,
+  defaultOpen = false,
   canEdit,
   editBlockedReason,
 }: EditMessageDialogProps) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   const [isPending, startTransition] = useTransition();
   const [content, setContent] = useState(currentContent);
+  const [subject, setSubject] = useState(currentSubject ?? '');
   const [changeReason, setChangeReason] = useState('');
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -56,6 +63,7 @@ export function EditMessageDialog({
         workspaceId,
         messageId,
         content,
+        platform === 'email' ? subject : null,
         changeReason.trim() || null
       );
       if (result.success) {
@@ -97,6 +105,18 @@ export function EditMessageDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {platform === 'email' && (
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-subject">Email subject</Label>
+              <Input
+                id="edit-subject"
+                value={subject}
+                onChange={(event) => setSubject(event.target.value)}
+                maxLength={300}
+                placeholder="Email subject…"
+              />
+            </div>
+          )}
           <div className="space-y-1.5">
             <Label htmlFor="edit-content">Message content *</Label>
             <Textarea
@@ -133,7 +153,13 @@ export function EditMessageDialog({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending || content.trim() === currentContent}>
+            <Button
+              type="submit"
+              disabled={
+                isPending ||
+                (content.trim() === currentContent && subject.trim() === (currentSubject ?? ''))
+              }
+            >
               {isPending ? 'Saving…' : 'Save version'}
             </Button>
           </div>

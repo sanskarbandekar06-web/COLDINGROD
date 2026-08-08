@@ -226,6 +226,7 @@ export async function updateMessageContentAction(
   workspaceId: string,
   messageId: string,
   content: string,
+  subject: string | null,
   changeReason: string | null
 ): Promise<ActionResult> {
   // 1. Authenticate + permission
@@ -242,13 +243,17 @@ export async function updateMessageContentAction(
   if (trimmed.length > 10000) {
     return { success: false, code: 'VALIDATION_ERROR', error: 'Content exceeds 10,000 characters.' };
   }
+  const trimmedSubject = subject?.trim() || null;
+  if (trimmedSubject && trimmedSubject.length > 300) {
+    return { success: false, code: 'VALIDATION_ERROR', error: 'Subject exceeds 300 characters.' };
+  }
 
   const supabase = await createClient();
 
   // 3. Fetch and validate message with workspace ownership
   const { data: message, error: fetchError } = await supabase
     .from('outreach_messages')
-    .select('id, workspace_id, status, ai_action_id, deleted_at')
+    .select('id, workspace_id, platform, status, ai_action_id, deleted_at')
     .eq('id', messageId)
     .eq('workspace_id', workspaceId)
     .maybeSingle();
@@ -340,6 +345,7 @@ export async function updateMessageContentAction(
     .from('outreach_messages')
     .update({
       content: trimmed,
+      subject: message.platform === 'email' ? trimmedSubject : null,
       updated_at: new Date().toISOString(),
     })
     .eq('id', messageId)
@@ -501,4 +507,49 @@ export async function restoreOutreachMessageAction(
   revalidatePath(`/dashboard/${workspaceSlug}/outreach`, 'page');
 
   return { success: true };
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// confirmOutreachSentAction — records delivery only after the user confirms it
+// ──────────────────────────────────────────────────────────────────────────────
+
+export async function confirmOutreachSentAction(
+  workspaceSlug: string,
+  workspaceId: string,
+  messageId: string
+): Promise<ActionResult> {
+  const { permitted } = await checkManageLeadsPermission(workspaceId);
+  if (!permitted) {
+    return {
+      success: false,
+      code: 'FORBIDDEN',
+      error: 'Permission denied. Requires manage_leads.',
+    };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('confirm_outreach_sent', {
+    check_workspace_id: workspaceId,
+    check_message_id: messageId,
+  });
+
+  if (error) {
+    const duplicate = error.code === '23505' ||
+      error.message.toLowerCase().includes('already sent');
+    return {
+      success: false,
+      code: duplicate ? 'VERSION_CONFLICT' : 'INVALID_STATUS',
+      error: duplicate
+        ? 'An identical message was already sent to this contact recently.'
+        : 'Only an approved message can be confirmed as sent.',
+    };
+  }
+
+  const base = `/dashboard/${workspaceSlug}`;
+  revalidatePath(`${base}/outreach`);
+  revalidatePath(`${base}/outreach/messages`);
+  revalidatePath(`${base}/outreach/messages/${messageId}`);
+  revalidatePath(`${base}/leads`);
+  revalidatePath(`${base}/activity`);
+  return { success: true, messageId };
 }

@@ -13,6 +13,7 @@ import { MessageVersionHistory } from '@/components/outreach/MessageVersionHisto
 import { SendReadinessPanel } from '@/components/outreach/SendReadinessPanel';
 import { OutreachActivityTimeline } from '@/components/outreach/OutreachActivityTimeline';
 import { FollowUpSequencePanel } from '@/components/outreach/FollowUpSequencePanel';
+import { CompanionDeliveryPanel } from '@/components/outreach/CompanionDeliveryPanel';
 import { EditMessageDialog } from '@/components/outreach/EditMessageDialog';
 import { CopyButton } from '@/components/outreach/CopyButton';
 import { ArchiveRestoreButton } from '@/components/outreach/ArchiveRestoreButton';
@@ -27,8 +28,10 @@ import { getFollowUpSequenceForMessage } from '@/services/follow-up.service';
 
 export default async function MessageDetailPage(props: {
   params: Promise<{ workspaceSlug: string; messageId: string }>;
+  searchParams: Promise<{ edit?: string }>;
 }) {
   const params = await props.params;
+  const searchParams = await props.searchParams;
   const context = await getWorkspaceContext(params.workspaceSlug);
   if (!context) notFound();
 
@@ -142,6 +145,9 @@ export default async function MessageDetailPage(props: {
                     workspaceId={workspace.id}
                     messageId={message.id}
                     currentContent={message.content}
+                    currentSubject={message.subject}
+                    platform={message.platform}
+                    defaultOpen={searchParams.edit === '1' && canEdit}
                     canEdit={canEdit}
                     editBlockedReason={editBlockedReason}
                   />
@@ -386,6 +392,26 @@ export default async function MessageDetailPage(props: {
           {/* Send Readiness */}
           <SectionCard title="Send Readiness">
             <SendReadinessPanel summary={readiness} />
+          </SectionCard>
+
+          <SectionCard
+            title="Send from Coldingrod"
+            description="Prepare the approved message through the paired Browser Companion without leaving this workflow."
+          >
+            <CompanionDeliveryPanel
+              workspaceSlug={params.workspaceSlug}
+              workspaceId={workspace.id}
+              message={{
+                id: message.id,
+                platform: message.platform,
+                subject: message.subject,
+                content: message.content,
+                status: message.status,
+              }}
+              contact={contact}
+              isReady={readiness.isReady}
+              canManage={canManage}
+            />
           </SectionCard>
 
           <SectionCard

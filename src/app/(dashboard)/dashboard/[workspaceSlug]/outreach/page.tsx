@@ -38,6 +38,7 @@ export default async function OutreachPage(props: {
   ]);
 
   const canCreate = context.permissions.includes('manage_leads');
+  const canGenerate = canCreate && context.permissions.includes('manage_ai');
 
   return (
     <div className="space-y-6">
@@ -50,6 +51,7 @@ export default async function OutreachPage(props: {
               workspaceSlug={params.workspaceSlug}
               workspaceId={workspace.id}
               leads={leads}
+              canGenerate={canGenerate}
             />
           ) : undefined
         }
@@ -130,7 +132,7 @@ export default async function OutreachPage(props: {
       <div className="rounded-lg border border-dashed border-muted-foreground/30 p-4 text-sm text-muted-foreground">
         <p className="font-medium mb-1">Provider-safe delivery boundary</p>
         <p>
-          Phase 4 integration state and health tracking are active. Outbound delivery still requires a verified provider receipt; Coldingrod never treats an enabled integration, copied draft, or approval as proof that a message was sent.
+          Approved messages can be prepared from Coldingrod with the Browser Companion. Email, WhatsApp, and SMS receive prefilled content; LinkedIn and Instagram open the contact profile with the approved text copied. A message is recorded as sent only after you confirm the provider send.
         </p>
       </div>
     </div>

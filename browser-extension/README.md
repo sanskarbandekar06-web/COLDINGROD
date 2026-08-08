@@ -9,7 +9,8 @@ A Chrome/Edge Manifest V3 side-panel extension for page-aware lead context and h
 - Shows contacts and recent cross-workspace outreach history.
 - Creates versioned outreach drafts that always enter `pending_approval`.
 - Lets an authorized human approve or reject a message from the side panel.
-- Copies approved content and opens email, WhatsApp, LinkedIn, Instagram, or SMS.
+- Adds a secure bridge to the Coldingrod message page for one-click approved delivery handoff.
+- Prefills email, WhatsApp, and SMS; copies approved text before opening LinkedIn or Instagram.
 - Records a message as sent only after the user confirms the real send happened.
 - Keeps the original Lead Discovery capture workflow for unmatched pages.
 
@@ -34,7 +35,7 @@ Chrome 114 or newer is required for the Side Panel API.
 - The key is scoped to one user, one workspace, active membership, and current permissions.
 - Requests are rate limited and audited. Keys can be revoked from workspace settings.
 - No password, Supabase session, Supabase key, Google Places key, or provider OAuth token is stored.
-- Customer-facing content is never auto-sent. A human approves, performs the final channel send, and confirms delivery.
+- Customer-facing content is never falsely marked sent. A human approves, performs the provider's final send, and confirms delivery from Coldingrod or the side panel.
 
 ## Development
 

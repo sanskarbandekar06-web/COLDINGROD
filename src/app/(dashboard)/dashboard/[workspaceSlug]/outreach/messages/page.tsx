@@ -81,6 +81,7 @@ export default async function OutreachMessagesPage(props: {
   ]);
 
   const canCreate = context.permissions.includes('manage_leads');
+  const canGenerate = canCreate && context.permissions.includes('manage_ai');
   const basePath = `/dashboard/${params.workspaceSlug}/outreach/messages`;
 
   function buildPageUrl(p: number) {
@@ -106,6 +107,7 @@ export default async function OutreachMessagesPage(props: {
               workspaceSlug={params.workspaceSlug}
               workspaceId={workspace.id}
               leads={leads}
+              canGenerate={canGenerate}
             />
           ) : undefined
         }
