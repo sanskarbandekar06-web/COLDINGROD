@@ -35,6 +35,33 @@ const securityHeaders = [
     : []),
 ];
 
+const noStoreHeaders = [
+  {
+    key: 'Cache-Control',
+    value: 'private, no-cache, no-store, max-age=0, must-revalidate',
+  },
+  {
+    key: 'CDN-Cache-Control',
+    value: 'no-store',
+  },
+  {
+    key: 'Vercel-CDN-Cache-Control',
+    value: 'no-store',
+  },
+];
+
+const appShellRoutes = [
+  '/',
+  '/login',
+  '/signup',
+  '/forgot-password',
+  '/reset-password',
+  '/dashboard/:path*',
+  '/invite/:path*',
+  '/terms',
+  '/privacy',
+];
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
@@ -44,6 +71,10 @@ const nextConfig: NextConfig = {
         source: '/(.*)',
         headers: securityHeaders,
       },
+      ...appShellRoutes.map((source) => ({
+        source,
+        headers: noStoreHeaders,
+      })),
       {
         source: '/api/browser-extension',
         headers: [
