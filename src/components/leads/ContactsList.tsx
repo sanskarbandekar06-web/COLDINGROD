@@ -139,6 +139,17 @@ export function ContactsList({
                     <Link2 className="h-4 w-4" />
                   </Button>
                 )}
+                {contact.facebook_url && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-blue-600 hover:text-blue-700"
+                    onClick={() => window.open(contact.facebook_url!, '_blank', 'noopener,noreferrer')}
+                    aria-label={`Open ${contact.first_name}'s Facebook`}
+                  >
+                    <Link2 className="h-4 w-4" />
+                  </Button>
+                )}
                 <Button
                   variant="ghost"
                   size="icon"
@@ -178,6 +189,10 @@ export function ContactsList({
                 <Label htmlFor="contact-last-name">Last name</Label>
                 <Input id="contact-last-name" name="lastName" maxLength={100} />
               </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="contact-facebook">Facebook page URL</Label>
+              <Input id="contact-facebook" name="facebookUrl" type="url" maxLength={500} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="contact-job-title">Job title</Label>

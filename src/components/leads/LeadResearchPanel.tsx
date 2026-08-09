@@ -7,6 +7,8 @@ import {
   Bot,
   CheckCircle2,
   ExternalLink,
+  FileSearch,
+  FileText,
   Lightbulb,
   Loader2,
   Search,
@@ -160,6 +162,20 @@ export function LeadResearchPanel({
           )}
 
           <div className="flex flex-wrap gap-2">
+            <Link
+              href={`/dashboard/${workspaceSlug}/leads/${leadId}/reports/summary`}
+              className={buttonVariants({ variant: 'outline', size: 'sm' })}
+            >
+              <FileText className="size-4" aria-hidden="true" />
+              Executive Summary
+            </Link>
+            <Link
+              href={`/dashboard/${workspaceSlug}/leads/${leadId}/reports/detailed`}
+              className={buttonVariants({ variant: 'outline', size: 'sm' })}
+            >
+              <FileSearch className="size-4" aria-hidden="true" />
+              Detailed Analysis Report
+            </Link>
             <Link
               href={`/dashboard/${workspaceSlug}/ai/actions/${latest.analysis_action_id}`}
               className={buttonVariants({ variant: 'ghost', size: 'sm' })}

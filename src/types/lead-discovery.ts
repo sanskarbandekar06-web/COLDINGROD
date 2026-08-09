@@ -34,6 +34,9 @@ export interface LeadDiscoveryCandidateInput {
   sourceUrl: string;
   businessEmail: string;
   businessPhone: string;
+  linkedinUrl: string;
+  instagramHandle: string;
+  facebookUrl: string;
   evidenceNotes: string;
   externalReference: string;
 }
@@ -80,6 +83,9 @@ export interface LeadDiscoveryCandidate {
   source_url: string | null;
   business_email: string | null;
   business_phone: string | null;
+  linkedin_url: string | null;
+  instagram_handle: string | null;
+  facebook_url: string | null;
   evidence_notes: string | null;
   external_provider: 'google_places' | null;
   external_reference: string | null;

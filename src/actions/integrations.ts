@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getWorkspaceContext } from '@/services/workspace.service';
 import { getEnabledIntegration } from '@/services/integration.service';
 import type { GooglePlacesSearchResult } from '@/types/integration';
+import { discoverPublicBusinessProfile } from '@/lib/public-business-profile';
 
 type IntegrationResult =
   | { success: true }
@@ -129,6 +130,11 @@ function safeGoogleResult(value: unknown): GooglePlacesSearchResult | null {
       /^https?:\/\/\S+$/i.test(value.websiteUri)
         ? value.websiteUri.slice(0, 500)
         : null,
+    phone: null,
+    email: null,
+    linkedinUrl: null,
+    instagramHandle: null,
+    facebookUrl: null,
   };
 }
 
@@ -297,9 +303,26 @@ export async function searchGooglePlacesAction(value: {
       recordValue(payload) && Array.isArray(payload.places)
         ? payload.places
         : [];
-    const results = places
+    const baseResults = places
       .map(safeGoogleResult)
       .filter((result): result is GooglePlacesSearchResult => result !== null);
+    const results = await Promise.all(
+      baseResults.map(async (result) => {
+        if (!result.websiteUri) return result;
+        const profile = await discoverPublicBusinessProfile(
+          result.websiteUri,
+          result.name,
+        );
+        return {
+          ...result,
+          phone: result.phone ?? profile.phone ?? null,
+          email: profile.email ?? null,
+          linkedinUrl: profile.linkedinUrl ?? null,
+          instagramHandle: profile.instagramHandle ?? null,
+          facebookUrl: profile.facebookUrl ?? null,
+        };
+      }),
+    );
     await recordHealth(context.workspace.id, true, null);
     revalidatePath(`/dashboard/${slug}/integrations`);
     return { success: true, results, attribution: 'Google Maps' };

@@ -41,4 +41,9 @@ export interface GooglePlacesSearchResult {
   address: string;
   googleMapsUri: string;
   websiteUri: string | null;
+  phone: string | null;
+  email: string | null;
+  linkedinUrl: string | null;
+  instagramHandle: string | null;
+  facebookUrl: string | null;
 }

@@ -1,12 +1,12 @@
 # Coldingrod Project Status
 
-Last verified: 2026-08-05
+Last verified: 2026-08-10
 
 Primary implementation workspace: `C:\Users\SANSKAR\COLDINGROD IMPLEMENTATION\coldingrod`
 
 ## Current phase
 
-Phases 1–5 of the agreed roadmap are complete. The linked Supabase database is current through migration 024, all 13 rollback-only hosted acceptance suites pass, and the post-release functionality repairs are implemented and locally verified. Production deployment verification is complete.
+Phases 1–5 of the agreed roadmap are complete. The linked Supabase database is current through migration 029, all 18 rollback-only hosted acceptance suites pass, and the post-release functionality repairs are implemented and locally verified. Production deployment verification is complete.
 
 All eight Phase 3 production agents are transparent and deterministic. They use only stored qualification evidence and verified research a workspace member supplies, preserve unknowns, require human selection before lead creation, and do not require an external AI-provider key.
 
@@ -28,6 +28,16 @@ All eight Phase 3 production agents are transparent and deterministic. They use 
 | Full currently discussed product plan | 100% | 0% |
 
 GitHub, Vercel, and Supabase are connected. Google email/password and Google OAuth are active, and the production OAuth chain reaches Google successfully. `GOOGLE_PLACES_API_KEY` is configured in Vercel for Production and Preview; it is intentionally absent from the local `.env.local` unless local Places testing is needed.
+
+## 2026-08-08 discovery contacts and report outputs
+
+- Connected discovery phone and email values to primary lead contacts automatically, including a guarded backfill for existing stored details.
+- Preserved LinkedIn, Instagram, and Facebook destinations through discovery review and lead import so outreach can use the reviewed contact directly.
+- Added best-effort verified public-site enrichment for older leads that have no contact record, without asking the user to re-enter already available details.
+- Repaired the existing Body Power Gym production lead with its independently verified public phone number; the lead detail now shows a primary reachable contact.
+- Added named, printable Executive Summary and Detailed Analysis Report outputs to completed lead research.
+- Added Facebook contact capture, display, readiness checks, and browser-companion handoff support.
+- Applied migration 029, passed all 18 hosted rollback-only suites, passed linked database lint with no findings, and passed TypeScript, ESLint, and the Next.js production build.
 
 ## 2026-08-05 functionality repair
 
@@ -147,8 +157,8 @@ GitHub, Vercel, and Supabase are connected. Google email/password and Google OAu
 - A clean production dependency audit with zero known vulnerabilities.
 ## Hosted database verification
 
-- Local and remote migration histories match through `024_personal_profile_preferences.sql`.
-- All thirteen rollback-only acceptance suites pass: Phase 2.8, 2.9, 2.10, Phase 3.1–3.6, Phase 4.1, Phase 5.1, Phase 5.2, and Phase 5.3.
+- Local and remote migration histories match through `029_discovery_contacts_and_reports.sql`.
+- All eighteen rollback-only acceptance suites pass: Phase 2.8, 2.9, 2.10, Phase 3.1–3.6, Phase 4.1, and Phase 5.1–5.8.
 - Phase 2.8 authorization, Phase 2.9 asset, and Phase 2.10 notification regression suites still pass.
 - Acceptance coverage includes authentication, dual permissions, workspace and lead/run isolation, agent scoping, strict input allowlisting, deterministic scoring, duplicate traceability, atomic human-approved import, research prerequisites, source validation, pain-point mapping, grounded outreach, exact approval snapshots, atomic approval/rejection, audit suppression, activity delivery, and notification delivery.
 - Direct authenticated writes to lead scores, discovery tables, and research reports are denied; trusted RPCs own scoring, discovery, research, personalization, and review transitions.
@@ -176,7 +186,7 @@ GitHub, Vercel, and Supabase are connected. Google email/password and Google OAu
 - Full-repository `npm run check` passes: TypeScript, ESLint, and the Next.js production build.
 - The personal profile UI and new browser companion use JavaScript where safe, limiting new TypeScript to existing typed routing and layout contracts.
 - `npm audit --omit=dev` reports zero production vulnerabilities.
-- Supabase schema lint and the performance advisor report no issues after migration 024. The security advisor reports only the intentional authenticated RPC boundaries plus the owner-configurable leaked-password setting.
+- Supabase schema lint reports no issues after migration 029. The prior performance-advisor and security-advisor review remains unchanged: only the intentional authenticated RPC boundaries plus the owner-configurable leaked-password setting were reported.
 - The signed-in dashboard, Terms, Privacy, and health endpoint render on localhost with no browser errors; unauthenticated dashboard requests redirect to login.
 - Security headers are present on public, authenticated, redirect, and health responses.
 

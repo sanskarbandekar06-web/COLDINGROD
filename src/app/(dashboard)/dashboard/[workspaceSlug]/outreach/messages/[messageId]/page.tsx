@@ -112,6 +112,7 @@ export default async function MessageDetailPage(props: {
     phone?: string | null;
     linkedin_url?: string | null;
     instagram_handle?: string | null;
+    facebook_url?: string | null;
     job_title?: string | null;
     is_primary?: boolean;
   } | null;
@@ -377,6 +378,7 @@ export default async function MessageDetailPage(props: {
                       {contact.phone && <p>📞 {contact.phone}</p>}
                       {contact.linkedin_url && <p>in: {contact.linkedin_url}</p>}
                       {contact.instagram_handle && <p>@ {contact.instagram_handle}</p>}
+                      {contact.facebook_url && <p>f: {contact.facebook_url}</p>}
                     </div>
                   </div>
                 )}

@@ -39,6 +39,7 @@ type ContactData = {
   phone: string | null;
   linkedin_url: string | null;
   instagram_handle: string | null;
+  facebook_url: string | null;
 } | null;
 
 function contactSupportsChannel(
@@ -66,12 +67,9 @@ function contactSupportsChannel(
         ? { supported: true, missing: '' }
         : { supported: false, missing: 'Contact has no Instagram handle' };
     case 'facebook':
-      // No specific contact field for Facebook in Database v1.0
-      return {
-        supported: false,
-        missing:
-          'Facebook contact field not available in Database v1.0. (Limitation)',
-      };
+      return contact.facebook_url
+        ? { supported: true, missing: '' }
+        : { supported: false, missing: 'Contact has no Facebook page URL' };
     default:
       return { supported: false, missing: `Unknown channel: ${channel}` };
   }

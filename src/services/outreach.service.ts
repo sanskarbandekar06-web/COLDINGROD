@@ -28,6 +28,7 @@ export interface OutreachMessageRow extends OutreachMessage {
     phone: string | null;
     linkedin_url: string | null;
     instagram_handle: string | null;
+    facebook_url: string | null;
   } | null;
   ai_action: {
     id: string;
@@ -76,7 +77,7 @@ export const getOutreachMessages = cache(
         content,
         lead:leads!outreach_messages_lead_id_fkey(id, company_name),
         contact:lead_contacts!outreach_messages_contact_id_fkey(
-          id, first_name, last_name, email, phone, linkedin_url, instagram_handle
+          id, first_name, last_name, email, phone, linkedin_url, instagram_handle, facebook_url
         ),
         ai_action:ai_actions!outreach_messages_ai_action_id_fkey(
           id, action_type, status,
@@ -169,7 +170,7 @@ export const getOutreachMessageDetail = cache(
         *,
         lead:leads!outreach_messages_lead_id_fkey(id, company_name, status, workspace_id),
         contact:lead_contacts!outreach_messages_contact_id_fkey(
-          id, first_name, last_name, email, phone, linkedin_url, instagram_handle,
+          id, first_name, last_name, email, phone, linkedin_url, instagram_handle, facebook_url,
           job_title, is_primary
         ),
         ai_action:ai_actions!outreach_messages_ai_action_id_fkey(
@@ -340,12 +341,13 @@ export const getContactsForLead = cache(
     phone: string | null;
     linkedin_url: string | null;
     instagram_handle: string | null;
+    facebook_url: string | null;
   }[]> => {
     const supabase = await createClient();
     const { data } = await supabase
       .from('lead_contacts')
       .select(
-        'id, first_name, last_name, email, phone, linkedin_url, instagram_handle'
+        'id, first_name, last_name, email, phone, linkedin_url, instagram_handle, facebook_url'
       )
       .eq('lead_id', leadId)
       .order('is_primary', { ascending: false });

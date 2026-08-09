@@ -41,6 +41,7 @@ interface ContactOption {
   phone: string | null;
   linkedin_url: string | null;
   instagram_handle: string | null;
+  facebook_url: string | null;
 }
 
 interface CreateMessageDialogProps {
@@ -75,6 +76,7 @@ function supportsChannel(contact: ContactOption, platform: string) {
   if (platform === 'email') return Boolean(contact.email);
   if (platform === 'linkedin') return Boolean(contact.linkedin_url);
   if (platform === 'instagram') return Boolean(contact.instagram_handle);
+  if (platform === 'facebook') return Boolean(contact.facebook_url);
   if (platform === 'whatsapp' || platform === 'sms') return Boolean(contact.phone);
   return true;
 }
@@ -121,8 +123,20 @@ export function CreateMessageDialog({
       const response = await fetch(
         `/api/outreach/contacts?leadId=${encodeURIComponent(selected)}&workspaceId=${encodeURIComponent(workspaceId)}`,
       );
-      if (response.ok) setContacts(await response.json() as ContactOption[]);
-      else toast.error('Contacts could not be loaded.');
+      if (!response.ok) {
+        toast.error('Contacts could not be loaded.');
+        return;
+      }
+      let loaded = await response.json() as ContactOption[];
+      if (loaded.length === 0) {
+        const enrichment = await fetch('/api/outreach/contacts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ leadId: selected, workspaceId }),
+        });
+        if (enrichment.ok) loaded = await enrichment.json() as ContactOption[];
+      }
+      setContacts(loaded);
     } catch {
       toast.error('Contacts could not be loaded.');
     } finally {

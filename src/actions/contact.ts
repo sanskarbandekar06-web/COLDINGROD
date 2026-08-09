@@ -66,6 +66,7 @@ export async function createContact(
     const linkedinUrl = formString(formData, 'linkedinUrl', 500);
     const instagramHandle =
       formString(formData, 'instagramHandle', 100)?.replace(/^@/, '') ?? null;
+    const facebookUrl = formString(formData, 'facebookUrl', 500);
     const isPrimary = formData.get('isPrimary') === 'true';
 
     if (!firstName) throw new Error('First name is required.');
@@ -74,6 +75,9 @@ export async function createContact(
     }
     if (!validOptionalUrl(linkedinUrl)) {
       throw new Error('Enter a valid LinkedIn URL.');
+    }
+    if (!validOptionalUrl(facebookUrl)) {
+      throw new Error('Enter a valid Facebook URL.');
     }
 
     const { supabase, userId } = await requireLeadInWorkspace(workspaceId, leadId);
@@ -88,6 +92,7 @@ export async function createContact(
         job_title: jobTitle,
         linkedin_url: linkedinUrl,
         instagram_handle: instagramHandle,
+        facebook_url: facebookUrl,
         is_primary: isPrimary,
       })
       .select('id')

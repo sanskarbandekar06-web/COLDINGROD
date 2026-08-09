@@ -26,6 +26,9 @@ const EMPTY_CANDIDATE: LeadDiscoveryCandidateInput = {
   sourceUrl: '',
   businessEmail: '',
   businessPhone: '',
+  linkedinUrl: '',
+  instagramHandle: '',
+  facebookUrl: '',
   evidenceNotes: '',
   externalReference: '',
 };
@@ -50,6 +53,9 @@ function candidateInput(candidate: CandidateDraft): LeadDiscoveryCandidateInput 
     sourceUrl: candidate.sourceUrl,
     businessEmail: candidate.businessEmail,
     businessPhone: candidate.businessPhone,
+    linkedinUrl: candidate.linkedinUrl,
+    instagramHandle: candidate.instagramHandle,
+    facebookUrl: candidate.facebookUrl,
     evidenceNotes: candidate.evidenceNotes,
     externalReference: candidate.externalReference,
   };
@@ -126,6 +132,11 @@ export function LeadDiscoveryForm({
             industry: market,
             location: place.address,
             sourceUrl: place.googleMapsUri,
+            businessEmail: place.email ?? '',
+            businessPhone: place.phone ?? '',
+            linkedinUrl: place.linkedinUrl ?? '',
+            instagramHandle: place.instagramHandle ?? '',
+            facebookUrl: place.facebookUrl ?? '',
             evidenceNotes: 'Found through Google Places and queued for human review.',
             externalReference: place.placeId,
           }),
@@ -464,7 +475,7 @@ export function LeadDiscoveryForm({
                   </div>
                   <details className="sm:col-span-2">
                     <summary className="cursor-pointer text-sm font-medium text-primary outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                      Add phone, source evidence, or Google Place ID
+                      Contact channels, source evidence, and Place ID
                     </summary>
                     <div className="mt-4 grid gap-4 sm:grid-cols-2">
                       <div className="space-y-2">
@@ -503,6 +514,59 @@ export function LeadDiscoveryForm({
                           disabled={pending || searchPending}
                         />
                       </div>
+                      <div className="space-y-2">
+                        <Label htmlFor={`${prefix}-linkedin`}>LinkedIn company URL</Label>
+                        <Input
+                          id={`${prefix}-linkedin`}
+                          type="url"
+                          value={candidate.linkedinUrl}
+                          onChange={(event) =>
+                            updateCandidate(
+                              candidate.key,
+                              'linkedinUrl',
+                              event.target.value,
+                            )
+                          }
+                          maxLength={500}
+                          placeholder="https://linkedin.com/company/example"
+                          disabled={pending || searchPending}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor={`${prefix}-instagram`}>Instagram handle</Label>
+                        <Input
+                          id={`${prefix}-instagram`}
+                          value={candidate.instagramHandle}
+                          onChange={(event) =>
+                            updateCandidate(
+                              candidate.key,
+                              'instagramHandle',
+                              event.target.value,
+                            )
+                          }
+                          maxLength={100}
+                          placeholder="@example"
+                          disabled={pending || searchPending}
+                        />
+                      </div>
+                      <div className="space-y-2 sm:col-span-2">
+                        <Label htmlFor={`${prefix}-facebook`}>Facebook page URL</Label>
+                        <Input
+                          id={`${prefix}-facebook`}
+                          type="url"
+                          value={candidate.facebookUrl}
+                          onChange={(event) =>
+                            updateCandidate(
+                              candidate.key,
+                              'facebookUrl',
+                              event.target.value,
+                            )
+                          }
+                          maxLength={500}
+                          placeholder="https://facebook.com/example"
+                          disabled={pending || searchPending}
+                        />
+                      </div>
                       <div className="space-y-2 sm:col-span-2">
                         <Label htmlFor={`${prefix}-place-id`}>
                           Google Place ID
@@ -523,8 +587,9 @@ export function LeadDiscoveryForm({
                         />
                         <p className="text-xs text-muted-foreground">
                           If one candidate uses a Place ID, every candidate in
-                          this run must use one. Other Google Places content is
-                          not saved automatically.
+                          this run must use one. Verified phone, website, email,
+                          and public social destinations shown above are saved
+                          with the imported lead.
                         </p>
                       </div>
                       <div className="space-y-2 sm:col-span-2">

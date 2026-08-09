@@ -28,6 +28,7 @@ export interface LeadContact {
   phone: string | null;
   linkedin_url: string | null;
   instagram_handle: string | null;
+  facebook_url: string | null;
   created_at: string;
 }
 

@@ -5,8 +5,10 @@ import Link from 'next/link';
 import {
   Clipboard,
   ExternalLink,
+  Mail,
   Loader2,
   MapPin,
+  Phone,
   Search,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -70,8 +72,8 @@ export function GooglePlacesSearch({
               Google Places search
             </CardTitle>
             <p className="mt-1 text-sm text-muted-foreground">
-              Find businesses, then copy only the permitted Place ID into the
-              human-reviewed intake below.
+              Find businesses and carry verified public contact destinations
+              into the human-reviewed lead intake.
             </p>
           </div>
           <Badge variant={operational ? 'default' : 'outline'}>
@@ -155,6 +157,17 @@ export function GooglePlacesSearch({
                   <p className="mt-1 text-sm text-muted-foreground">
                     {place.address}
                   </p>
+                  {(place.phone || place.email) && (
+                    <div className="mt-3 space-y-1 text-xs text-muted-foreground">
+                      {place.phone && <p className="flex items-center gap-2"><Phone className="size-3.5" aria-hidden="true" />{place.phone}</p>}
+                      {place.email && <p className="flex items-center gap-2"><Mail className="size-3.5" aria-hidden="true" />{place.email}</p>}
+                    </div>
+                  )}
+                  {(place.linkedinUrl || place.instagramHandle || place.facebookUrl) && (
+                    <p className="mt-2 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                      Public social destinations found
+                    </p>
+                  )}
                   <div className="mt-3 flex flex-wrap gap-2">
                     <Button
                       type="button"
@@ -192,8 +205,9 @@ export function GooglePlacesSearch({
             </p>
             <p className="text-xs text-muted-foreground">
               Results are ranked by Google using factors such as relevance,
-              distance, and prominence. Search content remains ephemeral;
-              Coldingrod stores only a selected Place ID.
+              distance, and prominence. Nothing becomes a lead until you
+              review and import it. Verified website, phone, email, and public
+              social destinations are preserved for outreach.
             </p>
           </div>
         )}

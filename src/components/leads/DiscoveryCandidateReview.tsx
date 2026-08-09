@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import {
   Building2,
   ExternalLink,
+  Link2,
   Loader2,
   Mail,
   MapPin,
@@ -233,6 +234,39 @@ export function DiscoveryCandidateReview({
                     >
                       Evidence source
                       <ExternalLink className="size-3.5" aria-hidden="true" />
+                    </a>
+                  )}
+                  {candidate.linkedin_url && (
+                    <a
+                      href={candidate.linkedin_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={buttonVariants({ variant: 'ghost', size: 'sm' })}
+                    >
+                      <Link2 className="size-3.5" aria-hidden="true" />
+                      LinkedIn
+                    </a>
+                  )}
+                  {candidate.instagram_handle && (
+                    <a
+                      href={`https://instagram.com/${candidate.instagram_handle}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={buttonVariants({ variant: 'ghost', size: 'sm' })}
+                    >
+                      <Link2 className="size-3.5" aria-hidden="true" />
+                      Instagram
+                    </a>
+                  )}
+                  {candidate.facebook_url && (
+                    <a
+                      href={candidate.facebook_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={buttonVariants({ variant: 'ghost', size: 'sm' })}
+                    >
+                      <Link2 className="size-3.5" aria-hidden="true" />
+                      Facebook
                     </a>
                   )}
                   {linkedLead && (

@@ -41,6 +41,8 @@ function destinationFor(message, contact) {
       const handle = String(contact?.instagram_handle || '').replace(/^@/, '').trim();
       return handle ? `https://www.instagram.com/${encodeURIComponent(handle)}/` : null;
     }
+    case 'facebook':
+      return contact?.facebook_url || null;
     case 'sms':
       return contact?.phone
         ? `sms:${encodeURIComponent(contact.phone)}?body=${body}`

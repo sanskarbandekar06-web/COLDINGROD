@@ -102,6 +102,9 @@ function isCandidate(value: unknown): value is LeadDiscoveryCandidateInput {
       'sourceUrl',
       'businessEmail',
       'businessPhone',
+      'linkedinUrl',
+      'instagramHandle',
+      'facebookUrl',
       'evidenceNotes',
       'externalReference',
     ])
@@ -177,6 +180,9 @@ function validateRunInput(input: RunLeadDiscoveryInput): string | null {
       !optionalLength(candidate.sourceUrl, 500) ||
       !optionalLength(candidate.businessEmail, 320) ||
       !optionalLength(candidate.businessPhone, 80) ||
+      !optionalLength(candidate.linkedinUrl, 500) ||
+      !optionalLength(candidate.instagramHandle, 100) ||
+      !optionalLength(candidate.facebookUrl, 500) ||
       !optionalLength(candidate.evidenceNotes, 1000) ||
       !optionalLength(candidate.externalReference, 255)
     ) {
@@ -199,6 +205,28 @@ function validateRunInput(input: RunLeadDiscoveryInput): string | null {
       !EMAIL_PATTERN.test(candidate.businessEmail.trim())
     ) {
       return `${label} email address is invalid.`;
+    }
+    if (
+      candidate.linkedinUrl.trim() &&
+      !/^https?:\/\/(?:[a-z0-9-]+\.)?linkedin\.com\//i.test(
+        candidate.linkedinUrl.trim(),
+      )
+    ) {
+      return `${label} LinkedIn URL is invalid.`;
+    }
+    if (
+      candidate.instagramHandle.trim() &&
+      !/^@?[A-Za-z0-9._]+$/.test(candidate.instagramHandle.trim())
+    ) {
+      return `${label} Instagram handle is invalid.`;
+    }
+    if (
+      candidate.facebookUrl.trim() &&
+      !/^https?:\/\/(?:[a-z0-9-]+\.)?facebook\.com\//i.test(
+        candidate.facebookUrl.trim(),
+      )
+    ) {
+      return `${label} Facebook URL is invalid.`;
     }
     if (
       candidate.externalReference.trim() &&
@@ -283,6 +311,9 @@ export async function runLeadDiscoveryAction(
     source_url: optional(candidate.sourceUrl),
     business_email: optional(candidate.businessEmail)?.toLowerCase(),
     business_phone: optional(candidate.businessPhone),
+    linkedin_url: optional(candidate.linkedinUrl),
+    instagram_handle: optional(candidate.instagramHandle)?.replace(/^@/, ''),
+    facebook_url: optional(candidate.facebookUrl),
     evidence_notes: optional(candidate.evidenceNotes),
     ...(providerRun
       ? { external_reference: candidate.externalReference.trim() }
@@ -313,8 +344,8 @@ export async function runLeadDiscoveryAction(
     }
   }
   const rpcName = providerRun
-    ? 'run_google_places_discovery_intake'
-    : 'run_lead_discovery_intake';
+    ? 'run_enriched_google_places_discovery_intake'
+    : 'run_enriched_lead_discovery_intake';
   const { data, error } = await supabase
     .rpc(rpcName, {
       check_workspace_id: context.workspace.id,
