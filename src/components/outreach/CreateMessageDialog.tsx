@@ -1,8 +1,17 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Bot, Loader2, PencilLine, Plus, ShieldCheck, Sparkles } from 'lucide-react';
+import {
+  Bot,
+  CircleAlert,
+  Loader2,
+  PencilLine,
+  Plus,
+  ShieldCheck,
+  Sparkles,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { createOutreachDraftAction } from '@/actions/outreach';
 import { generatePersonalizedOutreachAction } from '@/actions/personalized-outreach';
@@ -42,6 +51,17 @@ interface ContactOption {
   linkedin_url: string | null;
   instagram_handle: string | null;
   facebook_url: string | null;
+}
+
+interface OutreachReadiness {
+  qualified: boolean;
+  researched: boolean;
+  hasOpportunity: boolean;
+}
+
+interface ContactResponse {
+  contacts: ContactOption[];
+  readiness: OutreachReadiness;
 }
 
 interface CreateMessageDialogProps {
@@ -95,6 +115,7 @@ export function CreateMessageDialog({
   const [contacts, setContacts] = useState<ContactOption[]>([]);
   const [contactId, setContactId] = useState('');
   const [loadingContacts, setLoadingContacts] = useState(false);
+  const [readiness, setReadiness] = useState<OutreachReadiness | null>(null);
   const [platform, setPlatform] = useState<OutreachPlatform>('email');
   const [tone, setTone] = useState('consultative');
   const [goal, setGoal] = useState('offer_audit');
@@ -107,11 +128,13 @@ export function CreateMessageDialog({
   const selectedContactName = selectedContact
     ? `${selectedContact.first_name} ${selectedContact.last_name ?? ''}`.trim()
     : undefined;
+  const aiReady = Boolean(readiness?.researched && readiness.hasOpportunity);
 
   function reset() {
     setLeadId('');
     setContacts([]);
     setContactId('');
+    setReadiness(null);
     setPlatform('email');
     setTone('consultative');
     setGoal('offer_audit');
@@ -122,6 +145,7 @@ export function CreateMessageDialog({
     setLeadId(selected);
     setContacts([]);
     setContactId('');
+    setReadiness(null);
     if (!selected) return;
     setLoadingContacts(true);
     try {
@@ -132,7 +156,9 @@ export function CreateMessageDialog({
         toast.error('Contacts could not be loaded.');
         return;
       }
-      let loaded = await response.json() as ContactOption[];
+      const result = await response.json() as ContactResponse;
+      let loaded = result.contacts;
+      setReadiness(result.readiness);
       if (loaded.length === 0) {
         const enrichment = await fetch('/api/outreach/contacts', {
           method: 'POST',
@@ -327,6 +353,43 @@ export function CreateMessageDialog({
                   Coldingrod uses verified lead research and a channel-specific writing style. The generated copy opens immediately in an editable review dialog.
                 </p>
               </div>
+              {leadId && readiness && !aiReady && (
+                <div
+                  className="space-y-3 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-100"
+                  role="status"
+                  aria-live="polite"
+                >
+                  <div className="flex gap-3">
+                    <CircleAlert
+                      className="mt-0.5 size-5 shrink-0 text-amber-700 dark:text-amber-300"
+                      aria-hidden="true"
+                    />
+                    <div>
+                      <p className="font-semibold">Prepare this lead for AI outreach</p>
+                      <p className="mt-1 text-amber-900/80 dark:text-amber-100/80">
+                        {!readiness.qualified
+                          ? 'First qualify the lead, then complete business research with a verified service opportunity.'
+                          : !readiness.researched
+                            ? 'Complete business research before requesting an AI draft.'
+                            : 'Refresh the research so it includes at least one verified service opportunity.'}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-amber-300 bg-white text-amber-950 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-100"
+                    render={(
+                      <Link
+                        href={`/dashboard/${workspaceSlug}/leads/${leadId}#lead-preparation`}
+                        aria-label={`Prepare ${selectedLeadName ?? 'this lead'} for AI outreach`}
+                      />
+                    )}
+                  >
+                    Prepare this lead
+                  </Button>
+                </div>
+              )}
             </>
           ) : (
             <>
@@ -345,7 +408,15 @@ export function CreateMessageDialog({
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={pending}>Cancel</Button>
-            <Button type="submit" disabled={pending || !leadId || (mode === 'ai' && !contactId)}>
+            <Button
+              type="submit"
+              disabled={
+                pending ||
+                loadingContacts ||
+                !leadId ||
+                (mode === 'ai' && (!contactId || !aiReady))
+              }
+            >
               {pending ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : mode === 'ai' ? <ShieldCheck className="size-4" aria-hidden="true" /> : <PencilLine className="size-4" aria-hidden="true" />}
               {pending ? 'Preparing…' : mode === 'ai' ? `Suggest ${labels[platform]} draft` : 'Create draft'}
             </Button>

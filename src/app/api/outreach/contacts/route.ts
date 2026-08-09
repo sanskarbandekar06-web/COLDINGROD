@@ -62,15 +62,52 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  const { data: contacts } = await supabase
-    .from('lead_contacts')
-    .select(
-      'id, first_name, last_name, email, phone, linkedin_url, instagram_handle, facebook_url'
-    )
-    .eq('lead_id', leadId)
-    .order('is_primary', { ascending: false });
+  const [{ data: contacts }, { data: score }, { data: report }] =
+    await Promise.all([
+      supabase
+        .from('lead_contacts')
+        .select(
+          'id, first_name, last_name, email, phone, linkedin_url, instagram_handle, facebook_url',
+        )
+        .eq('lead_id', leadId)
+        .order('is_primary', { ascending: false }),
+      supabase
+        .from('lead_scores')
+        .select('id')
+        .eq('lead_id', leadId)
+        .order('scored_at', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from('lead_research_reports')
+        .select('id, pain_points')
+        .eq('workspace_id', workspaceId)
+        .eq('lead_id', leadId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ]);
 
-  return NextResponse.json(contacts ?? []);
+  const painPoints = Array.isArray(report?.pain_points)
+    ? report.pain_points
+    : [];
+  const hasOpportunity = painPoints.some(
+    (point) =>
+      point &&
+      typeof point === 'object' &&
+      'service_opportunity' in point &&
+      typeof point.service_opportunity === 'string' &&
+      point.service_opportunity.trim().length > 0,
+  );
+
+  return NextResponse.json({
+    contacts: contacts ?? [],
+    readiness: {
+      qualified: Boolean(score),
+      researched: Boolean(report),
+      hasOpportunity,
+    },
+  });
 }
 
 /**

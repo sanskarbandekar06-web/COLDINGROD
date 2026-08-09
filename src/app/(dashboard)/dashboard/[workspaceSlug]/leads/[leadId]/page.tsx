@@ -168,7 +168,7 @@ export default async function LeadDetailsPage({
           </SectionCard>
         </div>
 
-        <div className="space-y-6">
+        <div id="lead-preparation" className="scroll-mt-24 space-y-6">
           <SectionCard
             title="AI Opportunity Score"
             description="Transparent qualification based on observed business signals."

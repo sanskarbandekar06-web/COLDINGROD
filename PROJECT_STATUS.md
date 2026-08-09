@@ -29,6 +29,12 @@ All eight Phase 3 production agents are transparent and deterministic. They use 
 
 GitHub, Vercel, and Supabase are connected. Google email/password and Google OAuth are active, and the production OAuth chain reaches Google successfully. `GOOGLE_PLACES_API_KEY` is configured in Vercel for Production and Preview; it is intentionally absent from the local `.env.local` unless local Places testing is needed.
 
+## 2026-08-10 outreach readiness guidance
+
+- The New Message dialog now checks qualification, research, and verified service-opportunity readiness immediately after lead selection.
+- Leads that are not ready show an accessible inline explanation and a direct link to the exact preparation section on the lead page.
+- AI draft submission stays disabled until the verified-research prerequisites are satisfied, preventing the former late bottom-right error toast.
+
 ## 2026-08-08 discovery contacts and report outputs
 
 - Connected discovery phone and email values to primary lead contacts automatically, including a guarded backfill for existing stored details.
