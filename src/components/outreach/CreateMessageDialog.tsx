@@ -102,6 +102,11 @@ export function CreateMessageDialog({
   const reachableContacts = mode === 'ai'
     ? contacts.filter((contact) => supportsChannel(contact, platform))
     : contacts;
+  const selectedLeadName = leads.find((lead) => lead.id === leadId)?.company_name;
+  const selectedContact = contacts.find((contact) => contact.id === contactId);
+  const selectedContactName = selectedContact
+    ? `${selectedContact.first_name} ${selectedContact.last_name ?? ''}`.trim()
+    : undefined;
 
   function reset() {
     setLeadId('');
@@ -249,7 +254,7 @@ export function CreateMessageDialog({
               <Label htmlFor="outreach-lead">Lead *</Label>
               <Select name="lead_id" value={leadId} onValueChange={changeLead} required>
                 <SelectTrigger id="outreach-lead" className="w-full" aria-label="Select lead">
-                  <SelectValue placeholder="Select a lead…" />
+                  <SelectValue placeholder="Select a lead…">{selectedLeadName}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {leads.map((lead) => (
@@ -263,7 +268,7 @@ export function CreateMessageDialog({
               <Label htmlFor="outreach-channel">Channel *</Label>
               <Select name="platform" value={platform} onValueChange={changePlatform} required>
                 <SelectTrigger id="outreach-channel" className="w-full" aria-label="Select outreach channel">
-                  <SelectValue />
+                  <SelectValue>{labels[platform]}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {(mode === 'ai' ? AI_CHANNELS : OUTREACH_PLATFORMS).map((channel) => (
@@ -284,7 +289,9 @@ export function CreateMessageDialog({
               required={mode === 'ai'}
             >
               <SelectTrigger id="outreach-contact" className="w-full" aria-label="Select contact">
-                <SelectValue placeholder={loadingContacts ? 'Loading contacts…' : reachableContacts.length ? 'Select a contact…' : 'No reachable contact for this channel'} />
+                <SelectValue placeholder={loadingContacts ? 'Loading contacts…' : reachableContacts.length ? 'Select a contact…' : 'No reachable contact for this channel'}>
+                  {selectedContactName}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {reachableContacts.map((contact) => (
