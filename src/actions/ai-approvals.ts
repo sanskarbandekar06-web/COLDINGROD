@@ -8,7 +8,12 @@ const UUID_PATTERN =
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 export type AiDecisionResult =
-  | { success: true; approvalId: string }
+  | {
+      success: true;
+      approvalId: string;
+      entityType: string;
+      entityId: string | null;
+    }
   | {
       success: false;
       code: 'INVALID_INPUT' | 'UNAUTHORIZED' | 'STALE_APPROVAL' | 'DATABASE_ERROR';
@@ -83,16 +88,28 @@ async function decideAiRequestAction(
     };
   }
 
-  const result = data as unknown as { approval_id: string };
+  const result = data as unknown as {
+    approval_id: string;
+    entity_type: string;
+    entity_id: string | null;
+  };
   const base = `/dashboard/${workspaceSlug}`;
   revalidatePath(`${base}/ai/approvals`);
   revalidatePath(`${base}/ai/actions`);
   revalidatePath(`${base}/ai/actions/${actionId}`);
   revalidatePath(`${base}/ai`);
   revalidatePath(`${base}/outreach/messages`);
+  if (result.entity_type === 'outreach_message' && result.entity_id) {
+    revalidatePath(`${base}/outreach/messages/${result.entity_id}`);
+  }
   revalidatePath(`${base}/activity`);
 
-  return { success: true, approvalId: result.approval_id };
+  return {
+    success: true,
+    approvalId: result.approval_id,
+    entityType: result.entity_type,
+    entityId: result.entity_id,
+  };
 }
 
 export async function approveAiRequestAction(

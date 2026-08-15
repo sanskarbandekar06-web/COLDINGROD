@@ -7,7 +7,8 @@ import { format } from 'date-fns';
 import { JsonViewer } from '@/components/ai/JsonViewer';
 import { ApprovalActions } from '@/components/ai/ApprovalActions';
 import { sanitizeConfig } from '@/services/ai-sanitizer.service';
-import { CheckCircle, XCircle, Clock, Bot, FileText } from 'lucide-react';
+import { ArrowRight, CheckCircle, XCircle, Clock, Bot, FileText } from 'lucide-react';
+import { buttonVariants } from '@/components/ui/button';
 
 export const metadata: Metadata = {
   title: 'Review AI Action | Coldingrod',
@@ -195,6 +196,17 @@ export default async function ApprovalDetailPage({
                   <span>Platform: {outreachMessage.platform}</span>
                   <span>Status: {outreachMessage.status}</span>
                 </div>
+                {approval?.decision === 'approved' && (
+                  <Link
+                    href={`/dashboard/${workspaceSlug}/outreach/messages/${outreachMessage.id}#send-message`}
+                    className={buttonVariants({ size: 'sm' })}
+                  >
+                    {outreachMessage.platform === 'whatsapp'
+                      ? 'Continue to Open WhatsApp'
+                      : 'Continue to delivery'}
+                    <ArrowRight className="size-3.5" aria-hidden="true" />
+                  </Link>
+                )}
               </div>
             </div>
           )}

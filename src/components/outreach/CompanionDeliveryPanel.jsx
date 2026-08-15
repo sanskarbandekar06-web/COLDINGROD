@@ -23,6 +23,18 @@ function cleanPhone(value) {
   return String(value || '').replace(/\D/g, '');
 }
 
+function openProviderLabel(platform) {
+  const labels = {
+    email: 'Open Email',
+    whatsapp: 'Open WhatsApp',
+    linkedin: 'Open LinkedIn',
+    instagram: 'Open Instagram',
+    facebook: 'Open Facebook',
+    sms: 'Open Messages',
+  };
+  return labels[platform] || 'Open provider';
+}
+
 function destinationFor(message, contact) {
   const body = encodeURIComponent(message.content || '');
   const subject = encodeURIComponent(message.subject || '');
@@ -102,6 +114,7 @@ export function CompanionDeliveryPanel({
   const [prepared, setPrepared] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const destination = useMemo(() => destinationFor(message, contact), [message, contact]);
+  const providerLabel = openProviderLabel(message.platform);
   const terminal = ['sent', 'delivered', 'replied'].includes(message.status);
 
   useEffect(() => {
@@ -198,7 +211,7 @@ export function CompanionDeliveryPanel({
         <div className="flex flex-wrap gap-2">
           <Button onClick={prepare} disabled={!destination || pending}>
             {prepared ? <CopyCheck className="size-4" aria-hidden="true" /> : <ExternalLink className="size-4" aria-hidden="true" />}
-            {prepared ? 'Prepared — open again' : `Send with ${message.platform}`}
+            {prepared ? `${providerLabel} again` : providerLabel}
           </Button>
           <Button variant="outline" onClick={() => setConfirmOpen(true)} disabled={!prepared || pending}>
             <Send className="size-4" aria-hidden="true" />

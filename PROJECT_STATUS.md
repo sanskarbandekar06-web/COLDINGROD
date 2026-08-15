@@ -29,6 +29,13 @@ All eight Phase 3 production agents are transparent and deterministic. Lead impo
 
 GitHub, Vercel, and Supabase are connected. Google email/password and Google OAuth are active, and the production OAuth chain reaches Google successfully. `GOOGLE_PLACES_API_KEY` is configured in Vercel for Production and Preview; it is intentionally absent from the local `.env.local` unless local Places testing is needed.
 
+## 2026-08-16 approval-to-delivery handoff repair
+
+- Removed the hidden first-click confirmation state: Approve and continue now records the approval immediately.
+- Successful outreach approvals route directly to the linked message delivery controls instead of returning to the general Approval Center.
+- WhatsApp delivery now presents an explicit Open WhatsApp action, while decided approval pages retain a direct Continue to Open WhatsApp link.
+- Verified the hosted approval trigger is enabled and previously approved outreach transitions atomically to the scheduled send-ready state.
+
 ## 2026-08-16 lead document visibility repair
 
 - Moved Executive Summary and Detailed Analysis into a prominent Lead documents block above the pain-point cards instead of leaving their links below several long findings.

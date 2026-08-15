@@ -18,13 +18,8 @@ export function ApprovalActions({ workspaceId, actionId, workspaceSlug }: Approv
   const [isPending, startTransition] = useTransition();
   const [showRejectForm, setShowRejectForm] = useState(false);
   const [reason, setReason] = useState('');
-  const [confirmApprove, setConfirmApprove] = useState(false);
 
   const handleApprove = () => {
-    if (!confirmApprove) {
-      setConfirmApprove(true);
-      return;
-    }
     startTransition(async () => {
       const result = await approveAiRequestAction(workspaceId, actionId, workspaceSlug);
       if (!result?.success) {
@@ -35,10 +30,16 @@ export function ApprovalActions({ workspaceId, actionId, workspaceSlug }: Approv
         } else {
           toast.error(result?.error || 'Approval failed. Please try again.');
         }
-        setConfirmApprove(false);
       } else {
+        if (result.entityType === 'outreach_message' && result.entityId) {
+          toast.success('Message approved. Opening delivery controls…');
+          router.replace(
+            `/dashboard/${workspaceSlug}/outreach/messages/${result.entityId}#send-message`,
+          );
+          return;
+        }
         toast.success('Action approved successfully.');
-        router.push(`/dashboard/${workspaceSlug}/ai/approvals`);
+        router.replace(`/dashboard/${workspaceSlug}/ai/approvals`);
       }
     });
   };
@@ -76,8 +77,9 @@ export function ApprovalActions({ workspaceId, actionId, workspaceSlug }: Approv
         <h3 className="font-semibold text-sm">Pending Review</h3>
       </div>
       <p className="text-sm text-muted-foreground">
-        Review the details above before making a decision. Approval does not automatically execute
-        this action — a separate execution step is required.
+        Review the details above before making a decision. Approving an outreach
+        message immediately opens its delivery controls; the final provider send
+        still remains under your control.
       </p>
 
       {!showRejectForm && (
@@ -85,22 +87,21 @@ export function ApprovalActions({ workspaceId, actionId, workspaceSlug }: Approv
           <Button
             onClick={handleApprove}
             disabled={isPending}
-            className={`flex-1 ${confirmApprove ? 'bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-600' : ''}`}
-            aria-label={confirmApprove ? 'Confirm approval of this AI action' : 'Approve this AI action'}
+            className="flex-1 bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-600"
+            aria-label="Approve this AI action and continue"
           >
-            {isPending && confirmApprove ? (
+            {isPending ? (
               <Loader2 className="h-4 w-4 animate-spin mr-2" aria-hidden />
             ) : (
               <CheckCircle className="h-4 w-4 mr-2" aria-hidden />
             )}
-            {confirmApprove ? 'Confirm Approval' : 'Approve'}
+            {isPending ? 'Approving…' : 'Approve and continue'}
           </Button>
 
           <Button
             variant="outline"
             onClick={() => {
               setShowRejectForm(true);
-              setConfirmApprove(false);
             }}
             disabled={isPending}
             className="flex-1 border-rose-300 text-rose-600 hover:bg-rose-50 hover:text-rose-700 dark:border-rose-800 dark:text-rose-400 dark:hover:bg-rose-950"
@@ -110,17 +111,6 @@ export function ApprovalActions({ workspaceId, actionId, workspaceSlug }: Approv
             Reject
           </Button>
         </div>
-      )}
-
-      {confirmApprove && !showRejectForm && (
-        <button
-          type="button"
-          onClick={() => setConfirmApprove(false)}
-          disabled={isPending}
-          className="text-xs text-muted-foreground hover:underline disabled:opacity-50"
-        >
-          Cancel
-        </button>
       )}
 
       {showRejectForm && (

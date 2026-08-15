@@ -396,25 +396,27 @@ export default async function MessageDetailPage(props: {
             <SendReadinessPanel summary={readiness} />
           </SectionCard>
 
-          <SectionCard
-            title="Send from Coldingrod"
-            description="Prepare the approved message through the paired Browser Companion without leaving this workflow."
-          >
-            <CompanionDeliveryPanel
-              workspaceSlug={params.workspaceSlug}
-              workspaceId={workspace.id}
-              message={{
-                id: message.id,
-                platform: message.platform,
-                subject: message.subject,
-                content: message.content,
-                status: message.status,
-              }}
-              contact={contact}
-              isReady={readiness.isReady}
-              canManage={canManage}
-            />
-          </SectionCard>
+          <div id="send-message" className="scroll-mt-24">
+            <SectionCard
+              title="Send from Coldingrod"
+              description="Prepare the approved message through the paired Browser Companion without leaving this workflow."
+            >
+              <CompanionDeliveryPanel
+                workspaceSlug={params.workspaceSlug}
+                workspaceId={workspace.id}
+                message={{
+                  id: message.id,
+                  platform: message.platform,
+                  subject: message.subject,
+                  content: message.content,
+                  status: message.status,
+                }}
+                contact={contact}
+                isReady={readiness.isReady}
+                canManage={canManage}
+              />
+            </SectionCard>
+          </div>
 
           <SectionCard
             title="Follow-Up Automation"
