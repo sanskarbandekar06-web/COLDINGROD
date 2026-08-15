@@ -115,6 +115,69 @@ export function LeadResearchPanel({
             </div>
           </div>
 
+          <section
+            id="lead-documents"
+            aria-labelledby="lead-documents-title"
+            className="scroll-mt-24 space-y-3 rounded-xl border border-primary/20 bg-primary/[0.03] p-3"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h3 id="lead-documents-title" className="font-semibold">
+                  Lead documents
+                </h3>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Open either report to read, print, or save it as a PDF.
+                </p>
+              </div>
+              <Badge
+                variant="outline"
+                className="border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300"
+              >
+                Ready
+              </Badge>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <Link
+                href={`/dashboard/${workspaceSlug}/leads/${leadId}/reports/summary`}
+                className="group flex min-h-24 items-start gap-3 rounded-lg border bg-background p-3 transition-colors hover:border-primary/50 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+                  <FileText className="size-4" aria-hidden="true" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block font-semibold">Executive Summary</span>
+                  <span className="mt-1 block text-xs leading-5 text-muted-foreground">
+                    Concise business context and priority opportunities.
+                  </span>
+                  <span className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary">
+                    Open document
+                    <ExternalLink className="size-3" aria-hidden="true" />
+                  </span>
+                </span>
+              </Link>
+              <Link
+                href={`/dashboard/${workspaceSlug}/leads/${leadId}/reports/detailed`}
+                className="group flex min-h-24 items-start gap-3 rounded-lg border bg-background p-3 transition-colors hover:border-primary/50 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+                  <FileSearch className="size-4" aria-hidden="true" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block font-semibold">
+                    Detailed Analysis
+                  </span>
+                  <span className="mt-1 block text-xs leading-5 text-muted-foreground">
+                    Complete evidence, pain points, impact, and sources.
+                  </span>
+                  <span className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary">
+                    Open document
+                    <ExternalLink className="size-3" aria-hidden="true" />
+                  </span>
+                </span>
+              </Link>
+            </div>
+          </section>
+
           {latest.pain_points.length > 0 ? (
             <div className="space-y-3">
               {latest.pain_points.slice(0, 4).map((point) => (
@@ -163,20 +226,6 @@ export function LeadResearchPanel({
 
           <div className="flex flex-wrap gap-2">
             <Link
-              href={`/dashboard/${workspaceSlug}/leads/${leadId}/reports/summary`}
-              className={buttonVariants({ variant: 'outline', size: 'sm' })}
-            >
-              <FileText className="size-4" aria-hidden="true" />
-              Executive Summary
-            </Link>
-            <Link
-              href={`/dashboard/${workspaceSlug}/leads/${leadId}/reports/detailed`}
-              className={buttonVariants({ variant: 'outline', size: 'sm' })}
-            >
-              <FileSearch className="size-4" aria-hidden="true" />
-              Detailed Analysis Report
-            </Link>
-            <Link
               href={`/dashboard/${workspaceSlug}/ai/actions/${latest.analysis_action_id}`}
               className={buttonVariants({ variant: 'ghost', size: 'sm' })}
             >
@@ -206,15 +255,53 @@ export function LeadResearchPanel({
           </div>
         </>
       ) : (
-        <div className="flex flex-col items-center py-4 text-center">
-          <div className="rounded-xl bg-secondary/10 p-3 text-secondary">
-            <Search className="size-6" aria-hidden="true" />
+        <div className="space-y-4">
+          <section
+            id="lead-documents"
+            aria-labelledby="lead-documents-title"
+            className="scroll-mt-24 space-y-3 rounded-xl border bg-muted/20 p-3"
+          >
+            <div>
+              <h3 id="lead-documents-title" className="font-semibold">
+                Lead documents
+              </h3>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                Both documents appear here after automatic analysis finishes.
+              </p>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {[
+                [FileText, 'Executive Summary'],
+                [FileSearch, 'Detailed Analysis'],
+              ].map(([Icon, label]) => (
+                <div
+                  key={label as string}
+                  aria-disabled="true"
+                  className="flex min-h-20 items-start gap-3 rounded-lg border border-dashed bg-background/70 p-3 text-muted-foreground"
+                >
+                  <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-muted">
+                    <Icon className="size-4" aria-hidden="true" />
+                  </span>
+                  <span>
+                    <span className="block font-medium text-foreground">
+                      {label as string}
+                    </span>
+                    <span className="mt-1 block text-xs">Not generated yet</span>
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+          <div className="flex flex-col items-center py-3 text-center">
+            <div className="rounded-xl bg-secondary/10 p-3 text-secondary">
+              <Search className="size-6" aria-hidden="true" />
+            </div>
+            <p className="mt-3 font-medium">No research report yet</p>
+            <p className="mt-1 max-w-xs text-sm text-muted-foreground">
+              Use Automatic AI Analysis above to create both reports. Manual
+              evidence remains available as an optional correction.
+            </p>
           </div>
-          <p className="mt-3 font-medium">No research report yet</p>
-          <p className="mt-1 max-w-xs text-sm text-muted-foreground">
-            Use Automatic AI Analysis above to create both reports. Manual
-            evidence remains available as an optional correction.
-          </p>
         </div>
       )}
 

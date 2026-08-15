@@ -171,6 +171,7 @@ export function NotificationBell({
                   workspaceSlug,
                   activity.entityType,
                   activity.entityId,
+                  activity.action,
                 );
                 return (
                   <button

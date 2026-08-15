@@ -29,6 +29,13 @@ All eight Phase 3 production agents are transparent and deterministic. Lead impo
 
 GitHub, Vercel, and Supabase are connected. Google email/password and Google OAuth are active, and the production OAuth chain reaches Google successfully. `GOOGLE_PLACES_API_KEY` is configured in Vercel for Production and Preview; it is intentionally absent from the local `.env.local` unless local Places testing is needed.
 
+## 2026-08-16 lead document visibility repair
+
+- Moved Executive Summary and Detailed Analysis into a prominent Lead documents block above the pain-point cards instead of leaving their links below several long findings.
+- Leads without a completed report now show both document slots with a clear Not generated yet status, so the user can distinguish missing analysis from hidden navigation.
+- Research-complete notifications now open the lead page directly at the document block.
+- Verified the linked database: all 8 research-complete events have matching stored reports, with zero completed events pointing to missing documents.
+
 ## 2026-08-16 report-grounded message variety and channel aggregation
 
 - Replaced the single generic fallback sentence with a variation-aware, platform-native writer that changes structure, opening, finding, and subject while avoiding recent drafts for the same lead/channel.

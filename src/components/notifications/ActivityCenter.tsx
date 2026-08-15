@@ -256,6 +256,7 @@ export function ActivityCenter({
                 workspaceSlug,
                 activity.entityType,
                 activity.entityId,
+                activity.action,
               );
               return (
                 <article

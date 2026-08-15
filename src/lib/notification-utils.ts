@@ -117,8 +117,16 @@ export function notificationHref(
   workspaceSlug: string,
   entityType: string,
   entityId: string,
+  action?: string,
 ) {
   const base = `/dashboard/${workspaceSlug}`;
+  if (
+    ['lead', 'leads'].includes(entityType) &&
+    action === 'lead_research_completed'
+  ) {
+    return `${base}/leads/${entityId}#lead-documents`;
+  }
+
   const routes: Record<string, string> = {
     ai_action: `${base}/ai/actions/${entityId}`,
     ai_actions: `${base}/ai/actions/${entityId}`,
