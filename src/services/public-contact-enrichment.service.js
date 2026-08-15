@@ -19,20 +19,21 @@ async function readContacts(supabase, leadId) {
  * Best-effort repair for older leads created before discovery contact details
  * were carried into lead_contacts. RLS remains the final authorization layer.
  */
-export async function enrichLeadPublicContact(supabase, lead) {
+export async function enrichLeadPublicContact(supabase, lead, observedProfile = null) {
   const existing = await readContacts(supabase, lead.id);
-  if (existing.length > 0 || !lead.website_url) return existing;
-
-  const profile = await discoverPublicBusinessProfile(
-    lead.website_url,
-    lead.company_name,
-  );
+  const profile = observedProfile ?? (lead.website_url
+    ? await discoverPublicBusinessProfile(lead.website_url, lead.company_name)
+    : {});
+  const details = {
+    phone: lead.business_phone ?? profile.phone ?? null,
+    email: lead.business_email ?? profile.email ?? null,
+    linkedinUrl: profile.linkedinUrl ?? null,
+    instagramHandle: profile.instagramHandle ?? null,
+    facebookUrl: profile.facebookUrl ?? null,
+  };
   const hasReachableDetail = Boolean(
-    profile.phone ||
-      profile.email ||
-      profile.linkedinUrl ||
-      profile.instagramHandle ||
-      profile.facebookUrl,
+    details.phone || details.email || details.linkedinUrl ||
+      details.instagramHandle || details.facebookUrl,
   );
   if (!hasReachableDetail) return existing;
 
@@ -58,27 +59,24 @@ export async function enrichLeadPublicContact(supabase, lead) {
         first_name: lead.company_name,
         job_title: 'Business contact',
         is_primary: true,
-        email: profile.email ?? null,
-        phone: profile.phone ?? null,
-        linkedin_url: profile.linkedinUrl ?? null,
-        instagram_handle: profile.instagramHandle ?? null,
-        facebook_url: profile.facebookUrl ?? null,
+        email: details.email,
+        phone: details.phone,
+        linkedin_url: details.linkedinUrl,
+        instagram_handle: details.instagramHandle,
+        facebook_url: details.facebookUrl,
       })
       .select(CONTACT_FIELDS)
       .single();
     contact = data ?? null;
-  } else if (
-    profile.linkedinUrl ||
-    profile.instagramHandle ||
-    profile.facebookUrl
-  ) {
+  } else {
     await supabase
       .from('lead_contacts')
       .update({
-        linkedin_url: contact.linkedin_url ?? profile.linkedinUrl ?? null,
-        instagram_handle:
-          contact.instagram_handle ?? profile.instagramHandle ?? null,
-        facebook_url: contact.facebook_url ?? profile.facebookUrl ?? null,
+        email: contact.email ?? details.email,
+        phone: contact.phone ?? details.phone,
+        linkedin_url: contact.linkedin_url ?? details.linkedinUrl,
+        instagram_handle: contact.instagram_handle ?? details.instagramHandle,
+        facebook_url: contact.facebook_url ?? details.facebookUrl,
       })
       .eq('id', contact.id)
       .eq('lead_id', lead.id);

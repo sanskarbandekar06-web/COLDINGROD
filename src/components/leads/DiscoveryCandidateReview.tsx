@@ -84,7 +84,7 @@ export function DiscoveryCandidateReview({
           ? ` ${result.duplicateCount} became duplicate before import.`
           : '';
       toast.success(
-        `${result.importedCount} lead${result.importedCount === 1 ? '' : 's'} imported.${duplicateNote}`,
+        `${result.importedCount} lead${result.importedCount === 1 ? '' : 's'} imported and ${result.analyzedCount} automatically analyzed.${duplicateNote}`,
       );
       setSelected(new Set());
       router.refresh();

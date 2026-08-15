@@ -7,6 +7,7 @@ import type {
   LeadDiscoveryBriefInput,
   LeadDiscoveryCandidateInput,
 } from '@/types/lead-discovery';
+import { ensureAutomaticLeadIntelligence } from '@/services/automatic-lead-intelligence.service';
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -64,6 +65,7 @@ export type ImportLeadDiscoveryResult =
       selectedCount: number;
       importedCount: number;
       duplicateCount: number;
+      analyzedCount: number;
     }
   | { success: false; code: DiscoveryErrorCode; error: string };
 
@@ -470,6 +472,56 @@ export async function importLeadDiscoveryCandidatesAction(
   }
 
   const result = data as unknown as ImportRpcRow;
+  let analyzedCount = 0;
+  if (result.imported_count > 0) {
+    const { data: importedCandidates } = await supabase
+      .from('lead_discovery_candidates')
+      .select('imported_lead_id')
+      .eq('workspace_id', context.workspace.id)
+      .eq('run_id', value.runId)
+      .in('id', candidateIds)
+      .not('imported_lead_id', 'is', null);
+    const importedLeadIds = [...new Set(
+      (importedCandidates ?? [])
+        .map((candidate) => candidate.imported_lead_id)
+        .filter((id): id is string => Boolean(id)),
+    )];
+    if (importedLeadIds.length > 0) {
+      const { data: importedLeads } = await supabase
+        .from('leads')
+        .select(
+          'id, workspace_id, company_name, source, website_url, industry, location, business_email, business_phone',
+        )
+        .eq('workspace_id', context.workspace.id)
+        .in('id', importedLeadIds)
+        .is('deleted_at', null);
+      const leadsToAnalyze = importedLeads ?? [];
+      let nextLeadIndex = 0;
+      const analyzeNextLead = async () => {
+        while (nextLeadIndex < leadsToAnalyze.length) {
+          const leadIndex = nextLeadIndex;
+          nextLeadIndex += 1;
+          const lead = leadsToAnalyze[leadIndex];
+          try {
+            await ensureAutomaticLeadIntelligence({
+              supabase,
+              workspaceId: context.workspace.id,
+              lead,
+            });
+            analyzedCount += 1;
+          } catch (analysisError) {
+            console.error('Imported lead automatic analysis failed:', analysisError);
+          }
+        }
+      };
+      await Promise.all(
+        Array.from(
+          { length: Math.min(6, leadsToAnalyze.length) },
+          analyzeNextLead,
+        ),
+      );
+    }
+  }
   revalidateDiscoveryPaths(workspaceSlug, value.runId);
   return {
     success: true,
@@ -477,5 +529,6 @@ export async function importLeadDiscoveryCandidatesAction(
     selectedCount: result.selected_count,
     importedCount: result.imported_count,
     duplicateCount: result.duplicate_count,
+    analyzedCount,
   };
 }

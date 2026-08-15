@@ -137,7 +137,8 @@ export function LeadDiscoveryForm({
             linkedinUrl: place.linkedinUrl ?? '',
             instagramHandle: place.instagramHandle ?? '',
             facebookUrl: place.facebookUrl ?? '',
-            evidenceNotes: 'Found through Google Places and queued for human review.',
+            evidenceNotes: place.publicProfileSummary ??
+              'Found through Google Places and queued for human review. No additional public profile details were verified.',
             externalReference: place.placeId,
           }),
         );

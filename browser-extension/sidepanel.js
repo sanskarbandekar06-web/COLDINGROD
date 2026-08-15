@@ -26,6 +26,10 @@ const elements = {
   subjectInput: document.querySelector('#subject-input'),
   messageInput: document.querySelector('#message-input'),
   draftButton: document.querySelector('#draft-button'),
+  suggestButton: document.querySelector('#suggest-button'),
+  toneSelect: document.querySelector('#tone-select'),
+  goalSelect: document.querySelector('#goal-select'),
+  draftSource: document.querySelector('#draft-source'),
   historySection: document.querySelector('#history-section'),
   historyCount: document.querySelector('#history-count'),
   messageList: document.querySelector('#message-list'),
@@ -224,7 +228,16 @@ function renderContacts() {
     Boolean(state.selectedContactId) &&
     state.context?.permissions?.includes('manage_leads');
   elements.composeSection.classList.toggle('hidden', !canDraft);
+  elements.suggestButton.disabled =
+    !canDraft || !state.context?.permissions?.includes('manage_ai');
   renderChannels();
+}
+
+function clearComposeDraft() {
+  elements.subjectInput.value = '';
+  elements.messageInput.value = '';
+  elements.draftSource.textContent =
+    'No manual qualification form is needed. Unknown facts stay unknown.';
 }
 
 function formatStatus(status) {
@@ -622,6 +635,8 @@ async function createDraft(event) {
     });
     elements.subjectInput.value = '';
     elements.messageInput.value = '';
+    elements.draftSource.textContent =
+      'Draft saved for review. Generate another suggestion whenever you are ready.';
     setLiveMessage(
       'Draft submitted. A human approval is required before delivery.',
       'success',
@@ -636,6 +651,60 @@ async function createDraft(event) {
       'Submitting…',
       'Submit for approval',
     );
+  }
+}
+
+async function suggestDraft() {
+  const lead = state.context?.selected_lead;
+  const contact = selectedContact();
+  const platform = elements.channelSelect.value;
+  if (!lead || !contact || !platform) {
+    setLiveMessage(
+      'Choose a lead, reachable contact, and channel before asking for a suggestion.',
+      'error',
+    );
+    return;
+  }
+
+  setButtonBusy(
+    elements.suggestButton,
+    true,
+    'Analyzing public evidence…',
+    '✦ Analyze lead and suggest draft',
+  );
+  setLiveMessage(
+    'Researching the lead and writing channel-specific copy. You can edit everything before approval.',
+  );
+  try {
+    const suggestion = await companionRequest('suggest_draft', {
+      leadId: lead.id,
+      contactId: contact.id,
+      platform,
+      tone: elements.toneSelect.value,
+      goal: elements.goalSelect.value,
+      pageUrl: state.activeTab?.url || null,
+      pageTitle: state.activeTab?.title || null,
+    });
+    elements.subjectInput.value = suggestion.subject || '';
+    elements.messageInput.value = suggestion.content || '';
+    elements.draftSource.textContent =
+      `AI basis: ${suggestion.opportunity}. ${suggestion.analysis?.availableSources || 0} public source${suggestion.analysis?.availableSources === 1 ? '' : 's'} reviewed; unknowns preserved.`;
+    setLiveMessage(
+      'AI suggestion ready. Edit the message below, then submit it for human approval.',
+      'success',
+    );
+    elements.messageInput.focus();
+  } catch (error) {
+    await handleRequestError(error);
+  } finally {
+    setButtonBusy(
+      elements.suggestButton,
+      false,
+      'Analyzing public evidence…',
+      '✦ Analyze lead and suggest draft',
+    );
+    elements.suggestButton.disabled =
+      !state.context?.permissions?.includes('manage_ai');
   }
 }
 
@@ -678,6 +747,7 @@ async function disconnect(showMessage = true) {
 
 elements.setupForm.addEventListener('submit', connect);
 elements.composeForm.addEventListener('submit', createDraft);
+elements.suggestButton.addEventListener('click', suggestDraft);
 elements.refreshButton.addEventListener('click', () => refreshContext());
 elements.captureButton.addEventListener('click', captureCurrentPage);
 elements.disconnectButton.addEventListener('click', () => disconnect(true));
@@ -686,13 +756,16 @@ elements.appUrl.addEventListener('change', () => {
 });
 elements.leadSelect.addEventListener('change', () => {
   state.selectedContactId = '';
+  clearComposeDraft();
   refreshContext(elements.leadSelect.value || null);
 });
 elements.contactSelect.addEventListener('change', () => {
   state.selectedContactId = elements.contactSelect.value;
+  clearComposeDraft();
   renderContacts();
 });
 elements.channelSelect.addEventListener('change', () => {
+  clearComposeDraft();
   elements.subjectField.classList.toggle(
     'hidden',
     elements.channelSelect.value !== 'email',

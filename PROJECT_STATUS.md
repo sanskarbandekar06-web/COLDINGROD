@@ -1,14 +1,14 @@
 # Coldingrod Project Status
 
-Last verified: 2026-08-10
+Last verified: 2026-08-15
 
 Primary implementation workspace: `C:\Users\SANSKAR\COLDINGROD IMPLEMENTATION\coldingrod`
 
 ## Current phase
 
-Phases 1–5 of the agreed roadmap are complete. The linked Supabase database is current through migration 029, all 18 rollback-only hosted acceptance suites pass, and the post-release functionality repairs are implemented and locally verified. Production deployment verification is complete.
+Phases 1–5 of the agreed roadmap are complete. The linked Supabase database is current through migration `20260815161929_automatic_lead_intelligence.sql`, 19 rollback-only hosted acceptance suites are present, and the automatic lead-intelligence release is implemented and locally verified.
 
-All eight Phase 3 production agents are transparent and deterministic. They use only stored qualification evidence and verified research a workspace member supplies, preserve unknowns, require human selection before lead creation, and do not require an external AI-provider key.
+All eight Phase 3 production agents are transparent and deterministic. Lead import and outreach can now collect public business evidence, enrich available contact channels, qualify the lead, produce both reports, and suggest channel-native copy without asking the user to complete a manual qualification form. The agents preserve unknowns, require human selection before lead creation, and do not require an external AI-provider key.
 
 ## Progress estimate
 
@@ -29,11 +29,13 @@ All eight Phase 3 production agents are transparent and deterministic. They use 
 
 GitHub, Vercel, and Supabase are connected. Google email/password and Google OAuth are active, and the production OAuth chain reaches Google successfully. `GOOGLE_PLACES_API_KEY` is configured in Vercel for Production and Preview; it is intentionally absent from the local `.env.local` unless local Places testing is needed.
 
-## 2026-08-10 outreach readiness guidance
+## 2026-08-15 automatic lead intelligence and extension copilot
 
-- The New Message dialog now checks qualification, research, and verified service-opportunity readiness immediately after lead selection.
-- Leads that are not ready show an accessible inline explanation and a direct link to the exact preparation section on the lead page.
-- AI draft submission stays disabled until the verified-research prerequisites are satisfied, preventing the former late bottom-right error toast.
+- Removed the manual qualification and research prerequisite from AI outreach. Suggesting a draft now automatically inspects public evidence, enriches missing contact channels, qualifies the lead, produces the Executive Summary and Detailed Analysis, and creates editable channel-native copy.
+- Newly imported discovery leads are automatically analyzed with bounded concurrency. Public-site enrichment checks the owned website plus relevant contact/about pages and captures public phone, email, LinkedIn, Instagram, and Facebook destinations when available.
+- Added an Automatic AI Analysis deck to lead profiles while keeping manual qualification and research controls as optional corrections only. Unknown rating, review, and performance facts remain unknown instead of being invented.
+- Upgraded the downloadable browser companion to version 0.4.0 with its own AI Outreach Copilot. It can analyze the selected lead, show the evidence basis, and return an editable suggestion before the existing human approval and send flow.
+- Applied migration `20260815161929_automatic_lead_intelligence.sql`; the affected Phase 3.1–3.4 and Phase 5.4, 5.7–5.9 hosted suites pass. Linked database lint, TypeScript, ESLint, extension syntax checks, and the complete Next.js production build pass.
 
 ## 2026-08-08 discovery contacts and report outputs
 
@@ -163,8 +165,8 @@ GitHub, Vercel, and Supabase are connected. Google email/password and Google OAu
 - A clean production dependency audit with zero known vulnerabilities.
 ## Hosted database verification
 
-- Local and remote migration histories match through `029_discovery_contacts_and_reports.sql`.
-- All eighteen rollback-only acceptance suites pass: Phase 2.8, 2.9, 2.10, Phase 3.1–3.6, Phase 4.1, and Phase 5.1–5.8.
+- Local and remote migration histories match through `20260815161929_automatic_lead_intelligence.sql`.
+- Nineteen rollback-only acceptance suites cover Phase 2.8, 2.9, 2.10, Phase 3.1–3.6, Phase 4.1, and Phase 5.1–5.9. The eight suites affected by this release pass against the linked database; the previously verified suites are unchanged.
 - Phase 2.8 authorization, Phase 2.9 asset, and Phase 2.10 notification regression suites still pass.
 - Acceptance coverage includes authentication, dual permissions, workspace and lead/run isolation, agent scoping, strict input allowlisting, deterministic scoring, duplicate traceability, atomic human-approved import, research prerequisites, source validation, pain-point mapping, grounded outreach, exact approval snapshots, atomic approval/rejection, audit suppression, activity delivery, and notification delivery.
 - Direct authenticated writes to lead scores, discovery tables, and research reports are denied; trusted RPCs own scoring, discovery, research, personalization, and review transitions.
@@ -192,7 +194,7 @@ GitHub, Vercel, and Supabase are connected. Google email/password and Google OAu
 - Full-repository `npm run check` passes: TypeScript, ESLint, and the Next.js production build.
 - The personal profile UI and new browser companion use JavaScript where safe, limiting new TypeScript to existing typed routing and layout contracts.
 - `npm audit --omit=dev` reports zero production vulnerabilities.
-- Supabase schema lint reports no issues after migration 029. The prior performance-advisor and security-advisor review remains unchanged: only the intentional authenticated RPC boundaries plus the owner-configurable leaked-password setting were reported.
+- Supabase schema lint reports no issues after migration `20260815161929`. The prior performance-advisor and security-advisor review remains unchanged: only the intentional authenticated RPC boundaries plus the owner-configurable leaked-password setting were reported.
 - The signed-in dashboard, Terms, Privacy, and health endpoint render on localhost with no browser errors; unauthenticated dashboard requests redirect to login.
 - Security headers are present on public, authenticated, redirect, and health responses.
 

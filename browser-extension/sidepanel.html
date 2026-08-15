@@ -135,8 +135,8 @@
         <section id="compose-section" class="panel-card hidden" aria-labelledby="compose-heading">
           <div class="section-heading">
             <div>
-              <span class="eyebrow">Human-reviewed outreach</span>
-              <h3 id="compose-heading">Create a message</h3>
+              <span class="eyebrow">AI outreach copilot</span>
+              <h3 id="compose-heading">Suggest and edit a message</h3>
             </div>
             <span class="pill warning">Approval required</span>
           </div>
@@ -155,13 +155,46 @@
                 placeholder="A useful idea for your team"
               />
             </div>
+            <div class="agent-deck" aria-labelledby="agent-deck-title">
+              <div class="agent-deck-heading">
+                <span class="agent-mark" aria-hidden="true">✦</span>
+                <div>
+                  <strong id="agent-deck-title">Coldingrod AI</strong>
+                  <small>Public research + channel-native copy</small>
+                </div>
+              </div>
+              <div class="agent-grid">
+                <div class="field compact">
+                  <label for="tone-select">Tone</label>
+                  <select id="tone-select">
+                    <option value="consultative">Consultative</option>
+                    <option value="concise">Concise</option>
+                    <option value="warm">Warm</option>
+                  </select>
+                </div>
+                <div class="field compact">
+                  <label for="goal-select">Goal</label>
+                  <select id="goal-select">
+                    <option value="offer_audit">Offer a short audit</option>
+                    <option value="share_idea">Share one useful idea</option>
+                    <option value="book_call">Book a 15-minute call</option>
+                  </select>
+                </div>
+              </div>
+              <button id="suggest-button" class="button agent-button" type="button">
+                ✦ Analyze lead and suggest draft
+              </button>
+              <p id="draft-source" class="agent-note">
+                No manual qualification form is needed. Unknown facts stay unknown.
+              </p>
+            </div>
             <div class="field">
-              <label for="message-input">Message</label>
+              <label for="message-input">Editable message</label>
               <textarea
                 id="message-input"
                 rows="7"
                 maxlength="10000"
-                placeholder="Write a personalized message…"
+                placeholder="Use the AI suggestion above or write your own message…"
                 required
               ></textarea>
               <small>

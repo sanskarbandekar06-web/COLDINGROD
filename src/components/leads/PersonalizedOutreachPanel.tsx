@@ -123,8 +123,6 @@ export function PersonalizedOutreachPanel({
     });
   }
 
-  const prerequisiteReady = hasResearch && hasOpportunity;
-
   return (
     <div className="space-y-4">
       <div className="flex gap-3 rounded-lg border bg-muted/30 p-3">
@@ -135,23 +133,15 @@ export function PersonalizedOutreachPanel({
         <div>
           <p className="text-sm font-medium">Human review stays mandatory</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            The agents use the latest stored research, verify the contact
-            channel, include opt-out language, and create a draft only. Nothing
-            is sent automatically.
+            {hasResearch && hasOpportunity
+              ? 'Stored analysis is ready. The agents verify the channel, include opt-out language, and create a draft only.'
+              : 'No manual qualification is required. The agents will collect public evidence, qualify and research the lead, then create a draft only.'}
+            {' '}Nothing is sent without your review.
           </p>
         </div>
       </div>
 
-      {!hasResearch ? (
-        <p className="rounded-lg border bg-muted/40 p-3 text-xs text-muted-foreground">
-          Complete business research before generating personalized outreach.
-        </p>
-      ) : !hasOpportunity ? (
-        <p className="rounded-lg border bg-muted/40 p-3 text-xs text-muted-foreground">
-          The latest research has no evidence-backed service opportunity to
-          personalize.
-        </p>
-      ) : contacts.length === 0 ? (
+      {contacts.length === 0 ? (
         <p className="rounded-lg border bg-muted/40 p-3 text-xs text-muted-foreground">
           Add a contact with an email, phone number, LinkedIn URL, or Instagram
           handle first.
@@ -164,7 +154,7 @@ export function PersonalizedOutreachPanel({
           }}
         >
           <DialogTrigger
-            render={<Button className="w-full" disabled={!prerequisiteReady} />}
+            render={<Button className="w-full" />}
           >
             <Bot className="size-4" aria-hidden="true" />
             Generate personalized draft
@@ -173,8 +163,9 @@ export function PersonalizedOutreachPanel({
             <DialogHeader>
               <DialogTitle>Personalized Outreach Agent</DialogTitle>
               <DialogDescription>
-                Choose the recipient and intent. The message wording is derived
-                from verified research and will enter the Approval Center.
+                Choose the recipient and intent. If analysis is missing, the
+                agents complete it automatically before writing the editable
+                message and sending it to the Approval Center.
               </DialogDescription>
             </DialogHeader>
 

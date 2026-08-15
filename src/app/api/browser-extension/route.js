@@ -1,6 +1,9 @@
 import { createHash } from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
 import { getSupabasePublicEnv } from '@/lib/supabase/env';
+import { discoverPublicBusinessProfile } from '@/lib/public-business-profile';
+import { generateGroundedOutreachDraft } from '@/lib/outreach-message-generator';
+import { opportunityFromAutomaticProfile } from '@/services/automatic-lead-intelligence.service';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -8,6 +11,11 @@ export const dynamic = 'force-dynamic';
 const TOKEN_PATTERN = /^cgr_[A-Za-z0-9_-]{43}$/;
 const EXTENSION_ORIGIN_PATTERN = /^chrome-extension:\/\/[a-p]{32}$/;
 const MAX_BODY_BYTES = 30_000;
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const AI_PLATFORMS = new Set(['email', 'linkedin', 'whatsapp', 'instagram', 'sms']);
+const AI_TONES = new Set(['concise', 'consultative', 'warm']);
+const AI_GOALS = new Set(['book_call', 'offer_audit', 'share_idea']);
 
 function responseHeaders(request) {
   const origin = request.headers.get('origin');
@@ -180,6 +188,103 @@ export async function POST(request) {
 
   const hashedToken = tokenHash(token);
   const supabase = createAnonymousClient();
+
+  if (body.action === 'suggest_draft') {
+    const leadId = typeof body.leadId === 'string' ? body.leadId : '';
+    const contactId = typeof body.contactId === 'string' ? body.contactId : '';
+    const platform = typeof body.platform === 'string' ? body.platform.toLowerCase() : '';
+    const tone = typeof body.tone === 'string' ? body.tone.toLowerCase() : '';
+    const goal = typeof body.goal === 'string' ? body.goal.toLowerCase() : '';
+    if (!UUID_PATTERN.test(leadId) || !UUID_PATTERN.test(contactId) ||
+      !AI_PLATFORMS.has(platform) || !AI_TONES.has(tone) || !AI_GOALS.has(goal)) {
+      return json(
+        request,
+        { code: 'INVALID_INPUT', error: 'Choose a valid lead, contact, channel, tone, and goal.' },
+        400,
+      );
+    }
+
+    const { data: context, error: contextError } = await supabase.rpc(
+      'browser_extension_get_context',
+      {
+        check_token_hash: hashedToken,
+        check_page_url: typeof body.pageUrl === 'string' ? body.pageUrl : null,
+        check_page_title: typeof body.pageTitle === 'string' ? body.pageTitle : null,
+        check_lead_id: leadId,
+      },
+    );
+    if (contextError) {
+      const mapped = mapDatabaseError(contextError);
+      return json(request, { code: mapped.code, error: mapped.error }, mapped.status);
+    }
+    if (!context?.permissions?.includes('manage_ai') ||
+      !context?.permissions?.includes('manage_leads')) {
+      return json(
+        request,
+        { code: 'PERMISSION_DENIED', error: 'AI and lead management permissions are required.' },
+        403,
+      );
+    }
+
+    const lead = context.selected_lead;
+    const contact = lead?.contacts?.find((item) => item.id === contactId);
+    if (!lead || !contact) {
+      return json(
+        request,
+        { code: 'INVALID_INPUT', error: 'The selected lead or contact is unavailable.' },
+        400,
+      );
+    }
+    const reachable =
+      (platform === 'email' && contact.email) ||
+      (platform === 'linkedin' && contact.linkedin_url) ||
+      (platform === 'instagram' && contact.instagram_handle) ||
+      ((platform === 'whatsapp' || platform === 'sms') && contact.phone);
+    if (!reachable) {
+      return json(
+        request,
+        { code: 'INVALID_INPUT', error: 'This contact is not reachable on the selected channel.' },
+        400,
+      );
+    }
+
+    const profile = lead.website_url
+      ? await discoverPublicBusinessProfile(lead.website_url, lead.company_name)
+      : {
+          officialWebsite: false,
+          hasClearCta: null,
+          hasOnlineBooking: null,
+          seoStatus: 'unknown',
+          sourceUrls: [],
+        };
+    const opportunity = opportunityFromAutomaticProfile(lead, profile);
+    const draft = await generateGroundedOutreachDraft({
+      platform,
+      tone,
+      goal,
+      lead,
+      contact,
+      opportunity,
+      researchSummary: {
+        offerings: profile.description || lead.industry || 'Public business profile',
+        evidence_notes: profile.officialWebsite
+          ? 'Generated from the verified public website and stored contact destinations.'
+          : 'Generated from the reviewed lead profile without asserting unverified performance facts.',
+      },
+    });
+    return json(request, {
+      data: {
+        ...draft,
+        opportunity,
+        analysis: {
+          officialWebsite: Boolean(profile.officialWebsite),
+          availableSources: profile.sourceUrls?.length ?? 0,
+          unknownsPreserved: true,
+        },
+      },
+    });
+  }
+
   let rpcName;
   let rpcArguments;
 

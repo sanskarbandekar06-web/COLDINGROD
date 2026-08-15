@@ -5,6 +5,7 @@ import { buttonVariants } from '@/components/ui/button';
 import { SectionCard } from '@/components/dashboard/SectionCard';
 import { ActivityTimeline } from '@/components/leads/ActivityTimeline';
 import { ContactsList } from '@/components/leads/ContactsList';
+import { AutomaticLeadIntelligence } from '@/components/leads/AutomaticLeadIntelligence';
 import { LeadActionsMenu } from '@/components/leads/LeadActionsMenu';
 import { LeadQualificationPanel } from '@/components/leads/LeadQualificationPanel';
 import { LeadResearchPanel } from '@/components/leads/LeadResearchPanel';
@@ -86,7 +87,7 @@ export default async function LeadDetailsPage({
             lead.business_phone) && (
             <SectionCard
               title="Business Profile"
-              description="Business details preserved from lead discovery or manual research."
+              description="Verified business details and reachable destinations found during discovery or public research."
             >
               <dl className="grid gap-4 sm:grid-cols-2">
                 {lead.website_url && (
@@ -169,6 +170,22 @@ export default async function LeadDetailsPage({
         </div>
 
         <div id="lead-preparation" className="scroll-mt-24 space-y-6">
+          <SectionCard
+            title="Automatic AI Analysis"
+            description="One action completes qualification, public research, contact enrichment, and both reports."
+          >
+            <AutomaticLeadIntelligence
+              workspaceSlug={workspaceSlug}
+              leadId={lead.id}
+              canRun={canRunQualification}
+              isReady={
+                qualifications.length > 0 &&
+                researchReports.length > 0 &&
+                (researchReports[0]?.pain_points.length ?? 0) > 0
+              }
+            />
+          </SectionCard>
+
           <SectionCard
             title="AI Opportunity Score"
             description="Transparent qualification based on observed business signals."

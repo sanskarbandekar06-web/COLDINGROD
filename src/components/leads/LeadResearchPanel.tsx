@@ -204,16 +204,16 @@ export function LeadResearchPanel({
           </div>
           <p className="mt-3 font-medium">No research report yet</p>
           <p className="mt-1 max-w-xs text-sm text-muted-foreground">
-            Add verified business context after qualification to map observed
-            gaps to transparent service opportunities.
+            Use Automatic AI Analysis above to create both reports. Manual
+            evidence remains available as an optional correction.
           </p>
         </div>
       )}
 
       {!isQualified ? (
         <p className="rounded-lg border bg-muted/40 p-3 text-xs text-muted-foreground">
-          Run Lead Qualification first. Research pain points use its stored
-          evidence instead of guessing from free-form text.
+          Run Automatic AI Analysis above first. This optional manual editor
+          uses its stored score instead of guessing from free-form text.
         </p>
       ) : canRun ? (
         <Dialog
@@ -224,15 +224,15 @@ export function LeadResearchPanel({
         >
           <DialogTrigger render={<Button className="w-full" />}>
             <Search className="size-4" aria-hidden="true" />
-            {latest ? 'Refresh business research' : 'Research this business'}
+            {latest ? 'Adjust research evidence manually' : 'Add research evidence manually'}
           </DialogTrigger>
           <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
             <DialogHeader>
               <DialogTitle>Business Research Agent</DialogTitle>
               <DialogDescription>
-                Add at least two verified fields. Pain points come only from the
-                lead’s latest qualification factors; these notes add context,
-                not unsupported claims.
+                Optional override: add at least two verified fields to correct
+                or supplement the automatic analysis. These notes never permit
+                unsupported claims.
               </DialogDescription>
             </DialogHeader>
 

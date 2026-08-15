@@ -7,6 +7,9 @@ A Chrome/Edge Manifest V3 side-panel extension for page-aware lead context and h
 - Reads the active tab title and URL only after the user opens the companion.
 - Matches an existing Coldingrod lead by website or supported social profile.
 - Shows contacts and recent cross-workspace outreach history.
+- Analyzes available public lead evidence and suggests channel-native Email,
+  LinkedIn, WhatsApp, Instagram, or SMS copy directly in the side panel.
+- Keeps every AI suggestion editable before it becomes a versioned draft.
 - Creates versioned outreach drafts that always enter `pending_approval`.
 - Lets an authorized human approve or reject a message from the side panel.
 - Adds a secure bridge to the Coldingrod message page for one-click approved delivery handoff.

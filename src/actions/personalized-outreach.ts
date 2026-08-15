@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { getWorkspaceContext } from '@/services/workspace.service';
 import { generateGroundedOutreachDraft } from '@/lib/outreach-message-generator';
+import { ensureAutomaticLeadIntelligence } from '@/services/automatic-lead-intelligence.service';
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -69,10 +70,12 @@ export async function generatePersonalizedOutreachAction(
   }
 
   const supabase = await createClient();
-  const [{ data: lead }, { data: contact }, { data: report }] = await Promise.all([
+  const [{ data: lead }, { data: contact }, { data: initialReport }] = await Promise.all([
     supabase
       .from('leads')
-      .select('id, company_name, industry, location')
+      .select(
+        'id, workspace_id, company_name, source, website_url, industry, location, business_email, business_phone',
+      )
       .eq('id', value.leadId)
       .eq('workspace_id', context.workspace.id)
       .is('deleted_at', null)
@@ -93,20 +96,51 @@ export async function generatePersonalizedOutreachAction(
       .maybeSingle(),
   ]);
 
-  const painPoints = Array.isArray(report?.pain_points) ? report.pain_points : [];
-  const topPainPoint = isRecord(painPoints[0]) ? painPoints[0] : null;
-  const opportunity =
+  if (!lead || !contact) {
+    return {
+      success: false,
+      code: 'NOT_READY',
+      error: 'The selected lead or contact is no longer available.',
+    };
+  }
+
+  let report = initialReport;
+  let painPoints = Array.isArray(report?.pain_points) ? report.pain_points : [];
+  let topPainPoint = isRecord(painPoints[0]) ? painPoints[0] : null;
+  let opportunity =
     typeof topPainPoint?.service_opportunity === 'string'
       ? topPainPoint.service_opportunity.trim()
       : '';
 
-  if (!lead || !contact || !report || !opportunity) {
+  if (!report || !opportunity) {
+    try {
+      const prepared = await ensureAutomaticLeadIntelligence({
+        supabase,
+        workspaceId: context.workspace.id,
+        lead,
+      });
+      report = prepared.report;
+      painPoints = Array.isArray(report?.pain_points) ? report.pain_points : [];
+      topPainPoint = isRecord(painPoints[0]) ? painPoints[0] : null;
+      opportunity =
+        typeof topPainPoint?.service_opportunity === 'string'
+          ? topPainPoint.service_opportunity.trim()
+          : '';
+    } catch (error) {
+      console.error('Automatic outreach preparation failed:', error instanceof Error ? error.message : error);
+      return {
+        success: false,
+        code: 'EXECUTION_FAILED',
+        error: 'The AI agents could not analyze this lead and prepare a draft.',
+      };
+    }
+  }
+
+  if (!report || !opportunity) {
     return {
       success: false,
       code: 'NOT_READY',
-      error: !report || !opportunity
-        ? 'Complete business research with a service opportunity first.'
-        : 'The selected lead or contact is no longer available.',
+      error: 'Automatic public analysis did not produce a safe outreach basis.',
     };
   }
 
@@ -166,7 +200,7 @@ export async function generatePersonalizedOutreachAction(
         success: false,
         code: 'NOT_READY',
         error: message.includes('research')
-          ? 'Complete business research with a service opportunity first.'
+          ? 'Automatic lead analysis could not prepare a safe outreach basis.'
           : message.includes('reachable')
             ? 'That contact is not reachable on the selected channel.'
             : 'The lead, contact, or outreach choices are no longer valid.',

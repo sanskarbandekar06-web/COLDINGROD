@@ -18,6 +18,16 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import type { LeadContact } from '@/types/lead';
 
+function availablePlatforms(contact: LeadContact) {
+  const platforms: string[] = [];
+  if (contact.email) platforms.push('Email');
+  if (contact.phone) platforms.push('WhatsApp', 'SMS');
+  if (contact.linkedin_url) platforms.push('LinkedIn');
+  if (contact.instagram_handle) platforms.push('Instagram');
+  if (contact.facebook_url) platforms.push('Facebook');
+  return platforms;
+}
+
 export function ContactsList({
   contacts,
   leadId,
@@ -75,7 +85,7 @@ export function ContactsList({
               key={contact.id}
               className="group flex flex-col justify-between gap-4 rounded-lg border p-4 sm:flex-row"
             >
-              <div className="space-y-1">
+              <div className="min-w-0 space-y-1">
                 <div className="flex items-center gap-2">
                   <h4 className="text-sm font-medium">
                     {contact.first_name} {contact.last_name || ''}
@@ -108,6 +118,24 @@ export function ContactsList({
                       <Phone className="h-3 w-3" /> {contact.phone}
                     </a>
                   )}
+                </div>
+                <div className="pt-3">
+                  <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                    Available platforms
+                  </p>
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    {availablePlatforms(contact).length > 0 ? (
+                      availablePlatforms(contact).map((platform) => (
+                        <Badge key={platform} variant="outline" className="font-normal">
+                          {platform}
+                        </Badge>
+                      ))
+                    ) : (
+                      <span className="text-xs text-muted-foreground">
+                        No verified destination found yet
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="flex items-start gap-2">

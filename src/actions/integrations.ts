@@ -135,6 +135,7 @@ function safeGoogleResult(value: unknown): GooglePlacesSearchResult | null {
     linkedinUrl: null,
     instagramHandle: null,
     facebookUrl: null,
+    publicProfileSummary: null,
   };
 }
 
@@ -313,6 +314,13 @@ export async function searchGooglePlacesAction(value: {
           result.websiteUri,
           result.name,
         );
+        const availablePlatforms = [
+          profile.email && 'Email',
+          profile.phone && 'WhatsApp/SMS',
+          profile.linkedinUrl && 'LinkedIn',
+          profile.instagramHandle && 'Instagram',
+          profile.facebookUrl && 'Facebook',
+        ].filter(Boolean);
         return {
           ...result,
           phone: result.phone ?? profile.phone ?? null,
@@ -320,6 +328,15 @@ export async function searchGooglePlacesAction(value: {
           linkedinUrl: profile.linkedinUrl ?? null,
           instagramHandle: profile.instagramHandle ?? null,
           facebookUrl: profile.facebookUrl ?? null,
+          publicProfileSummary: [
+            profile.officialWebsite
+              ? `Verified public website${profile.pageTitle ? `: ${profile.pageTitle}` : ''}.`
+              : 'The supplied website was not verified as an owned business site.',
+            profile.description ? `Profile: ${profile.description}` : null,
+            availablePlatforms.length
+              ? `Available platforms: ${availablePlatforms.join(', ')}.`
+              : 'No verified direct contact platform was found on the public site.',
+          ].filter(Boolean).join(' ').slice(0, 1000),
         };
       }),
     );

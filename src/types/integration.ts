@@ -46,4 +46,5 @@ export interface GooglePlacesSearchResult {
   linkedinUrl: string | null;
   instagramHandle: string | null;
   facebookUrl: string | null;
+  publicProfileSummary: string | null;
 }

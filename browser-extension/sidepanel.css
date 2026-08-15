@@ -407,6 +407,96 @@ small,
   padding: 14px;
 }
 
+.agent-deck {
+  display: grid;
+  gap: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(100, 94, 251, 0.28);
+  border-radius: 13px;
+  background:
+    radial-gradient(circle at 100% 0, rgba(100, 94, 251, 0.22), transparent 38%),
+    linear-gradient(145deg, #10182a, #17213a);
+  padding: 13px;
+  color: white;
+  box-shadow: 0 16px 34px -24px rgba(11, 28, 48, 0.9);
+}
+
+.agent-deck-heading {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.agent-deck-heading strong,
+.agent-deck-heading small {
+  display: block;
+}
+
+.agent-deck-heading strong {
+  font-size: 12px;
+}
+
+.agent-deck-heading small,
+.agent-note {
+  color: #aeb9d0;
+}
+
+.agent-mark {
+  display: grid;
+  width: 31px;
+  height: 31px;
+  place-items: center;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #8b85ff, #645efb);
+  box-shadow: 0 10px 20px -12px #8b85ff;
+  font-size: 15px;
+}
+
+.agent-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.field.compact {
+  gap: 4px;
+}
+
+.field.compact label {
+  color: #dce4f3;
+  font-size: 9px;
+}
+
+.field.compact select {
+  min-height: 36px;
+  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.09);
+  color: white;
+  font-size: 10px;
+}
+
+.field.compact option {
+  background: #17213a;
+  color: white;
+}
+
+.button.agent-button {
+  min-height: 40px;
+  border-color: rgba(255, 255, 255, 0.15);
+  background: white;
+  color: #10182a;
+}
+
+.button.agent-button:hover {
+  background: #eeedff;
+  color: var(--brand-dark);
+}
+
+.agent-note {
+  font-size: 9px;
+  line-height: 1.45;
+}
+
 .section-heading h3 {
   margin-top: 3px;
   font-size: 14px;

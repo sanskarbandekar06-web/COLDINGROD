@@ -231,8 +231,8 @@ export function LeadQualificationPanel({
           </div>
           <p className="mt-3 font-medium">Not qualified yet</p>
           <p className="mt-1 max-w-xs text-sm text-muted-foreground">
-            Add observed business signals to calculate an auditable service
-            opportunity score.
+            Use Automatic AI Analysis above. This form is only for manually
+            correcting or supplementing evidence.
           </p>
         </div>
       )}
@@ -246,14 +246,14 @@ export function LeadQualificationPanel({
         >
           <DialogTrigger render={<Button className="w-full" />}>
             <Sparkles className="size-4" aria-hidden="true" />
-            {latest ? 'Run qualification again' : 'Qualify this lead'}
+            {latest ? 'Adjust evidence manually' : 'Add evidence manually'}
           </DialogTrigger>
           <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
             <DialogHeader>
               <DialogTitle>Lead Qualification Agent</DialogTitle>
               <DialogDescription>
-                Record at least three known signals. The transparent rules engine
-                scores the opportunity without inventing missing facts.
+                Optional override: record at least three known signals when you
+                want to correct or supplement the automatic public analysis.
               </DialogDescription>
             </DialogHeader>
 

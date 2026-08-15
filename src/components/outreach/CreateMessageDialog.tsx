@@ -1,11 +1,9 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   Bot,
-  CircleAlert,
   Loader2,
   PencilLine,
   Plus,
@@ -128,7 +126,6 @@ export function CreateMessageDialog({
   const selectedContactName = selectedContact
     ? `${selectedContact.first_name} ${selectedContact.last_name ?? ''}`.trim()
     : undefined;
-  const aiReady = Boolean(readiness?.researched && readiness.hasOpportunity);
 
   function reset() {
     setLeadId('');
@@ -159,14 +156,12 @@ export function CreateMessageDialog({
       const result = await response.json() as ContactResponse;
       let loaded = result.contacts;
       setReadiness(result.readiness);
-      if (loaded.length === 0) {
-        const enrichment = await fetch('/api/outreach/contacts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ leadId: selected, workspaceId }),
-        });
-        if (enrichment.ok) loaded = await enrichment.json() as ContactOption[];
-      }
+      const enrichment = await fetch('/api/outreach/contacts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ leadId: selected, workspaceId }),
+      });
+      if (enrichment.ok) loaded = await enrichment.json() as ContactOption[];
       setContacts(loaded);
     } catch {
       toast.error('Contacts could not be loaded.');
@@ -350,44 +345,30 @@ export function CreateMessageDialog({
               <div className="flex gap-3 rounded-lg border border-primary/20 bg-primary/5 p-3 text-sm">
                 <Bot className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
                 <p>
-                  Coldingrod uses verified lead research and a channel-specific writing style. The generated copy opens immediately in an editable review dialog.
+                  Coldingrod automatically researches and qualifies the lead,
+                  then writes channel-specific copy. The result opens in an
+                  editable review dialog.
                 </p>
               </div>
-              {leadId && readiness && !aiReady && (
+              {leadId && readiness &&
+                (!readiness.qualified || !readiness.researched || !readiness.hasOpportunity) && (
                 <div
-                  className="space-y-3 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-100"
+                  className="flex gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm"
                   role="status"
                   aria-live="polite"
                 >
-                  <div className="flex gap-3">
-                    <CircleAlert
-                      className="mt-0.5 size-5 shrink-0 text-amber-700 dark:text-amber-300"
-                      aria-hidden="true"
-                    />
-                    <div>
-                      <p className="font-semibold">Prepare this lead for AI outreach</p>
-                      <p className="mt-1 text-amber-900/80 dark:text-amber-100/80">
-                        {!readiness.qualified
-                          ? 'First qualify the lead, then complete business research with a verified service opportunity.'
-                          : !readiness.researched
-                            ? 'Complete business research before requesting an AI draft.'
-                            : 'Refresh the research so it includes at least one verified service opportunity.'}
-                      </p>
-                    </div>
+                  <Sparkles
+                    className="mt-0.5 size-5 shrink-0 text-primary"
+                    aria-hidden="true"
+                  />
+                  <div>
+                    <p className="font-semibold">Automatic analysis included</p>
+                    <p className="mt-1 text-muted-foreground">
+                      No manual qualification form is required. Clicking Suggest
+                      will inspect available public evidence, enrich reachable
+                      channels, create both reports, and prepare the draft.
+                    </p>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-amber-300 bg-white text-amber-950 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-100"
-                    render={(
-                      <Link
-                        href={`/dashboard/${workspaceSlug}/leads/${leadId}#lead-preparation`}
-                        aria-label={`Prepare ${selectedLeadName ?? 'this lead'} for AI outreach`}
-                      />
-                    )}
-                  >
-                    Prepare this lead
-                  </Button>
                 </div>
               )}
             </>
@@ -414,11 +395,11 @@ export function CreateMessageDialog({
                 pending ||
                 loadingContacts ||
                 !leadId ||
-                (mode === 'ai' && (!contactId || !aiReady))
+                (mode === 'ai' && !contactId)
               }
             >
               {pending ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : mode === 'ai' ? <ShieldCheck className="size-4" aria-hidden="true" /> : <PencilLine className="size-4" aria-hidden="true" />}
-              {pending ? 'Preparing…' : mode === 'ai' ? `Suggest ${labels[platform]} draft` : 'Create draft'}
+              {pending ? (mode === 'ai' ? 'Analyzing & drafting…' : 'Preparing…') : mode === 'ai' ? `Suggest ${labels[platform]} draft` : 'Create draft'}
             </Button>
           </DialogFooter>
         </form>
