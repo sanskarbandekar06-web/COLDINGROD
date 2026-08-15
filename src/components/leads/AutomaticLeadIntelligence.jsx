@@ -45,10 +45,10 @@ export function AutomaticLeadIntelligence({
               {isReady ? 'AI lead intelligence is ready' : 'Let the agents prepare this lead'}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Coldingrod checks the public website, contact destinations, social
-              links, calls to action, booking flow, and search metadata. It then
-              creates the Opportunity Score, Executive Summary, and Detailed
-              Analysis automatically.
+              Coldingrod aggregates the imported source, verified website,
+              contact/about pages, structured business data, and existing
+              destinations. It then creates the Opportunity Score, Executive
+              Summary, and Detailed Analysis automatically.
             </p>
           </div>
         </div>

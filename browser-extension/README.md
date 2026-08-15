@@ -11,6 +11,8 @@ A Chrome/Edge Manifest V3 side-panel extension for page-aware lead context and h
   LinkedIn, WhatsApp, Instagram, or SMS copy directly in the side panel.
 - Keeps every AI suggestion editable before it becomes a versioned draft.
 - Creates versioned outreach drafts that always enter `pending_approval`.
+- Builds each suggestion from the lead's Executive Summary and Detailed Analysis and avoids repeating recent drafts.
+- Refreshes independently verified website/contact-page channels before presenting Email, WhatsApp, SMS, LinkedIn, or Instagram.
 - Lets an authorized human approve or reject a message from the side panel.
 - Adds a secure bridge to the Coldingrod message page for one-click approved delivery handoff.
 - Prefills email, WhatsApp, and SMS; copies approved text before opening LinkedIn or Instagram.

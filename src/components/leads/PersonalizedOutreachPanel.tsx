@@ -62,13 +62,15 @@ function contactChannel(contact: LeadContact, platform: string) {
 
 export function PersonalizedOutreachPanel({
   workspaceSlug,
+  workspaceId,
   leadId,
-  contacts,
+  contacts: initialContacts,
   canGenerate,
   hasResearch,
   hasOpportunity,
 }: {
   workspaceSlug: string;
+  workspaceId: string;
   leadId: string;
   contacts: LeadContact[];
   canGenerate: boolean;
@@ -82,11 +84,44 @@ export function PersonalizedOutreachPanel({
   const [contactId, setContactId] = useState('');
   const [tone, setTone] = useState('consultative');
   const [goal, setGoal] = useState('offer_audit');
+  const [contacts, setContacts] = useState(initialContacts);
+  const [loadingContacts, setLoadingContacts] = useState(false);
 
   const reachableContacts = useMemo(
     () => contacts.filter((contact) => supportsChannel(contact, platform)),
     [contacts, platform],
   );
+  const availableChannels = useMemo(
+    () => CHANNELS.filter((channel) =>
+      contacts.some((contact) => supportsChannel(contact, channel.value)),
+    ),
+    [contacts],
+  );
+
+  async function refreshContacts() {
+    setLoadingContacts(true);
+    try {
+      const response = await fetch('/api/outreach/contacts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ leadId, workspaceId }),
+      });
+      if (!response.ok) return;
+      const refreshed = await response.json() as LeadContact[];
+      setContacts(refreshed);
+      const found = CHANNELS.find((channel) =>
+        refreshed.some((contact) => supportsChannel(contact, channel.value)),
+      );
+      if (found && !refreshed.some((contact) => supportsChannel(contact, platform))) {
+        setPlatform(found.value);
+        setContactId(
+          refreshed.find((contact) => supportsChannel(contact, found.value))?.id ?? '',
+        );
+      }
+    } finally {
+      setLoadingContacts(false);
+    }
+  }
 
   function changePlatform(nextPlatform: string | null) {
     const selected = nextPlatform ?? 'email';
@@ -141,16 +176,14 @@ export function PersonalizedOutreachPanel({
         </div>
       </div>
 
-      {contacts.length === 0 ? (
-        <p className="rounded-lg border bg-muted/40 p-3 text-xs text-muted-foreground">
-          Add a contact with an email, phone number, LinkedIn URL, or Instagram
-          handle first.
-        </p>
-      ) : canGenerate ? (
+      {canGenerate ? (
         <Dialog
           open={open}
           onOpenChange={(nextOpen) => {
-            if (!pending) setOpen(nextOpen);
+            if (!pending) {
+              setOpen(nextOpen);
+              if (nextOpen) void refreshContacts();
+            }
           }}
         >
           <DialogTrigger
@@ -188,8 +221,17 @@ export function PersonalizedOutreachPanel({
                   </SelectTrigger>
                   <SelectContent>
                     {CHANNELS.map((channel) => (
-                      <SelectItem key={channel.value} value={channel.value}>
+                      <SelectItem
+                        key={channel.value}
+                        value={channel.value}
+                        disabled={contacts.length > 0 &&
+                          !availableChannels.some((item) => item.value === channel.value)}
+                      >
                         {channel.label}
+                        {contacts.length > 0 &&
+                          !availableChannels.some((item) => item.value === channel.value)
+                          ? ' · not found'
+                          : ''}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -201,7 +243,7 @@ export function PersonalizedOutreachPanel({
                 <Select
                   value={contactId}
                   onValueChange={(value) => setContactId(value ?? '')}
-                  disabled={reachableContacts.length === 0}
+                  disabled={loadingContacts || reachableContacts.length === 0}
                 >
                   <SelectTrigger
                     id="personalized-contact"
@@ -211,7 +253,7 @@ export function PersonalizedOutreachPanel({
                     <SelectValue
                       placeholder={
                         reachableContacts.length > 0
-                          ? 'Select a contact…'
+                          ? loadingContacts ? 'Refreshing channels…' : 'Select a contact…'
                           : 'No contact supports this channel'
                       }
                     />

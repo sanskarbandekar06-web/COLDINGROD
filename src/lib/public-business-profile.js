@@ -4,7 +4,14 @@ import { lookup } from 'node:dns/promises';
 import { isIP } from 'node:net';
 
 const MAX_HTML_BYTES = 600_000;
-const MAX_SUPPORTING_PAGES = 2;
+const MAX_SUPPORTING_PAGES = 5;
+const COMMON_SUPPORTING_PATHS = [
+  '/contact',
+  '/contact-us',
+  '/about',
+  '/about-us',
+  '/connect',
+];
 const SOCIAL_HOSTS = {
   linkedin: new Set(['linkedin.com', 'www.linkedin.com']),
   instagram: new Set(['instagram.com', 'www.instagram.com']),
@@ -116,8 +123,9 @@ function profileFromUrl(value) {
     const url = new URL(value);
     const host = url.hostname.toLowerCase();
     const segments = url.pathname.split('/').filter(Boolean);
-    if (SOCIAL_HOSTS.linkedin.has(host) && segments[0]?.toLowerCase() === 'company' && segments[1]) {
-      return { linkedinUrl: `https://www.linkedin.com/company/${segments[1]}` };
+    if (SOCIAL_HOSTS.linkedin.has(host) &&
+      ['company', 'in'].includes(segments[0]?.toLowerCase()) && segments[1]) {
+      return { linkedinUrl: `https://www.linkedin.com/${segments[0].toLowerCase()}/${segments[1]}` };
     }
     if (SOCIAL_HOSTS.instagram.has(host) && segments[0] &&
       !['p', 'reel', 'reels', 'stories', 'explore', 'accounts'].includes(segments[0].toLowerCase())) {
@@ -125,7 +133,9 @@ function profileFromUrl(value) {
     }
     if (SOCIAL_HOSTS.facebook.has(host) && segments[0] &&
       !['share', 'sharer', 'dialog', 'plugins', 'login'].includes(segments[0].toLowerCase())) {
-      return { facebookUrl: `https://www.facebook.com/${segments[0]}` };
+      return {
+        facebookUrl: `https://www.facebook.com/${segments.slice(0, 3).join('/')}`,
+      };
     }
   } catch {
     return {};
@@ -189,6 +199,49 @@ function contactHref(value) {
   return {};
 }
 
+function normalizedPhone(value) {
+  const phone = decodeHtml(value).replace(/\s+/g, ' ').trim();
+  const digits = phone.replace(/\D/g, '');
+  if (digits.length < 7 || digits.length > 15) return '';
+  return phone.slice(0, 80);
+}
+
+function publicUrlContact(value, baseUrl) {
+  try {
+    const url = new URL(decodeHtml(value).replaceAll('\\/', '/'), baseUrl);
+    const host = url.hostname.toLowerCase();
+    if (host === 'wa.me' || host.endsWith('.wa.me')) {
+      return { phone: normalizedPhone(url.pathname.split('/').filter(Boolean)[0] ?? '') };
+    }
+    if (host === 'api.whatsapp.com' || host === 'web.whatsapp.com') {
+      return { phone: normalizedPhone(url.searchParams.get('phone') ?? '') };
+    }
+  } catch {
+    return {};
+  }
+  return {};
+}
+
+function visibleContactDetails(html) {
+  const text = compactText(html, 50_000);
+  const emailCandidates = text.match(
+    /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,
+  ) ?? [];
+  const email = emailCandidates.find((candidate) =>
+    !/(example\.(?:com|org)|domain\.com|email\.com)$/i.test(candidate),
+  );
+  const phoneCandidates = text.match(
+    /(?:\+?\d[\d\s().-]{5,}\d)/g,
+  ) ?? [];
+  const phone = phoneCandidates
+    .map(normalizedPhone)
+    .find(Boolean);
+  return {
+    email: email?.toLowerCase().slice(0, 320),
+    phone: phone || undefined,
+  };
+}
+
 function metaContent(html, key, attribute = 'name') {
   const tags = html.match(/<meta\b[^>]*>/gi) ?? [];
   for (const tag of tags) {
@@ -228,6 +281,8 @@ function mergePageDetails(target, html, finalUrl) {
     const contact = contactHref(rawHref);
     if (!target.phone && contact.phone) target.phone = contact.phone;
     if (!target.email && contact.email) target.email = contact.email;
+    const publicContact = publicUrlContact(rawHref, finalUrl);
+    if (!target.phone && publicContact.phone) target.phone = publicContact.phone;
     try {
       const profile = profileFromUrl(new URL(rawHref, finalUrl).toString());
       if (!target.linkedinUrl && profile.linkedinUrl) target.linkedinUrl = profile.linkedinUrl;
@@ -236,6 +291,23 @@ function mergePageDetails(target, html, finalUrl) {
     } catch {
       // Ignore malformed or non-HTTP links from the public page.
     }
+  }
+
+  const visible = visibleContactDetails(html);
+  if (!target.phone && visible.phone) target.phone = visible.phone;
+  if (!target.email && visible.email) target.email = visible.email;
+
+  const embeddedUrls = decodeHtml(html)
+    .replaceAll('\\/', '/')
+    .match(/https?:\/\/[^\s"'<>]+/gi) ?? [];
+  for (const rawUrl of embeddedUrls) {
+    const normalizedUrl = rawUrl.replace(/[),.;]+$/, '');
+    const profile = profileFromUrl(normalizedUrl);
+    const publicContact = publicUrlContact(normalizedUrl, finalUrl);
+    if (!target.linkedinUrl && profile.linkedinUrl) target.linkedinUrl = profile.linkedinUrl;
+    if (!target.instagramHandle && profile.instagramHandle) target.instagramHandle = profile.instagramHandle;
+    if (!target.facebookUrl && profile.facebookUrl) target.facebookUrl = profile.facebookUrl;
+    if (!target.phone && publicContact.phone) target.phone = publicContact.phone;
   }
 
   const jsonLdPattern = /<script\b[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
@@ -252,7 +324,12 @@ function mergePageDetails(target, html, finalUrl) {
         if (!item || typeof item !== 'object') continue;
         if (!target.phone && typeof item.telephone === 'string') target.phone = item.telephone.trim().slice(0, 80);
         if (!target.email && typeof item.email === 'string') target.email = item.email.replace(/^mailto:/i, '').trim().toLowerCase().slice(0, 320);
-        for (const socialUrl of Array.isArray(item.sameAs) ? item.sameAs : []) {
+        const socialUrls = Array.isArray(item.sameAs)
+          ? item.sameAs
+          : typeof item.sameAs === 'string'
+            ? [item.sameAs]
+            : [];
+        for (const socialUrl of socialUrls) {
           if (typeof socialUrl !== 'string') continue;
           const profile = profileFromUrl(socialUrl);
           if (!target.linkedinUrl && profile.linkedinUrl) target.linkedinUrl = profile.linkedinUrl;
@@ -285,6 +362,11 @@ function supportingPageUrls(html, finalUrl) {
     } catch {
       // Ignore invalid links.
     }
+  }
+  for (const path of COMMON_SUPPORTING_PATHS) {
+    if (urls.length >= MAX_SUPPORTING_PAGES) break;
+    const candidate = new URL(path, base).toString();
+    if (candidate !== base.toString() && !urls.includes(candidate)) urls.push(candidate);
   }
   return urls;
 }

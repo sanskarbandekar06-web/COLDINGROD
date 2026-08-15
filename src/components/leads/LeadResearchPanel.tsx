@@ -196,6 +196,14 @@ export function LeadResearchPanel({
               </a>
             ))}
           </div>
+          <div className="flex gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-200">
+            <CheckCircle2 className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+            <p>
+              Outreach grounding ready. Every new AI suggestion uses the latest
+              Executive Summary and the complete Detailed Analysis, then avoids
+              repeating recent drafts for the same channel.
+            </p>
+          </div>
         </>
       ) : (
         <div className="flex flex-col items-center py-4 text-center">

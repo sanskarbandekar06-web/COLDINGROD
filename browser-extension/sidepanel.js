@@ -237,7 +237,7 @@ function clearComposeDraft() {
   elements.subjectInput.value = '';
   elements.messageInput.value = '';
   elements.draftSource.textContent =
-    'No manual qualification form is needed. Unknown facts stay unknown.';
+    'Suggestions use the lead’s Executive Summary and Detailed Analysis. Unknown facts stay unknown.';
 }
 
 function formatStatus(status) {
@@ -688,7 +688,7 @@ async function suggestDraft() {
     elements.subjectInput.value = suggestion.subject || '';
     elements.messageInput.value = suggestion.content || '';
     elements.draftSource.textContent =
-      `AI basis: ${suggestion.opportunity}. ${suggestion.analysis?.availableSources || 0} public source${suggestion.analysis?.availableSources === 1 ? '' : 's'} reviewed; unknowns preserved.`;
+      `Report-grounded AI basis: ${suggestion.opportunity}. ${suggestion.analysis?.availableSources || 0} public source${suggestion.analysis?.availableSources === 1 ? '' : 's'} reviewed; Executive Summary + Detailed Analysis used; unknowns preserved.`;
     setLiveMessage(
       'AI suggestion ready. Edit the message below, then submit it for human approval.',
       'success',

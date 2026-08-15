@@ -1,7 +1,9 @@
 import 'server-only';
 
-import { discoverPublicBusinessProfile } from '@/lib/public-business-profile';
-import { enrichLeadPublicContact } from '@/services/public-contact-enrichment.service';
+import {
+  discoverLeadPublicContactProfile,
+  enrichLeadPublicContact,
+} from '@/services/public-contact-enrichment.service';
 
 function record(value) {
   return value && typeof value === 'object' && !Array.isArray(value);
@@ -23,10 +25,30 @@ function socialPresent(contacts, profile) {
   );
 }
 
-function buildAutomaticEvidence(lead, profile, contacts) {
-  const hasWebsite = Boolean(lead.website_url);
-  const verifiedWebsite = hasWebsite && profile.officialWebsite;
+function availableChannels(contacts, profile) {
+  const channels = new Set();
+  if (profile.email || contacts.some((contact) => contact.email)) channels.add('Email');
+  if (profile.phone || contacts.some((contact) => contact.phone)) {
+    channels.add('WhatsApp');
+    channels.add('SMS');
+  }
+  if (profile.linkedinUrl || contacts.some((contact) => contact.linkedin_url)) {
+    channels.add('LinkedIn');
+  }
+  if (profile.instagramHandle || contacts.some((contact) => contact.instagram_handle)) {
+    channels.add('Instagram');
+  }
+  if (profile.facebookUrl || contacts.some((contact) => contact.facebook_url)) {
+    channels.add('Facebook');
+  }
+  return [...channels];
+}
+
+export function buildAutomaticEvidence(lead, profile, contacts) {
+  const hasWebsite = Boolean(lead.website_url || profile.websiteAnalyzed);
+  const verifiedWebsite = Boolean(profile.officialWebsite);
   const hasSocial = socialPresent(contacts, profile);
+  const channels = availableChannels(contacts, profile);
   const websiteStatus = !hasWebsite
     ? 'none'
     : verifiedWebsite && (profile.seoStatus !== 'weak' || profile.hasClearCta)
@@ -70,6 +92,11 @@ function buildAutomaticEvidence(lead, profile, contacts) {
       ? 'An online booking or scheduling path was observed.'
       : 'No online booking or scheduling path was observed.',
   );
+  observations.push(
+    channels.length
+      ? `Verified outreach channels: ${channels.join(', ')}.`
+      : 'No direct outreach channel could be independently verified.',
+  );
   observations.push('Google rating and review totals remain unknown and are not treated as claims.');
 
   const challenges = [];
@@ -103,6 +130,14 @@ function buildAutomaticEvidence(lead, profile, contacts) {
     research: {
       source_type: 'manual_observation',
       offerings,
+      ...(lead.industry || lead.location
+        ? {
+            target_audience: [
+              lead.industry ? `Public business category: ${lead.industry}.` : '',
+              lead.location ? `Public service location: ${lead.location}.` : '',
+            ].filter(Boolean).join(' '),
+          }
+        : {}),
       observed_challenges: (challenges.join(' ') ||
         'No material public-profile gap was asserted.').slice(0, 1000),
       evidence_notes: evidenceNotes,
@@ -115,7 +150,7 @@ function buildAutomaticEvidence(lead, profile, contacts) {
 async function latestReport(supabase, workspaceId, leadId) {
   const { data } = await supabase
     .from('lead_research_reports')
-    .select('id, research_summary, pain_points, confidence, created_at')
+    .select('id, research_summary, source_urls, pain_points, confidence, created_at')
     .eq('workspace_id', workspaceId)
     .eq('lead_id', leadId)
     .order('created_at', { ascending: false })
@@ -137,26 +172,23 @@ export async function ensureAutomaticLeadIntelligence({
   force = false,
 }) {
   const currentReport = await latestReport(supabase, workspaceId, lead.id);
-  if (!force && reportHasOpportunity(currentReport)) {
+  const profile = await discoverLeadPublicContactProfile(supabase, lead);
+  const contacts = await enrichLeadPublicContact(supabase, lead, profile);
+  const currentSources = new Set(
+    Array.isArray(currentReport?.source_urls) ? currentReport.source_urls : [],
+  );
+  const hasNewSource = (profile.sourceUrls ?? []).some(
+    (source) => !currentSources.has(source),
+  );
+  if (!force && reportHasOpportunity(currentReport) && !hasNewSource) {
     return {
       report: currentReport,
       prepared: false,
+      contacts,
+      profile,
       observations: [],
     };
   }
-
-  const profile = lead.website_url
-    ? await discoverPublicBusinessProfile(lead.website_url, lead.company_name)
-    : {
-        websiteAnalyzed: false,
-        officialWebsite: false,
-        businessNameMatched: false,
-        hasClearCta: null,
-        hasOnlineBooking: null,
-        seoStatus: 'unknown',
-        sourceUrls: [],
-      };
-  const contacts = await enrichLeadPublicContact(supabase, lead, profile);
   const evidence = buildAutomaticEvidence(lead, profile, contacts);
 
   const { data: qualification, error: qualificationError } = await supabase

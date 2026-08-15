@@ -217,6 +217,7 @@ export default async function LeadDetailsPage({
           >
             <PersonalizedOutreachPanel
               workspaceSlug={workspaceSlug}
+              workspaceId={context.workspace.id}
               leadId={lead.id}
               contacts={contacts}
               canGenerate={canRunQualification}

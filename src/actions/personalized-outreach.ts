@@ -70,7 +70,7 @@ export async function generatePersonalizedOutreachAction(
   }
 
   const supabase = await createClient();
-  const [{ data: lead }, { data: contact }, { data: initialReport }] = await Promise.all([
+  const [{ data: lead }, { data: initialContact }] = await Promise.all([
     supabase
       .from('leads')
       .select(
@@ -82,21 +82,13 @@ export async function generatePersonalizedOutreachAction(
       .maybeSingle(),
     supabase
       .from('lead_contacts')
-      .select('id, lead_id, first_name, job_title, email, phone, linkedin_url, instagram_handle')
+      .select('id, lead_id, first_name, job_title, email, phone, linkedin_url, instagram_handle, facebook_url')
       .eq('id', value.contactId)
       .eq('lead_id', value.leadId)
       .maybeSingle(),
-    supabase
-      .from('lead_research_reports')
-      .select('id, research_summary, pain_points')
-      .eq('workspace_id', context.workspace.id)
-      .eq('lead_id', value.leadId)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle(),
   ]);
 
-  if (!lead || !contact) {
+  if (!lead || !initialContact) {
     return {
       success: false,
       code: 'NOT_READY',
@@ -104,37 +96,50 @@ export async function generatePersonalizedOutreachAction(
     };
   }
 
-  let report = initialReport;
-  let painPoints = Array.isArray(report?.pain_points) ? report.pain_points : [];
-  let topPainPoint = isRecord(painPoints[0]) ? painPoints[0] : null;
-  let opportunity =
+  let report;
+  let contact = initialContact;
+  let recentMessages: { content: string }[] = [];
+  try {
+    const prepared = await ensureAutomaticLeadIntelligence({
+      supabase,
+      workspaceId: context.workspace.id,
+      lead,
+    });
+    report = prepared.report;
+    const [{ data: refreshedContact }, { data: previousMessages }] = await Promise.all([
+      supabase
+        .from('lead_contacts')
+        .select('id, lead_id, first_name, job_title, email, phone, linkedin_url, instagram_handle, facebook_url')
+        .eq('id', value.contactId)
+        .eq('lead_id', value.leadId)
+        .maybeSingle(),
+      supabase
+        .from('outreach_messages')
+        .select('content')
+        .eq('workspace_id', context.workspace.id)
+        .eq('lead_id', value.leadId)
+        .eq('platform', value.platform)
+        .is('deleted_at', null)
+        .order('created_at', { ascending: false })
+        .limit(5),
+    ]);
+    contact = refreshedContact ?? initialContact;
+    recentMessages = previousMessages ?? [];
+  } catch (error) {
+    console.error('Automatic outreach preparation failed:', error instanceof Error ? error.message : error);
+    return {
+      success: false,
+      code: 'EXECUTION_FAILED',
+      error: 'The AI agents could not analyze this lead and prepare a draft.',
+    };
+  }
+
+  const painPoints = Array.isArray(report?.pain_points) ? report.pain_points : [];
+  const topPainPoint = isRecord(painPoints[0]) ? painPoints[0] : null;
+  const opportunity =
     typeof topPainPoint?.service_opportunity === 'string'
       ? topPainPoint.service_opportunity.trim()
       : '';
-
-  if (!report || !opportunity) {
-    try {
-      const prepared = await ensureAutomaticLeadIntelligence({
-        supabase,
-        workspaceId: context.workspace.id,
-        lead,
-      });
-      report = prepared.report;
-      painPoints = Array.isArray(report?.pain_points) ? report.pain_points : [];
-      topPainPoint = isRecord(painPoints[0]) ? painPoints[0] : null;
-      opportunity =
-        typeof topPainPoint?.service_opportunity === 'string'
-          ? topPainPoint.service_opportunity.trim()
-          : '';
-    } catch (error) {
-      console.error('Automatic outreach preparation failed:', error instanceof Error ? error.message : error);
-      return {
-        success: false,
-        code: 'EXECUTION_FAILED',
-        error: 'The AI agents could not analyze this lead and prepare a draft.',
-      };
-    }
-  }
 
   if (!report || !opportunity) {
     return {
@@ -164,9 +169,12 @@ export async function generatePersonalizedOutreachAction(
     lead,
     contact,
     opportunity,
-    researchSummary: isRecord(report.research_summary)
+    executiveSummary: isRecord(report.research_summary)
       ? report.research_summary
       : {},
+    detailedAnalysis: painPoints,
+    sourceUrls: Array.isArray(report.source_urls) ? report.source_urls : [],
+    avoidMessages: recentMessages.map((message) => message.content),
   });
 
   const { data, error } = await supabase

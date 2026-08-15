@@ -1,10 +1,13 @@
 import 'server-only';
 
+import { createHash, randomUUID } from 'node:crypto';
+
 const CHANNEL_LIMITS = {
   email: 1800,
   linkedin: 700,
   whatsapp: 500,
   instagram: 500,
+  facebook: 500,
   sms: 320,
 };
 
@@ -13,6 +16,7 @@ const CHANNEL_STYLES = {
   linkedin: 'a professional, peer-to-peer LinkedIn message; concise, credible, and connection-oriented',
   whatsapp: 'a brief, conversational WhatsApp message that feels natural on mobile and avoids email-like formality',
   instagram: 'a friendly, lightweight Instagram DM with a casual but respectful voice',
+  facebook: 'a friendly Facebook Messenger note; conversational, specific, and respectful',
   sms: 'an extremely concise SMS with one idea, one question, and STOP opt-out wording',
 };
 
@@ -21,6 +25,7 @@ const OPT_OUTS = {
   linkedin: 'If it is not relevant, no worries — I will not follow up.',
   whatsapp: 'If it is not relevant, just say so and I will not follow up.',
   instagram: 'No worries if it is not a fit — I will not follow up.',
+  facebook: 'No worries if it is not a fit — I will not follow up.',
   sms: 'Reply STOP to opt out.',
 };
 
@@ -30,6 +35,7 @@ const GOAL_COPY = {
     linkedin: 'Open to a quick 15-minute chat next week?',
     whatsapp: 'Would a quick 15-minute chat next week be useful?',
     instagram: 'Open to a quick 15-minute chat next week?',
+    facebook: 'Open to a quick 15-minute chat next week?',
     sms: 'Open to a 15-min chat next week?',
   },
   offer_audit: {
@@ -37,6 +43,7 @@ const GOAL_COPY = {
     linkedin: 'Happy to share a short audit with a few practical next steps — useful?',
     whatsapp: 'I can send a short audit with a few practical next steps if useful.',
     instagram: 'Want me to send a quick audit with a few practical next steps?',
+    facebook: 'Want me to send a quick audit with a few practical next steps?',
     sms: 'Want a short audit with practical next steps?',
   },
   share_idea: {
@@ -44,6 +51,7 @@ const GOAL_COPY = {
     linkedin: 'Would it help if I shared one concrete idea?',
     whatsapp: 'Want me to send one concrete idea?',
     instagram: 'Want me to send one practical idea?',
+    facebook: 'Want me to send one practical idea?',
     sms: 'Want me to send one practical idea?',
   },
 };
@@ -89,34 +97,122 @@ function truncateWithOptOut(content, platform) {
   return `${withOptOut.slice(0, available).trim()}\n\n${optOut}`.slice(0, max);
 }
 
-function fallbackDraft({ platform, tone, goal, lead, contact, opportunity }) {
+function record(value) {
+  return value && typeof value === 'object' && !Array.isArray(value);
+}
+
+function seededNumber(value) {
+  return Number.parseInt(createHash('sha256').update(value).digest('hex').slice(0, 8), 16);
+}
+
+function sentence(value, maximum = 260) {
+  return clean(value, maximum).replace(/[.;:,\s]+$/, '');
+}
+
+function lowerFirst(value) {
+  return value ? `${value[0].toLowerCase()}${value.slice(1)}` : value;
+}
+
+function researchBasis(input, variant) {
+  const summary = record(input.executiveSummary)
+    ? input.executiveSummary
+    : record(input.researchSummary)
+      ? input.researchSummary
+      : {};
+  const details = Array.isArray(input.detailedAnalysis)
+    ? input.detailedAnalysis.filter(record)
+    : [];
+  const specificDetails = details.filter((point) =>
+    sentence(point.evidence, 280) &&
+    !/unknown|no performance claim/i.test(sentence(point.evidence, 280)),
+  );
+  const detailPool = specificDetails.length ? specificDetails : details;
+  const point = detailPool.length ? detailPool[variant % detailPool.length] : null;
+  const summaryPool = [
+    summary.offerings,
+    summary.observed_challenges,
+    summary.differentiators,
+    summary.target_audience,
+    summary.recent_activity,
+  ].map((value) => sentence(value, 260)).filter(Boolean);
+  const summaryInsight = summaryPool.length
+    ? summaryPool[(variant >>> 3) % summaryPool.length]
+    : '';
+  return {
+    insight: sentence(point?.evidence, 240) || summaryInsight ||
+      sentence(input.lead.industry || input.lead.location, 180) ||
+      'its current public customer journey',
+    context: summaryInsight || sentence(input.lead.industry, 140) ||
+      'the business’s public profile',
+    opportunity: sentence(point?.service_opportunity, 220) ||
+      sentence(input.opportunity, 220) || 'an evidence-led growth review',
+    reportFinding: sentence(point?.label, 140) || 'public-profile opportunity',
+  };
+}
+
+function pick(values, variant, offset = 0) {
+  return values[(variant + offset) % values.length];
+}
+
+function fallbackDraft(input) {
+  const { platform, tone, goal, lead, contact } = input;
   const firstName = clean(contact.first_name, 80) || 'there';
   const company = clean(lead.company_name, 140);
-  const idea = clean(opportunity, platform === 'sms' ? 90 : 220).toLowerCase();
+  const variationKey = input.variationKey || randomUUID();
+  const variant = seededNumber(
+    `${lead.id || company}|${platform}|${tone}|${goal}|${variationKey}`,
+  );
+  const basis = researchBasis(input, variant);
+  const insight = sentence(basis.insight, platform === 'sms' ? 80 : 190);
+  const idea = sentence(basis.opportunity, platform === 'sms' ? 70 : 150).toLowerCase();
   const cta = GOAL_COPY[goal]?.[platform] ?? GOAL_COPY.share_idea[platform];
   const warmStart = tone === 'warm';
-  const concise = tone === 'concise';
   let subject = null;
   let content;
 
   switch (platform) {
     case 'linkedin':
-      content = `Hi ${firstName} — ${warmStart ? `hope you are doing well. ` : ''}I noticed ${company} may have an opportunity around ${idea}. ${cta}\n\n${optOutFor(platform)}`;
+      content = pick([
+        `Hi ${firstName} — I reviewed ${company}'s public profile and one detail stood out: ${insight}. I have a focused idea around ${idea}. ${cta}`,
+        `Hi ${firstName}${warmStart ? ' — hope your week is going well.' : '.'} The lead analysis for ${company} highlighted ${lowerFirst(insight)}. It points to a practical opportunity around ${idea}. ${cta}`,
+        `Hi ${firstName} — while looking at ${company}, I focused on ${basis.context}. The detailed review surfaced ${lowerFirst(insight)}. ${cta}`,
+      ], variant) + `\n\n${optOutFor(platform)}`;
       break;
     case 'whatsapp':
-      content = `Hi ${firstName}${warmStart ? ' 👋' : ','} I was looking at ${company} and noticed an opportunity around ${idea}. ${cta}\n\n${optOutFor(platform)}`;
+      content = pick([
+        `Hi ${firstName}${warmStart ? ' 👋' : ','} I took a look at ${company}. One thing the analysis picked up was ${lowerFirst(insight)}. I have a practical idea around ${idea}. ${cta}`,
+        `Hi ${firstName}, I was reviewing ${company} and noticed ${lowerFirst(insight)}. It may be worth exploring ${idea}. ${cta}`,
+        `Hi ${firstName}${warmStart ? '!' : ','} Quick note after looking through ${company}'s public presence: ${insight}. ${cta}`,
+      ], variant) + `\n\n${optOutFor(platform)}`;
       break;
     case 'instagram':
-      content = `Hi ${firstName}${warmStart ? '! 👋' : '!'} Came across ${company} and noticed an opportunity around ${idea}. ${cta}\n\n${optOutFor(platform)}`;
+    case 'facebook':
+      content = pick([
+        `Hi ${firstName}${warmStart ? '! 👋' : '!'} I came across ${company} and noticed ${lowerFirst(insight)}. I have one idea around ${idea}. ${cta}`,
+        `Hey ${firstName} — I was looking through ${company}'s public profile. The review highlighted ${lowerFirst(insight)}. ${cta}`,
+        `Hi ${firstName}! A quick observation from ${company}'s analysis: ${insight}. There may be a useful next step around ${idea}. ${cta}`,
+      ], variant) + `\n\n${optOutFor(platform)}`;
       break;
     case 'sms':
-      content = `Hi ${firstName}—noticed ${company} may have an opportunity around ${idea}. ${cta} ${optOutFor(platform)}`;
+      content = pick([
+        `Hi ${firstName}—reviewed ${company} and noticed ${lowerFirst(insight)}. ${cta} ${optOutFor(platform)}`,
+        `Hi ${firstName}—quick idea for ${company} around ${idea}. ${cta} ${optOutFor(platform)}`,
+        `Hi ${firstName}—${basis.reportFinding} stood out in ${company}'s review. ${cta} ${optOutFor(platform)}`,
+      ], variant);
       break;
     default:
-      subject = clean(`Idea for ${company}: ${opportunity}`, 160);
+      subject = clean(pick([
+        `${basis.reportFinding} idea for ${company}`,
+        `A practical ${company} growth idea`,
+        `${company}: ${basis.opportunity}`,
+      ], variant), 160);
       content = [
-        `Hello ${firstName},`,
-        `${warmStart ? 'I hope you are doing well. ' : ''}I ${concise ? 'reviewed' : 'was reviewing'} ${company}'s public presence and noticed an opportunity around ${idea}.`,
+        warmStart ? `Hi ${firstName},` : `Hello ${firstName},`,
+        pick([
+          `I reviewed both the executive summary and detailed analysis for ${company}. One verified detail stood out: ${insight}. That suggests a focused opportunity around ${idea}.`,
+          `While looking through ${company}'s public presence, I focused on ${basis.context}. The detailed review highlighted ${lowerFirst(insight)}, so I sketched a practical idea around ${idea}.`,
+          `The research summary for ${company} shows ${basis.context}. The deeper analysis also surfaced ${lowerFirst(insight)}. There may be a useful next step around ${idea}.`,
+        ], variant),
         cta,
         optOutFor(platform),
         tone === 'warm' ? 'Best wishes,' : tone === 'consultative' ? 'Regards,' : 'Thanks,',
@@ -126,7 +222,7 @@ function fallbackDraft({ platform, tone, goal, lead, contact, opportunity }) {
   return {
     subject,
     content: truncateWithOptOut(content, platform),
-    generator: 'grounded-platform-template-v2',
+    generator: 'report-grounded-platform-writer-v3',
   };
 }
 
@@ -147,8 +243,35 @@ function parseJsonText(text) {
   return JSON.parse(normalized);
 }
 
+function normalizedDraft(value) {
+  return cleanContent(value, 10_000).toLowerCase();
+}
+
+function distinctFallback(input) {
+  const previous = new Set(
+    (input.avoidMessages ?? []).map(normalizedDraft).filter(Boolean),
+  );
+  let candidate = fallbackDraft({
+    ...input,
+    variationKey: `${input.variationKey}:0`,
+  });
+  if (!previous.has(normalizedDraft(candidate.content))) return candidate;
+  for (let attempt = 1; attempt < 8; attempt += 1) {
+    candidate = fallbackDraft({
+      ...input,
+      variationKey: `${input.variationKey}:${attempt}`,
+    });
+    if (!previous.has(normalizedDraft(candidate.content))) return candidate;
+  }
+  return candidate;
+}
+
 export async function generateGroundedOutreachDraft(input) {
-  const fallback = fallbackDraft(input);
+  const normalizedInput = {
+    ...input,
+    variationKey: input.variationKey || randomUUID(),
+  };
+  const fallback = distinctFallback(normalizedInput);
   const apiKey = process.env.OPENAI_API_KEY?.trim();
   if (!apiKey) return fallback;
 
@@ -172,11 +295,17 @@ export async function generateGroundedOutreachDraft(input) {
         industry: clean(input.lead.industry, 120),
         location: clean(input.lead.location, 160),
         opportunity: clean(input.opportunity, 300),
-        research_summary: input.researchSummary,
+        executive_summary: input.executiveSummary ?? input.researchSummary,
+        detailed_analysis: input.detailedAnalysis,
+        source_urls: input.sourceUrls,
       },
+      previous_drafts_to_avoid: (input.avoidMessages ?? []).slice(0, 5),
+      variation_key: normalizedInput.variationKey,
       rules: [
         'Do not invent familiarity, private facts, performance claims, results, or customer details.',
         'Use a different native writing style for the selected channel.',
+        'Ground the opening in a specific fact from the executive summary and a finding from the detailed analysis.',
+        'Do not repeat the wording, opening, or CTA construction of previous drafts.',
         'Include exactly one clear call to action.',
         `Include this opt-out meaning: ${optOutFor(platform)}`,
         platform === 'email' ? 'Return a specific subject and body.' : 'Return null for subject.',
@@ -226,6 +355,10 @@ export async function generateGroundedOutreachDraft(input) {
     const parsed = parseJsonText(extractResponseText(payload));
     const content = cleanContent(parsed.content, limitFor(platform));
     if (!content) return fallback;
+    const previous = new Set(
+      (input.avoidMessages ?? []).map(normalizedDraft).filter(Boolean),
+    );
+    if (previous.has(normalizedDraft(content))) return fallback;
 
     return {
       subject: platform === 'email' ? clean(parsed.subject || fallback.subject, 160) : null,

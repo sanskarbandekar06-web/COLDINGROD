@@ -99,6 +99,12 @@ function supportsChannel(contact: ContactOption, platform: string) {
   return true;
 }
 
+function channelsForContacts(contacts: ContactOption[]) {
+  return AI_CHANNELS.filter((channel) =>
+    contacts.some((contact) => supportsChannel(contact, channel)),
+  );
+}
+
 export function CreateMessageDialog({
   workspaceSlug,
   workspaceId,
@@ -121,6 +127,7 @@ export function CreateMessageDialog({
   const reachableContacts = mode === 'ai'
     ? contacts.filter((contact) => supportsChannel(contact, platform))
     : contacts;
+  const availableChannels = channelsForContacts(contacts);
   const selectedLeadName = leads.find((lead) => lead.id === leadId)?.company_name;
   const selectedContact = contacts.find((contact) => contact.id === contactId);
   const selectedContactName = selectedContact
@@ -163,6 +170,15 @@ export function CreateMessageDialog({
       });
       if (enrichment.ok) loaded = await enrichment.json() as ContactOption[];
       setContacts(loaded);
+      const foundChannels = channelsForContacts(loaded);
+      const nextPlatform = foundChannels.includes(platform as typeof AI_CHANNELS[number])
+        ? platform
+        : foundChannels[0] ?? platform;
+      setPlatform(nextPlatform as OutreachPlatform);
+      const firstReachable = loaded.find((contact) =>
+        supportsChannel(contact, nextPlatform),
+      );
+      setContactId(firstReachable?.id ?? '');
     } catch {
       toast.error('Contacts could not be loaded.');
     } finally {
@@ -171,14 +187,16 @@ export function CreateMessageDialog({
   }
 
   function changePlatform(value: string | null) {
-    setPlatform((value ?? 'email') as OutreachPlatform);
-    setContactId('');
+    const nextPlatform = (value ?? 'email') as OutreachPlatform;
+    setPlatform(nextPlatform);
+    setContactId(
+      contacts.find((contact) => supportsChannel(contact, nextPlatform))?.id ?? '',
+    );
   }
 
   function changeMode(nextMode: 'ai' | 'manual') {
     setMode(nextMode);
     setContactId('');
-    if (nextMode === 'ai' && platform === 'facebook') setPlatform('email');
   }
 
   function submit(event: React.FormEvent<HTMLFormElement>) {
@@ -293,12 +311,42 @@ export function CreateMessageDialog({
                 </SelectTrigger>
                 <SelectContent>
                   {(mode === 'ai' ? AI_CHANNELS : OUTREACH_PLATFORMS).map((channel) => (
-                    <SelectItem key={channel} value={channel}>{labels[channel]}</SelectItem>
+                    <SelectItem
+                      key={channel}
+                      value={channel}
+                      disabled={mode === 'ai' && contacts.length > 0 &&
+                        !availableChannels.includes(channel as typeof AI_CHANNELS[number])}
+                    >
+                      {labels[channel]}
+                      {mode === 'ai' && contacts.length > 0 &&
+                        !availableChannels.includes(channel as typeof AI_CHANNELS[number])
+                        ? ' · not found'
+                        : ''}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
+
+          {leadId && !loadingContacts && (
+            <div className="rounded-lg border bg-muted/30 p-3" role="status" aria-live="polite">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Verified outreach channels
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {availableChannels.length ? availableChannels.map((channel) => (
+                  <span key={channel} className="rounded-full border bg-background px-2.5 py-1 text-xs font-medium">
+                    {labels[channel]}
+                  </span>
+                )) : (
+                  <span className="text-sm text-muted-foreground">
+                    No direct channel was verified from the stored lead, imported source, or public website.
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="outreach-contact">Reachable contact {mode === 'ai' ? '*' : '(optional)'}</Label>
@@ -345,9 +393,9 @@ export function CreateMessageDialog({
               <div className="flex gap-3 rounded-lg border border-primary/20 bg-primary/5 p-3 text-sm">
                 <Bot className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
                 <p>
-                  Coldingrod automatically researches and qualifies the lead,
-                  then writes channel-specific copy. The result opens in an
-                  editable review dialog.
+                  Coldingrod creates the Executive Summary and Detailed
+                  Analysis first, then uses both reports to write distinct
+                  channel-specific copy. The result opens for editing.
                 </p>
               </div>
               {leadId && readiness &&

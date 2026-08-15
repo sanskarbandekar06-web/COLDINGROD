@@ -3,7 +3,10 @@ import { createClient } from '@supabase/supabase-js';
 import { getSupabasePublicEnv } from '@/lib/supabase/env';
 import { discoverPublicBusinessProfile } from '@/lib/public-business-profile';
 import { generateGroundedOutreachDraft } from '@/lib/outreach-message-generator';
-import { opportunityFromAutomaticProfile } from '@/services/automatic-lead-intelligence.service';
+import {
+  buildAutomaticEvidence,
+  opportunityFromAutomaticProfile,
+} from '@/services/automatic-lead-intelligence.service';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -68,6 +71,91 @@ function createAnonymousClient() {
       },
     },
   });
+}
+
+function contactChannelCount(contacts) {
+  const channels = new Set();
+  for (const contact of contacts ?? []) {
+    if (contact.email) channels.add('email');
+    if (contact.phone) {
+      channels.add('whatsapp');
+      channels.add('sms');
+    }
+    if (contact.linkedin_url) channels.add('linkedin');
+    if (contact.instagram_handle) channels.add('instagram');
+    if (contact.facebook_url) channels.add('facebook');
+  }
+  return channels.size;
+}
+
+async function getExtensionBasis(supabase, hashedToken, leadId) {
+  const { data, error } = await supabase.rpc(
+    'browser_extension_get_outreach_basis',
+    { check_token_hash: hashedToken, check_lead_id: leadId },
+  );
+  if (error) throw error;
+  return data;
+}
+
+async function ensureExtensionBasis(supabase, hashedToken, leadId) {
+  let basis = await getExtensionBasis(supabase, hashedToken, leadId);
+  const lead = basis?.lead;
+  if (!lead) throw new Error('Lead outreach basis is unavailable.');
+  const shouldInspectWebsite = Boolean(lead.website_url) &&
+    (!basis.report || contactChannelCount(basis.contacts) < 2);
+  const profile = shouldInspectWebsite
+    ? await discoverPublicBusinessProfile(lead.website_url, lead.company_name)
+    : {
+        websiteAnalyzed: false,
+        officialWebsite: false,
+        businessNameMatched: false,
+        hasClearCta: null,
+        hasOnlineBooking: null,
+        seoStatus: 'unknown',
+        sourceUrls: [],
+      };
+
+  if (!basis.report || shouldInspectWebsite) {
+    const evidence = buildAutomaticEvidence(lead, profile, basis.contacts ?? []);
+    const { error } = await supabase.rpc(
+      'browser_extension_prepare_lead_intelligence',
+      {
+        check_token_hash: hashedToken,
+        check_lead_id: leadId,
+        input_signals: evidence.signals,
+        research_input: evidence.research,
+        contact_input: {
+          email: profile.email ?? null,
+          phone: profile.phone ?? null,
+          linkedin_url: profile.linkedinUrl ?? null,
+          instagram_handle: profile.instagramHandle ?? null,
+          facebook_url: profile.facebookUrl ?? null,
+        },
+      },
+    );
+    if (error) throw error;
+    basis = await getExtensionBasis(supabase, hashedToken, leadId);
+  }
+  return { basis, profile };
+}
+
+function mergeBasisIntoContext(context, basis) {
+  if (!context?.selected_lead || !basis?.lead) return context;
+  const contacts = basis.contacts ?? [];
+  const contactsById = new Map(contacts.map((contact) => [contact.id, contact]));
+  return {
+    ...context,
+    selected_lead: {
+      ...context.selected_lead,
+      ...basis.lead,
+      contacts,
+      report: basis.report,
+    },
+    messages: (context.messages ?? []).map((message) => ({
+      ...message,
+      ...(contactsById.get(message.contact_id) ?? {}),
+    })),
+  };
 }
 
 function mapDatabaseError(error) {
@@ -226,8 +314,15 @@ export async function POST(request) {
       );
     }
 
-    const lead = context.selected_lead;
-    const contact = lead?.contacts?.find((item) => item.id === contactId);
+    let prepared;
+    try {
+      prepared = await ensureExtensionBasis(supabase, hashedToken, leadId);
+    } catch (basisError) {
+      const mapped = mapDatabaseError(basisError);
+      return json(request, { code: mapped.code, error: mapped.error }, mapped.status);
+    }
+    const lead = prepared.basis?.lead;
+    const contact = prepared.basis?.contacts?.find((item) => item.id === contactId);
     if (!lead || !contact) {
       return json(
         request,
@@ -248,16 +343,18 @@ export async function POST(request) {
       );
     }
 
-    const profile = lead.website_url
-      ? await discoverPublicBusinessProfile(lead.website_url, lead.company_name)
-      : {
-          officialWebsite: false,
-          hasClearCta: null,
-          hasOnlineBooking: null,
-          seoStatus: 'unknown',
-          sourceUrls: [],
-        };
-    const opportunity = opportunityFromAutomaticProfile(lead, profile);
+    const profile = prepared.profile;
+    const report = prepared.basis.report;
+    const painPoints = Array.isArray(report?.pain_points) ? report.pain_points : [];
+    const reportOpportunity = painPoints.find((point) =>
+      point && typeof point.service_opportunity === 'string' &&
+      point.service_opportunity.trim(),
+    )?.service_opportunity;
+    const opportunity = reportOpportunity ||
+      opportunityFromAutomaticProfile(lead, profile);
+    const previousMessages = (prepared.basis.recent_messages ?? [])
+      .filter((message) => message.platform === platform)
+      .map((message) => message.content);
     const draft = await generateGroundedOutreachDraft({
       platform,
       tone,
@@ -265,12 +362,10 @@ export async function POST(request) {
       lead,
       contact,
       opportunity,
-      researchSummary: {
-        offerings: profile.description || lead.industry || 'Public business profile',
-        evidence_notes: profile.officialWebsite
-          ? 'Generated from the verified public website and stored contact destinations.'
-          : 'Generated from the reviewed lead profile without asserting unverified performance facts.',
-      },
+      executiveSummary: report?.research_summary ?? {},
+      detailedAnalysis: painPoints,
+      sourceUrls: report?.source_urls ?? [],
+      avoidMessages: previousMessages,
     });
     return json(request, {
       data: {
@@ -278,7 +373,10 @@ export async function POST(request) {
         opportunity,
         analysis: {
           officialWebsite: Boolean(profile.officialWebsite),
-          availableSources: profile.sourceUrls?.length ?? 0,
+          availableSources: report?.source_urls?.length ?? profile.sourceUrls?.length ?? 0,
+          reportId: report?.id ?? null,
+          reportConfidence: report?.confidence ?? null,
+          groundedInBothReports: Boolean(report),
           unknownsPreserved: true,
         },
       },
@@ -349,6 +447,21 @@ export async function POST(request) {
       { code: mapped.code, error: mapped.error },
       mapped.status,
     );
+  }
+
+  if (body.action === 'context' && data?.selected_lead?.id) {
+    try {
+      const prepared = await ensureExtensionBasis(
+        supabase,
+        hashedToken,
+        data.selected_lead.id,
+      );
+      return json(request, {
+        data: mergeBasisIntoContext(data, prepared.basis),
+      });
+    } catch (basisError) {
+      console.error('Browser companion enrichment failed:', basisError?.message);
+    }
   }
 
   return json(request, { data });

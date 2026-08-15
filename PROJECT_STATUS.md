@@ -1,12 +1,12 @@
 # Coldingrod Project Status
 
-Last verified: 2026-08-15
+Last verified: 2026-08-16
 
 Primary implementation workspace: `C:\Users\SANSKAR\COLDINGROD IMPLEMENTATION\coldingrod`
 
 ## Current phase
 
-Phases 1–5 of the agreed roadmap are complete. The linked Supabase database is current through migration `20260815161929_automatic_lead_intelligence.sql`, 19 rollback-only hosted acceptance suites are present, and the automatic lead-intelligence release is implemented and locally verified.
+Phases 1–5 of the agreed roadmap are complete. The linked Supabase database is current through migration `20260815185515_report_grounded_outreach_channels.sql`, 20 rollback-only hosted acceptance suites are present, and the report-grounded outreach/channel-enrichment release is implemented and verified.
 
 All eight Phase 3 production agents are transparent and deterministic. Lead import and outreach can now collect public business evidence, enrich available contact channels, qualify the lead, produce both reports, and suggest channel-native copy without asking the user to complete a manual qualification form. The agents preserve unknowns, require human selection before lead creation, and do not require an external AI-provider key.
 
@@ -28,6 +28,15 @@ All eight Phase 3 production agents are transparent and deterministic. Lead impo
 | Full currently discussed product plan | 100% | 0% |
 
 GitHub, Vercel, and Supabase are connected. Google email/password and Google OAuth are active, and the production OAuth chain reaches Google successfully. `GOOGLE_PLACES_API_KEY` is configured in Vercel for Production and Preview; it is intentionally absent from the local `.env.local` unless local Places testing is needed.
+
+## 2026-08-16 report-grounded message variety and channel aggregation
+
+- Replaced the single generic fallback sentence with a variation-aware, platform-native writer that changes structure, opening, finding, and subject while avoiding recent drafts for the same lead/channel.
+- Every suggestion now uses the latest Executive Summary plus the complete Detailed Analysis. The optional OpenAI path receives the same evidence and explicit prior-draft avoidance; the no-key writer remains fully functional and report-grounded.
+- Contact enrichment now aggregates the stored lead, imported discovery record, existing contacts, verified website, linked contact/about pages, structured business data, visible phone/email text, WhatsApp links, and public social destinations.
+- Outreach selectors automatically choose the first verified channel/contact and clearly label unavailable channels instead of opening on an empty email selection.
+- Upgraded the browser companion to version 0.5.0. Its paired-token boundary can securely create missing reports, refresh independently verified contact destinations, and retrieve both reports plus recent messages without a service-role key.
+- Applied migration `20260815185515_report_grounded_outreach_channels.sql`. Phase 3.4 and Phase 5.4, 5.8, 5.9, and 5.10 rollback-only suites pass; linked schema lint reports no errors.
 
 ## 2026-08-15 automatic lead intelligence and extension copilot
 
@@ -165,8 +174,8 @@ GitHub, Vercel, and Supabase are connected. Google email/password and Google OAu
 - A clean production dependency audit with zero known vulnerabilities.
 ## Hosted database verification
 
-- Local and remote migration histories match through `20260815161929_automatic_lead_intelligence.sql`.
-- Nineteen rollback-only acceptance suites cover Phase 2.8, 2.9, 2.10, Phase 3.1–3.6, Phase 4.1, and Phase 5.1–5.9. The eight suites affected by this release pass against the linked database; the previously verified suites are unchanged.
+- Local and remote migration histories match through `20260815185515_report_grounded_outreach_channels.sql`.
+- Twenty rollback-only acceptance suites cover Phase 2.8, 2.9, 2.10, Phase 3.1–3.6, Phase 4.1, and Phase 5.1–5.10. The five suites affected by this release pass against the linked database; the previously verified suites are unchanged.
 - Phase 2.8 authorization, Phase 2.9 asset, and Phase 2.10 notification regression suites still pass.
 - Acceptance coverage includes authentication, dual permissions, workspace and lead/run isolation, agent scoping, strict input allowlisting, deterministic scoring, duplicate traceability, atomic human-approved import, research prerequisites, source validation, pain-point mapping, grounded outreach, exact approval snapshots, atomic approval/rejection, audit suppression, activity delivery, and notification delivery.
 - Direct authenticated writes to lead scores, discovery tables, and research reports are denied; trusted RPCs own scoring, discovery, research, personalization, and review transitions.
@@ -194,7 +203,7 @@ GitHub, Vercel, and Supabase are connected. Google email/password and Google OAu
 - Full-repository `npm run check` passes: TypeScript, ESLint, and the Next.js production build.
 - The personal profile UI and new browser companion use JavaScript where safe, limiting new TypeScript to existing typed routing and layout contracts.
 - `npm audit --omit=dev` reports zero production vulnerabilities.
-- Supabase schema lint reports no issues after migration `20260815161929`. The prior performance-advisor and security-advisor review remains unchanged: only the intentional authenticated RPC boundaries plus the owner-configurable leaked-password setting were reported.
+- Supabase schema lint reports no issues after migration `20260815185515`. The prior performance-advisor and security-advisor review remains unchanged: only the intentional authenticated RPC boundaries plus the owner-configurable leaked-password setting were reported.
 - The signed-in dashboard, Terms, Privacy, and health endpoint render on localhost with no browser errors; unauthenticated dashboard requests redirect to login.
 - Security headers are present on public, authenticated, redirect, and health responses.
 
