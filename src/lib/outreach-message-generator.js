@@ -31,28 +31,100 @@ const OPT_OUTS = {
 
 const GOAL_COPY = {
   book_call: {
-    email: 'Would a short 15-minute conversation next week be useful?',
-    linkedin: 'Open to a quick 15-minute chat next week?',
-    whatsapp: 'Would a quick 15-minute chat next week be useful?',
-    instagram: 'Open to a quick 15-minute chat next week?',
-    facebook: 'Open to a quick 15-minute chat next week?',
-    sms: 'Open to a 15-min chat next week?',
+    email: [
+      'Would a short 15-minute conversation next week be useful?',
+      'Is a quick 15-minute call worth exploring next week?',
+      'Would you be open to comparing notes for 15 minutes?',
+    ],
+    linkedin: [
+      'Open to a quick 15-minute chat next week?',
+      'Would a brief call be useful to compare ideas?',
+      'Is this worth a 15-minute conversation?',
+    ],
+    whatsapp: [
+      'Would a quick 15-minute chat next week be useful?',
+      'Would you be open to a short call about it?',
+      'Is a brief 15-minute conversation worth trying?',
+    ],
+    instagram: [
+      'Open to a quick 15-minute chat next week?',
+      'Would a brief call be useful?',
+      'Worth a quick 15-minute conversation?',
+    ],
+    facebook: [
+      'Open to a quick 15-minute chat next week?',
+      'Would a brief call be useful?',
+      'Is this worth a 15-minute conversation?',
+    ],
+    sms: [
+      'Open to a 15-min chat next week?',
+      'Worth a brief call?',
+      'Could we compare notes for 15 mins?',
+    ],
   },
   offer_audit: {
-    email: 'I can share a concise audit with a few practical next steps if that would help.',
-    linkedin: 'Happy to share a short audit with a few practical next steps — useful?',
-    whatsapp: 'I can send a short audit with a few practical next steps if useful.',
-    instagram: 'Want me to send a quick audit with a few practical next steps?',
-    facebook: 'Want me to send a quick audit with a few practical next steps?',
-    sms: 'Want a short audit with practical next steps?',
+    email: [
+      'I can share a concise audit with a few practical next steps if that would help.',
+      'Would a one-page audit of the opportunity be useful?',
+      'I can send the short review I prepared, with no meeting required.',
+    ],
+    linkedin: [
+      'Happy to share a short audit with a few practical next steps - useful?',
+      'Would you like the one-page audit behind this observation?',
+      'I can send the concise review if it would be helpful.',
+    ],
+    whatsapp: [
+      'I can send a short audit with a few practical next steps if useful.',
+      'Want the one-page review behind this idea?',
+      'Should I share the quick audit I prepared?',
+    ],
+    instagram: [
+      'Want me to send a quick audit with a few practical next steps?',
+      'Would the one-page review be useful?',
+      'Should I send the short audit behind this?',
+    ],
+    facebook: [
+      'Want me to send a quick audit with a few practical next steps?',
+      'Would the one-page review be useful?',
+      'Should I share the short audit?',
+    ],
+    sms: [
+      'Want a short audit with practical next steps?',
+      'Should I send the one-page review?',
+      'Would a quick audit help?',
+    ],
   },
   share_idea: {
-    email: 'Would it be helpful if I sent over one concrete idea?',
-    linkedin: 'Would it help if I shared one concrete idea?',
-    whatsapp: 'Want me to send one concrete idea?',
-    instagram: 'Want me to send one practical idea?',
-    facebook: 'Want me to send one practical idea?',
-    sms: 'Want me to send one practical idea?',
+    email: [
+      'Would it be helpful if I sent over one concrete idea?',
+      'May I share the practical idea that came out of the review?',
+      'Would you like a concise example of how this could work?',
+    ],
+    linkedin: [
+      'Would it help if I shared one concrete idea?',
+      'May I send the practical idea that came from the review?',
+      'Would a concise example be useful?',
+    ],
+    whatsapp: [
+      'Want me to send one concrete idea?',
+      'Should I share the practical idea I mapped out?',
+      'Would a quick example be useful?',
+    ],
+    instagram: [
+      'Want me to send one practical idea?',
+      'Should I share the quick idea?',
+      'Would a short example help?',
+    ],
+    facebook: [
+      'Want me to send one practical idea?',
+      'Should I share the quick idea?',
+      'Would a short example help?',
+    ],
+    sms: [
+      'Want me to send one practical idea?',
+      'Should I share the quick idea?',
+      'Would a short example help?',
+    ],
   },
 };
 
@@ -154,6 +226,13 @@ function pick(values, variant, offset = 0) {
   return values[(variant + offset) % values.length];
 }
 
+function callToAction(goal, platform, variant) {
+  const choices = GOAL_COPY[goal]?.[platform] ?? GOAL_COPY.share_idea[platform];
+  // Use a different slice of the hash than the opening template. This avoids
+  // locking one opening to one CTA and materially expands the unique combinations.
+  return pick(choices, Math.floor(variant / 17), 5);
+}
+
 function fallbackDraft(input) {
   const { platform, tone, goal, lead, contact } = input;
   const firstName = clean(contact.first_name, 80) || 'there';
@@ -165,7 +244,7 @@ function fallbackDraft(input) {
   const basis = researchBasis(input, variant);
   const insight = sentence(basis.insight, platform === 'sms' ? 80 : 190);
   const idea = sentence(basis.opportunity, platform === 'sms' ? 70 : 150).toLowerCase();
-  const cta = GOAL_COPY[goal]?.[platform] ?? GOAL_COPY.share_idea[platform];
+  const cta = callToAction(goal, platform, variant);
   const warmStart = tone === 'warm';
   let subject = null;
   let content;
@@ -176,6 +255,9 @@ function fallbackDraft(input) {
         `Hi ${firstName} — I reviewed ${company}'s public profile and one detail stood out: ${insight}. I have a focused idea around ${idea}. ${cta}`,
         `Hi ${firstName}${warmStart ? ' — hope your week is going well.' : '.'} The lead analysis for ${company} highlighted ${lowerFirst(insight)}. It points to a practical opportunity around ${idea}. ${cta}`,
         `Hi ${firstName} — while looking at ${company}, I focused on ${basis.context}. The detailed review surfaced ${lowerFirst(insight)}. ${cta}`,
+        `${firstName}, a quick observation from the research on ${company}: ${insight}. The clearest next step appears to be ${idea}. ${cta}`,
+        `Hello ${firstName} — ${basis.reportFinding} came through clearly in ${company}'s review, especially ${lowerFirst(insight)}. ${cta}`,
+        `Hi ${firstName}. I compared ${company}'s executive summary with the detailed findings and noticed ${lowerFirst(insight)}. ${cta}`,
       ], variant) + `\n\n${optOutFor(platform)}`;
       break;
     case 'whatsapp':
@@ -183,6 +265,9 @@ function fallbackDraft(input) {
         `Hi ${firstName}${warmStart ? ' 👋' : ','} I took a look at ${company}. One thing the analysis picked up was ${lowerFirst(insight)}. I have a practical idea around ${idea}. ${cta}`,
         `Hi ${firstName}, I was reviewing ${company} and noticed ${lowerFirst(insight)}. It may be worth exploring ${idea}. ${cta}`,
         `Hi ${firstName}${warmStart ? '!' : ','} Quick note after looking through ${company}'s public presence: ${insight}. ${cta}`,
+        `${firstName}, quick observation from ${company}'s research: ${insight}. The strongest opportunity looks like ${idea}. ${cta}`,
+        `Hello ${firstName} - I compared the summary and detailed review for ${company}. ${insight} stood out. ${cta}`,
+        `Hi ${firstName}. The analysis of ${company} points to ${lowerFirst(insight)}. I mapped one practical next step around ${idea}. ${cta}`,
       ], variant) + `\n\n${optOutFor(platform)}`;
       break;
     case 'instagram':
@@ -191,6 +276,9 @@ function fallbackDraft(input) {
         `Hi ${firstName}${warmStart ? '! 👋' : '!'} I came across ${company} and noticed ${lowerFirst(insight)}. I have one idea around ${idea}. ${cta}`,
         `Hey ${firstName} — I was looking through ${company}'s public profile. The review highlighted ${lowerFirst(insight)}. ${cta}`,
         `Hi ${firstName}! A quick observation from ${company}'s analysis: ${insight}. There may be a useful next step around ${idea}. ${cta}`,
+        `${firstName}, one detail from ${company}'s public presence caught my attention: ${insight}. ${cta}`,
+        `Hello ${firstName}! I compared ${company}'s summary with the deeper review and noticed ${lowerFirst(insight)}. ${cta}`,
+        `Hi ${firstName} - the clearest opportunity in ${company}'s analysis is around ${idea}. It is grounded in this finding: ${insight}. ${cta}`,
       ], variant) + `\n\n${optOutFor(platform)}`;
       break;
     case 'sms':
@@ -198,6 +286,9 @@ function fallbackDraft(input) {
         `Hi ${firstName}—reviewed ${company} and noticed ${lowerFirst(insight)}. ${cta} ${optOutFor(platform)}`,
         `Hi ${firstName}—quick idea for ${company} around ${idea}. ${cta} ${optOutFor(platform)}`,
         `Hi ${firstName}—${basis.reportFinding} stood out in ${company}'s review. ${cta} ${optOutFor(platform)}`,
+        `${firstName}—the ${company} analysis highlighted ${lowerFirst(insight)}. ${cta} ${optOutFor(platform)}`,
+        `Hello ${firstName}—I mapped a practical next step for ${company}: ${idea}. ${cta} ${optOutFor(platform)}`,
+        `Hi ${firstName}—one evidence-backed idea for ${company} came from ${lowerFirst(insight)}. ${cta} ${optOutFor(platform)}`,
       ], variant);
       break;
     default:
@@ -212,6 +303,9 @@ function fallbackDraft(input) {
           `I reviewed both the executive summary and detailed analysis for ${company}. One verified detail stood out: ${insight}. That suggests a focused opportunity around ${idea}.`,
           `While looking through ${company}'s public presence, I focused on ${basis.context}. The detailed review highlighted ${lowerFirst(insight)}, so I sketched a practical idea around ${idea}.`,
           `The research summary for ${company} shows ${basis.context}. The deeper analysis also surfaced ${lowerFirst(insight)}. There may be a useful next step around ${idea}.`,
+          `I compared the executive summary with the detailed findings for ${company}. The strongest signal was ${lowerFirst(insight)}. A practical response could focus on ${idea}.`,
+          `A recent review of ${company}'s public journey surfaced ${lowerFirst(insight)}. That evidence points most clearly to ${idea}.`,
+          `The ${basis.reportFinding} finding in ${company}'s analysis caught my attention: ${insight}. I mapped a focused next step around ${idea}.`,
         ], variant),
         cta,
         optOutFor(platform),
@@ -222,7 +316,7 @@ function fallbackDraft(input) {
   return {
     subject,
     content: truncateWithOptOut(content, platform),
-    generator: 'report-grounded-platform-writer-v3',
+    generator: 'report-grounded-platform-writer-v4',
   };
 }
 
@@ -247,23 +341,58 @@ function normalizedDraft(value) {
   return cleanContent(value, 10_000).toLowerCase();
 }
 
-function distinctFallback(input) {
-  const previous = new Set(
-    (input.avoidMessages ?? []).map(normalizedDraft).filter(Boolean),
+function wordSet(value) {
+  return new Set(
+    normalizedDraft(value)
+      .replace(/https?:\/\/\S+/g, ' ')
+      .replace(/[^a-z0-9]+/g, ' ')
+      .split(/\s+/)
+      .filter((word) => word.length > 2),
   );
-  let candidate = fallbackDraft({
-    ...input,
-    variationKey: `${input.variationKey}:0`,
-  });
-  if (!previous.has(normalizedDraft(candidate.content))) return candidate;
-  for (let attempt = 1; attempt < 8; attempt += 1) {
-    candidate = fallbackDraft({
+}
+
+function similarity(left, right) {
+  const leftWords = wordSet(left);
+  const rightWords = wordSet(right);
+  if (!leftWords.size || !rightWords.size) return 0;
+  let intersection = 0;
+  for (const word of leftWords) {
+    if (rightWords.has(word)) intersection += 1;
+  }
+  return intersection / (leftWords.size + rightWords.size - intersection);
+}
+
+function maximumSimilarity(content, previous) {
+  return previous.reduce(
+    (maximum, prior) => Math.max(maximum, similarity(content, prior)),
+    0,
+  );
+}
+
+function distinctFallback(input) {
+  const previous = (input.avoidMessages ?? []).filter(Boolean).slice(0, 25);
+  const normalizedPrevious = new Set(previous.map(normalizedDraft));
+  let best = null;
+  let bestSimilarity = Number.POSITIVE_INFINITY;
+
+  for (let attempt = 0; attempt < 36; attempt += 1) {
+    const candidate = fallbackDraft({
       ...input,
       variationKey: `${input.variationKey}:${attempt}`,
     });
-    if (!previous.has(normalizedDraft(candidate.content))) return candidate;
+    const candidateSimilarity = maximumSimilarity(candidate.content, previous);
+    if (
+      !normalizedPrevious.has(normalizedDraft(candidate.content)) &&
+      candidateSimilarity < 0.64
+    ) {
+      return candidate;
+    }
+    if (candidateSimilarity < bestSimilarity) {
+      best = candidate;
+      bestSimilarity = candidateSimilarity;
+    }
   }
-  return candidate;
+  return best ?? fallbackDraft(input);
 }
 
 export async function generateGroundedOutreachDraft(input) {
@@ -299,7 +428,7 @@ export async function generateGroundedOutreachDraft(input) {
         detailed_analysis: input.detailedAnalysis,
         source_urls: input.sourceUrls,
       },
-      previous_drafts_to_avoid: (input.avoidMessages ?? []).slice(0, 5),
+      previous_drafts_to_avoid: (input.avoidMessages ?? []).slice(0, 20),
       variation_key: normalizedInput.variationKey,
       rules: [
         'Do not invent familiarity, private facts, performance claims, results, or customer details.',
@@ -355,10 +484,12 @@ export async function generateGroundedOutreachDraft(input) {
     const parsed = parseJsonText(extractResponseText(payload));
     const content = cleanContent(parsed.content, limitFor(platform));
     if (!content) return fallback;
-    const previous = new Set(
-      (input.avoidMessages ?? []).map(normalizedDraft).filter(Boolean),
-    );
-    if (previous.has(normalizedDraft(content))) return fallback;
+    const previous = (input.avoidMessages ?? []).filter(Boolean).slice(0, 25);
+    const normalizedPrevious = new Set(previous.map(normalizedDraft));
+    if (
+      normalizedPrevious.has(normalizedDraft(content)) ||
+      maximumSimilarity(content, previous) >= 0.72
+    ) return fallback;
 
     return {
       subject: platform === 'email' ? clean(parsed.subject || fallback.subject, 160) : null,

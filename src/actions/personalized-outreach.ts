@@ -121,7 +121,7 @@ export async function generatePersonalizedOutreachAction(
         .eq('platform', value.platform)
         .is('deleted_at', null)
         .order('created_at', { ascending: false })
-        .limit(5),
+        .limit(25),
     ]);
     contact = refreshedContact ?? initialContact;
     recentMessages = previousMessages ?? [];
@@ -240,4 +240,87 @@ export async function generatePersonalizedOutreachAction(
     personalizationActionId: result.personalization_action_id,
     complianceActionId: result.compliance_action_id,
   };
+}
+
+export async function suggestMorePersonalizedOutreachAction(
+  value: unknown,
+): Promise<GeneratePersonalizedOutreachResult> {
+  if (
+    !isRecord(value) ||
+    typeof value.workspaceSlug !== 'string' ||
+    typeof value.messageId !== 'string' ||
+    value.workspaceSlug.trim().length === 0 ||
+    value.workspaceSlug.trim().length > 120 ||
+    !UUID_PATTERN.test(value.messageId)
+  ) {
+    return {
+      success: false,
+      code: 'INVALID_INPUT',
+      error: 'The message selection is invalid.',
+    };
+  }
+
+  const workspaceSlug = value.workspaceSlug.trim();
+  const context = await getWorkspaceContext(workspaceSlug);
+  if (
+    !context ||
+    !context.permissions.includes('manage_ai') ||
+    !context.permissions.includes('manage_leads')
+  ) {
+    return {
+      success: false,
+      code: 'UNAUTHORIZED',
+      error: 'AI and lead management permissions are required.',
+    };
+  }
+
+  const supabase = await createClient();
+  const { data: sourceMessage, error } = await supabase
+    .from('outreach_messages')
+    .select(`
+      id, lead_id, contact_id, platform, status, ai_action_id, deleted_at,
+      ai_action:ai_actions!outreach_messages_ai_action_id_fkey(payload)
+    `)
+    .eq('id', value.messageId)
+    .eq('workspace_id', context.workspace.id)
+    .maybeSingle();
+
+  if (error || !sourceMessage || sourceMessage.deleted_at) {
+    return {
+      success: false,
+      code: 'NOT_READY',
+      error: 'The source message is no longer available.',
+    };
+  }
+  if (
+    !sourceMessage.ai_action_id ||
+    !sourceMessage.contact_id ||
+    !['draft', 'pending_approval'].includes(sourceMessage.status)
+  ) {
+    return {
+      success: false,
+      code: 'NOT_READY',
+      error: 'Suggest more is available for editable AI drafts before approval.',
+    };
+  }
+
+  const actionRelation = Array.isArray(sourceMessage.ai_action)
+    ? sourceMessage.ai_action[0]
+    : sourceMessage.ai_action;
+  const payload = isRecord(actionRelation?.payload) ? actionRelation.payload : {};
+  const tone = typeof payload.tone === 'string' && TONES.includes(payload.tone)
+    ? payload.tone
+    : 'consultative';
+  const goal = typeof payload.goal === 'string' && GOALS.includes(payload.goal)
+    ? payload.goal
+    : 'offer_audit';
+
+  return generatePersonalizedOutreachAction({
+    workspaceSlug,
+    leadId: sourceMessage.lead_id,
+    contactId: sourceMessage.contact_id,
+    platform: sourceMessage.platform,
+    tone,
+    goal,
+  });
 }

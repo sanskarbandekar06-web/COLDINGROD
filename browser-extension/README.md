@@ -10,6 +10,8 @@ A Chrome/Edge Manifest V3 side-panel extension for page-aware lead context and h
 - Analyzes available public lead evidence and suggests channel-native Email,
   LinkedIn, WhatsApp, Instagram, or SMS copy directly in the side panel.
 - Keeps every AI suggestion editable before it becomes a versioned draft.
+- Offers **Suggest a different draft** and includes the unsaved suggestion in
+  the no-repeat check before generating the next option.
 - Creates versioned outreach drafts that always enter `pending_approval`.
 - Builds each suggestion from the lead's Executive Summary and Detailed Analysis and avoids repeating recent drafts.
 - Refreshes independently verified website/contact-page channels before presenting Email, WhatsApp, SMS, LinkedIn, or Instagram.

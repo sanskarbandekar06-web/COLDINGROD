@@ -25,6 +25,7 @@ import { Input } from '@/components/ui/input';
 import { Pencil } from 'lucide-react';
 import { updateMessageContentAction } from '@/actions/outreach';
 import { toast } from 'sonner';
+import { SuggestMoreButton } from './SuggestMoreButton';
 
 interface EditMessageDialogProps {
   workspaceSlug: string;
@@ -36,6 +37,7 @@ interface EditMessageDialogProps {
   defaultOpen?: boolean;
   canEdit: boolean;
   editBlockedReason?: string;
+  canSuggestMore?: boolean;
 }
 
 export function EditMessageDialog({
@@ -48,6 +50,7 @@ export function EditMessageDialog({
   defaultOpen = false,
   canEdit,
   editBlockedReason,
+  canSuggestMore = false,
 }: EditMessageDialogProps) {
   const [open, setOpen] = useState(defaultOpen);
   const [isPending, startTransition] = useTransition();
@@ -144,7 +147,11 @@ export function EditMessageDialog({
             />
           </div>
 
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex flex-col-reverse justify-between gap-2 pt-2 sm:flex-row">
+            {canSuggestMore ? (
+              <SuggestMoreButton workspaceSlug={workspaceSlug} messageId={messageId} />
+            ) : <span />}
+            <div className="flex justify-end gap-2">
             <Button
               type="button"
               variant="ghost"
@@ -162,6 +169,7 @@ export function EditMessageDialog({
             >
               {isPending ? 'Saving…' : 'Save version'}
             </Button>
+            </div>
           </div>
         </form>
       </DialogContent>

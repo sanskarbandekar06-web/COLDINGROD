@@ -355,6 +355,9 @@ export async function POST(request) {
     const previousMessages = (prepared.basis.recent_messages ?? [])
       .filter((message) => message.platform === platform)
       .map((message) => message.content);
+    const currentDraft = typeof body.currentDraft === 'string'
+      ? body.currentDraft.trim().slice(0, 10_000)
+      : '';
     const draft = await generateGroundedOutreachDraft({
       platform,
       tone,
@@ -365,7 +368,7 @@ export async function POST(request) {
       executiveSummary: report?.research_summary ?? {},
       detailedAnalysis: painPoints,
       sourceUrls: report?.source_urls ?? [],
-      avoidMessages: previousMessages,
+      avoidMessages: [currentDraft, ...previousMessages].filter(Boolean),
     });
     return json(request, {
       data: {

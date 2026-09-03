@@ -112,6 +112,7 @@ export function CompanionDeliveryPanel({
   const [pending, startTransition] = useTransition();
   const [extension, setExtension] = useState({ detected: false, paired: false });
   const [prepared, setPrepared] = useState(false);
+  const [companionPending, setCompanionPending] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const destination = useMemo(() => destinationFor(message, contact), [message, contact]);
   const providerLabel = openProviderLabel(message.platform);
@@ -123,32 +124,51 @@ export function CompanionDeliveryPanel({
       .catch(() => setExtension({ detected: false, paired: false }));
   }, []);
 
-  async function prepare() {
+  function openFromWeb() {
     if (!destination) {
       toast.error('This contact has no usable destination for the selected channel.');
       return;
     }
 
+    // This must happen directly inside the click event. Waiting for clipboard or
+    // extension work first causes browsers to block the provider as a pop-up.
+    const providerWindow = window.open(destination, '_blank');
+    if (/^https?:/i.test(destination)) {
+      if (!providerWindow) {
+        toast.error('Your browser blocked the provider tab. Allow pop-ups for Coldingrod and try again.');
+        return;
+      }
+      providerWindow.opener = null;
+    } else if (providerWindow) {
+      providerWindow.opener = null;
+    }
+
+    setPrepared(true);
+    void copyText(message.content)
+      .then(() => toast.success(
+        ['linkedin', 'instagram', 'facebook'].includes(message.platform)
+          ? 'Provider opened and the approved message was copied for pasting.'
+          : 'Provider opened with the approved message ready. Complete the final send there.',
+      ))
+      .catch(() => toast.info('Provider opened. Copy the approved message manually if it was not prefilled.'));
+  }
+
+  async function openWithCompanion() {
+    if (!destination || !extension.paired) return;
+    setCompanionPending(true);
     try {
       await copyText(message.content);
-      let openedByCompanion = false;
-      try {
-        await bridgeRequest('open_delivery', {
-          platform: message.platform,
-          destination,
-        });
-        openedByCompanion = true;
-      } catch {
-        window.open(destination, '_blank', 'noopener,noreferrer');
-      }
+      await bridgeRequest('open_delivery', {
+        platform: message.platform,
+        destination,
+      });
       setPrepared(true);
-      toast.success(
-        openedByCompanion
-          ? 'Companion prepared the provider in a background tab and copied the approved text.'
-          : 'Provider opened and approved text copied. Pair the Companion for background handoff.',
-      );
+      toast.success('Browser Companion opened the provider and copied the approved text.');
     } catch {
-      toast.error('The provider could not be opened. Allow pop-ups or reload the Companion extension.');
+      setExtension((current) => ({ ...current, paired: false }));
+      toast.error('The Companion did not respond. Use the web-app button or reconnect the extension.');
+    } finally {
+      setCompanionPending(false);
     }
   }
 
@@ -189,13 +209,13 @@ export function CompanionDeliveryPanel({
         <PlugZap className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="font-medium">Coldingrod Browser Companion</p>
+            <p className="font-medium">Optional Browser Companion</p>
             <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${extension.detected && extension.paired ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200' : 'bg-muted text-muted-foreground'}`}>
               {extension.detected ? (extension.paired ? 'Connected' : 'Pairing required') : 'Not detected'}
             </span>
           </div>
           <p className="mt-1 text-sm text-muted-foreground">
-            Email, WhatsApp, and SMS open with approved copy prefilled. LinkedIn and Instagram open the contact profile with the message copied for pasting.
+            Web delivery works without the extension. The Companion is an optional shortcut for opening the provider from its side panel.
           </p>
           {!extension.paired && (
             <Link href={`/dashboard/${workspaceSlug}/settings/browser-extension`} className="mt-2 inline-block text-sm font-medium text-primary hover:underline">
@@ -208,15 +228,29 @@ export function CompanionDeliveryPanel({
       {!isReady ? (
         <p className="text-sm text-muted-foreground">Complete the readiness checks and approve this message before delivery.</p>
       ) : (
-        <div className="flex flex-wrap gap-2">
-          <Button onClick={prepare} disabled={!destination || pending}>
+        <div className="space-y-3">
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 text-sm">
+            <p className="font-medium">Send from the web app</p>
+            <p className="mt-1 text-muted-foreground">
+              Coldingrod keeps this page open and launches the verified destination. WhatsApp, email, and SMS are prefilled; social messages are copied for pasting.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+          <Button onClick={openFromWeb} disabled={!destination || pending}>
             {prepared ? <CopyCheck className="size-4" aria-hidden="true" /> : <ExternalLink className="size-4" aria-hidden="true" />}
             {prepared ? `${providerLabel} again` : providerLabel}
           </Button>
+          {extension.paired && (
+            <Button variant="outline" onClick={openWithCompanion} disabled={!destination || pending || companionPending}>
+              {companionPending ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : <PlugZap className="size-4" aria-hidden="true" />}
+              {companionPending ? 'Opening…' : 'Use Companion'}
+            </Button>
+          )}
           <Button variant="outline" onClick={() => setConfirmOpen(true)} disabled={!prepared || pending}>
             <Send className="size-4" aria-hidden="true" />
             I sent it — confirm delivery
           </Button>
+          </div>
         </div>
       )}
 

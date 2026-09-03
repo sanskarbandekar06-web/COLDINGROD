@@ -1,6 +1,6 @@
 # Coldingrod Project Status
 
-Last verified: 2026-08-16
+Last verified: 2026-09-03
 
 Primary implementation workspace: `C:\Users\SANSKAR\COLDINGROD IMPLEMENTATION\coldingrod`
 
@@ -28,6 +28,15 @@ All eight Phase 3 production agents are transparent and deterministic. Lead impo
 | Full currently discussed product plan | 100% | 0% |
 
 GitHub, Vercel, and Supabase are connected. Google email/password and Google OAuth are active, and the production OAuth chain reaches Google successfully. `GOOGLE_PLACES_API_KEY` is configured in Vercel for Production and Preview; it is intentionally absent from the local `.env.local` unless local Places testing is needed.
+
+## 2026-09-03 web delivery, non-repeating drafts, and lead dossier export
+
+- Separated direct web delivery from the optional Browser Companion. Approved WhatsApp, email, and SMS destinations now open synchronously from the click so browser pop-up protection does not block them; LinkedIn, Instagram, and Facebook open with the approved copy placed on the clipboard.
+- Added **Suggest more** to both the message review page and its editable review dialog. New options preserve the original draft and approval audit trail.
+- Expanded the report-grounded writer to vary openings, structure, evidence angle, subject, and call to action. It rejects exact or highly similar recent copy against up to 25 same-lead/channel drafts.
+- Updated Browser Companion 0.6.0 so repeated suggestions include the current unsaved draft in the no-repeat set and clearly switch to **Suggest a different draft**.
+- Added multi-select lead export and a permission-checked Word endpoint. One shareable `.docx` now contains each selected lead's verified website, phone, WhatsApp, email, LinkedIn, Instagram, Facebook, Google Maps/Place ID, qualification score, Executive Summary, Detailed Analysis, and evidence sources with clickable hyperlinks.
+- Verified 12 consecutive deterministic fallback suggestions were all unique and client-specific. TypeScript, ESLint, the production Next.js build, route/authentication smoke checks, DOCX package/hyperlink/table-geometry checks, and the production dependency audit pass.
 
 ## 2026-08-16 approval-to-delivery handoff repair
 

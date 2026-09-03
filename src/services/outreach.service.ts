@@ -34,6 +34,7 @@ export interface OutreachMessageRow extends OutreachMessage {
     id: string;
     action_type: string;
     status: string;
+    payload?: Record<string, unknown> | null;
     agent: { name: string } | null;
   } | null;
 }
@@ -174,7 +175,7 @@ export const getOutreachMessageDetail = cache(
           job_title, is_primary
         ),
         ai_action:ai_actions!outreach_messages_ai_action_id_fkey(
-          id, action_type, status, priority, created_at,
+          id, action_type, status, priority, created_at, payload,
           agent:ai_agents!ai_actions_agent_id_fkey(id, name, description)
         )
       `

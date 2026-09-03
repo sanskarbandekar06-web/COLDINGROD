@@ -77,6 +77,7 @@ export default async function LeadsPage(props: {
             currentPage={leadsData.page} 
             workspaceId={context.workspace.id}
             workspaceSlug={params.workspaceSlug}
+            canExport={context.permissions.includes('manage_leads')}
           />
         </TabsContent>
         

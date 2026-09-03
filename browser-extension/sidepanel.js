@@ -44,6 +44,7 @@ const state = {
   context: null,
   selectedContactId: '',
   preparedMessageIds: new Set(),
+  hasSuggestedDraft: false,
 };
 
 const ALLOWED_APP_URLS = new Set([
@@ -236,6 +237,8 @@ function renderContacts() {
 function clearComposeDraft() {
   elements.subjectInput.value = '';
   elements.messageInput.value = '';
+  state.hasSuggestedDraft = false;
+  elements.suggestButton.textContent = '✦ Analyze lead and suggest draft';
   elements.draftSource.textContent =
     'Suggestions use the lead’s Executive Summary and Detailed Analysis. Unknown facts stay unknown.';
 }
@@ -669,8 +672,10 @@ async function suggestDraft() {
   setButtonBusy(
     elements.suggestButton,
     true,
-    'Analyzing public evidence…',
-    '✦ Analyze lead and suggest draft',
+    state.hasSuggestedDraft ? 'Writing a different option…' : 'Analyzing public evidence…',
+    state.hasSuggestedDraft
+      ? '↻ Suggest a different draft'
+      : '✦ Analyze lead and suggest draft',
   );
   setLiveMessage(
     'Researching the lead and writing channel-specific copy. You can edit everything before approval.',
@@ -684,9 +689,11 @@ async function suggestDraft() {
       goal: elements.goalSelect.value,
       pageUrl: state.activeTab?.url || null,
       pageTitle: state.activeTab?.title || null,
+      currentDraft: elements.messageInput.value.trim() || null,
     });
     elements.subjectInput.value = suggestion.subject || '';
     elements.messageInput.value = suggestion.content || '';
+    state.hasSuggestedDraft = true;
     elements.draftSource.textContent =
       `Report-grounded AI basis: ${suggestion.opportunity}. ${suggestion.analysis?.availableSources || 0} public source${suggestion.analysis?.availableSources === 1 ? '' : 's'} reviewed; Executive Summary + Detailed Analysis used; unknowns preserved.`;
     setLiveMessage(
@@ -701,7 +708,9 @@ async function suggestDraft() {
       elements.suggestButton,
       false,
       'Analyzing public evidence…',
-      '✦ Analyze lead and suggest draft',
+      state.hasSuggestedDraft
+        ? '↻ Suggest a different draft'
+        : '✦ Analyze lead and suggest draft',
     );
     elements.suggestButton.disabled =
       !state.context?.permissions?.includes('manage_ai');

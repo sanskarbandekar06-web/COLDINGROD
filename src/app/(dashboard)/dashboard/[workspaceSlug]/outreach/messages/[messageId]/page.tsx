@@ -15,6 +15,7 @@ import { OutreachActivityTimeline } from '@/components/outreach/OutreachActivity
 import { FollowUpSequencePanel } from '@/components/outreach/FollowUpSequencePanel';
 import { CompanionDeliveryPanel } from '@/components/outreach/CompanionDeliveryPanel';
 import { EditMessageDialog } from '@/components/outreach/EditMessageDialog';
+import { SuggestMoreButton } from '@/components/outreach/SuggestMoreButton';
 import { CopyButton } from '@/components/outreach/CopyButton';
 import { ArchiveRestoreButton } from '@/components/outreach/ArchiveRestoreButton';
 import { Button } from '@/components/ui/button';
@@ -87,6 +88,12 @@ export default async function MessageDetailPage(props: {
 
   // AI action state display
   const isAiGenerated = Boolean(message.ai_action_id);
+  const canSuggestMore = canManage &&
+    context.permissions.includes('manage_ai') &&
+    isAiGenerated &&
+    Boolean(message.contact_id) &&
+    message.deleted_at === null &&
+    ['draft', 'pending_approval'].includes(message.status);
   const actionStatus = aiAction?.status as string | undefined;
   const approvalDecision = aiApproval?.decision as string | undefined;
 
@@ -151,6 +158,13 @@ export default async function MessageDetailPage(props: {
                     defaultOpen={searchParams.edit === '1' && canEdit}
                     canEdit={canEdit}
                     editBlockedReason={editBlockedReason}
+                    canSuggestMore={canSuggestMore}
+                  />
+                )}
+                {canSuggestMore && (
+                  <SuggestMoreButton
+                    workspaceSlug={params.workspaceSlug}
+                    messageId={message.id}
                   />
                 )}
                 <CopyButton text={message.content} label="Copy message" />
@@ -399,7 +413,7 @@ export default async function MessageDetailPage(props: {
           <div id="send-message" className="scroll-mt-24">
             <SectionCard
               title="Send from Coldingrod"
-              description="Prepare the approved message through the paired Browser Companion without leaving this workflow."
+              description="Open the verified provider directly from the web app. The Browser Companion remains an optional shortcut."
             >
               <CompanionDeliveryPanel
                 workspaceSlug={params.workspaceSlug}

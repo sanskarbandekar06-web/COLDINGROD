@@ -12,6 +12,7 @@ import { format } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { CreateLeadModal } from './CreateLeadModal';
 import { LeadDrawer } from './LeadDrawer';
+import { LeadDossierExportButton } from './LeadDossierExportButton';
 
 interface LeadsTableProps {
   leads: LeadListItem[];
@@ -19,6 +20,7 @@ interface LeadsTableProps {
   currentPage: number;
   workspaceId: string;
   workspaceSlug: string;
+  canExport: boolean;
 }
 
 const statusColors: Record<string, string> = {
@@ -31,7 +33,7 @@ const statusColors: Record<string, string> = {
   lost: 'bg-rose-100 text-rose-800 border-rose-200',
 };
 
-export function LeadsTable({ leads, totalPages, currentPage, workspaceId, workspaceSlug }: LeadsTableProps) {
+export function LeadsTable({ leads, totalPages, currentPage, workspaceId, workspaceSlug, canExport }: LeadsTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentSearch = searchParams.get('search') || '';
@@ -40,6 +42,21 @@ export function LeadsTable({ leads, totalPages, currentPage, workspaceId, worksp
   const [searchInput, setSearchInput] = useState(currentSearch);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [drawerLeadId, setDrawerLeadId] = useState<string | null>(null);
+  const [selectedLeadIds, setSelectedLeadIds] = useState<string[]>([]);
+  const allPageSelected = leads.length > 0 && leads.every((lead) => selectedLeadIds.includes(lead.id));
+
+  const toggleLead = (leadId: string, selected: boolean) => {
+    setSelectedLeadIds((current) => selected
+      ? [...new Set([...current, leadId])]
+      : current.filter((id) => id !== leadId));
+  };
+
+  const togglePage = (selected: boolean) => {
+    const pageIds = new Set(leads.map((lead) => lead.id));
+    setSelectedLeadIds((current) => selected
+      ? [...new Set([...current, ...pageIds])]
+      : current.filter((id) => !pageIds.has(id)));
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,6 +121,11 @@ export function LeadsTable({ leads, totalPages, currentPage, workspaceId, worksp
           </select>
         </form>
         <div className="flex items-center gap-2 w-full sm:w-auto">
+          <LeadDossierExportButton
+            workspaceSlug={workspaceSlug}
+            selectedLeadIds={selectedLeadIds}
+            disabled={!canExport}
+          />
           <Button onClick={() => setIsCreateOpen(true)} className="w-full sm:w-auto">
             <Plus className="h-4 w-4 mr-2" /> New Lead
           </Button>
@@ -114,6 +136,15 @@ export function LeadsTable({ leads, totalPages, currentPage, workspaceId, worksp
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-10">
+                <input
+                  type="checkbox"
+                  className="size-4 accent-brand-indigo"
+                  checked={allPageSelected}
+                  onChange={(event) => togglePage(event.target.checked)}
+                  aria-label="Select all leads on this page"
+                />
+              </TableHead>
               <TableHead>Company</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Score</TableHead>
@@ -125,7 +156,7 @@ export function LeadsTable({ leads, totalPages, currentPage, workspaceId, worksp
           <TableBody>
             {leads.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center">
+                <TableCell colSpan={7} className="h-24 text-center">
                   No leads found.
                 </TableCell>
               </TableRow>
@@ -136,6 +167,15 @@ export function LeadsTable({ leads, totalPages, currentPage, workspaceId, worksp
                   className="cursor-pointer hover:bg-muted/50"
                   onClick={() => openDrawer(lead.id)}
                 >
+                  <TableCell onClick={(event) => event.stopPropagation()}>
+                    <input
+                      type="checkbox"
+                      className="size-4 accent-brand-indigo"
+                      checked={selectedLeadIds.includes(lead.id)}
+                      onChange={(event) => toggleLead(lead.id, event.target.checked)}
+                      aria-label={`Select ${lead.company_name} for Word export`}
+                    />
+                  </TableCell>
                   <TableCell className="font-medium">
                     {lead.company_name}
                   </TableCell>
@@ -181,6 +221,10 @@ export function LeadsTable({ leads, totalPages, currentPage, workspaceId, worksp
           </TableBody>
         </Table>
       </div>
+
+      <p className="text-xs text-muted-foreground">
+        Select confirmed leads, then export one organized Word dossier with clickable website, contact, social, Google Maps, Executive Summary, Detailed Analysis, and evidence links.
+      </p>
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
