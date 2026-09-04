@@ -33,6 +33,7 @@ export function ApprovalActions({ workspaceId, actionId, workspaceSlug }: Approv
       } else {
         if (result.entityType === 'outreach_message' && result.entityId) {
           toast.success('Message approved. Opening delivery controls…');
+          router.refresh();
           router.replace(
             `/dashboard/${workspaceSlug}/outreach/messages/${result.entityId}#send-message`,
           );

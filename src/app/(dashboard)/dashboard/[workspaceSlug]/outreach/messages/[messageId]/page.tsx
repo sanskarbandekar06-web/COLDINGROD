@@ -18,6 +18,7 @@ import { EditMessageDialog } from '@/components/outreach/EditMessageDialog';
 import { SuggestMoreButton } from '@/components/outreach/SuggestMoreButton';
 import { CopyButton } from '@/components/outreach/CopyButton';
 import { ArchiveRestoreButton } from '@/components/outreach/ArchiveRestoreButton';
+import { ApprovalActions } from '@/components/ai/ApprovalActions';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { createClient } from '@/lib/supabase/server';
@@ -272,13 +273,21 @@ export default async function MessageDetailPage(props: {
                       : 'No approval decision recorded.'}
                   </p>
                   {actionStatus === 'pending_approval' && message.ai_action_id && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      render={<Link href={`/dashboard/${params.workspaceSlug}/ai/approvals`} />}
-                    >
-                      Go to Approval Center
-                    </Button>
+                    context.permissions.includes('manage_ai') ? (
+                      <ApprovalActions
+                        workspaceId={workspace.id}
+                        actionId={message.ai_action_id}
+                        workspaceSlug={params.workspaceSlug}
+                      />
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        render={<Link href={`/dashboard/${params.workspaceSlug}/ai/approvals`} />}
+                      >
+                        Go to Approval Center
+                      </Button>
+                    )
                   )}
                 </div>
               ) : (

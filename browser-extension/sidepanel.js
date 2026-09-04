@@ -294,9 +294,23 @@ async function decideMessage(message, decision) {
       decision,
       reason,
     });
+    let opened = false;
+    let copied = false;
+    if (decision === 'approved') {
+      try {
+        const prepared = await openApprovedDestination(message);
+        opened = true;
+        copied = prepared.copied;
+      } catch {
+        // The approval is already durable. Keep it successful and let the
+        // refreshed card expose the delivery control for another attempt.
+      }
+    }
     setLiveMessage(
       decision === 'approved'
-        ? 'Message approved. It is now ready for human delivery.'
+        ? opened
+          ? `Message approved. The destination is open${copied ? ' and the message is copied' : ''}; complete the final send there.`
+          : 'Message approved. Use Copy & open on the refreshed card to launch the destination.'
         : 'Message rejected and blocked from delivery.',
       'success',
     );
@@ -328,6 +342,8 @@ function deliveryUrl(message) {
         ? `https://www.instagram.com/${encodeURIComponent(handle)}/`
         : null;
     }
+    case 'facebook':
+      return message.facebook_url || null;
     case 'sms':
       return message.phone
         ? `sms:${encodeURIComponent(message.phone)}?body=${body}`
@@ -335,6 +351,24 @@ function deliveryUrl(message) {
     default:
       return null;
   }
+}
+
+async function openApprovedDestination(message) {
+  const destination = deliveryUrl(message);
+  if (!destination) {
+    throw new Error('The approved contact has no usable destination for this channel.');
+  }
+  await chrome.tabs.create({ url: destination, active: true });
+  let copied = false;
+  try {
+    await navigator.clipboard.writeText(message.content || '');
+    copied = true;
+  } catch {
+    // Prefilled providers still work. Social destinations remain open so the
+    // visible message can be copied manually if clipboard access is blocked.
+  }
+  state.preparedMessageIds.add(message.id);
+  return { copied };
 }
 
 async function prepareDelivery(message, markButton) {
@@ -348,9 +382,7 @@ async function prepareDelivery(message, markButton) {
   }
 
   try {
-    await navigator.clipboard.writeText(message.content || '');
-    await chrome.tabs.create({ url: destination });
-    state.preparedMessageIds.add(message.id);
+    await openApprovedDestination(message);
     markButton.disabled = false;
     setLiveMessage(
       'Approved text copied and the channel opened. Send it there, then return and confirm below.',

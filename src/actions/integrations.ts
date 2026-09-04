@@ -99,6 +99,13 @@ function recordValue(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+function safePhone(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const phone = value.replace(/\s+/g, ' ').trim().slice(0, 80);
+  const digits = phone.replace(/\D/g, '');
+  return digits.length >= 7 && digits.length <= 15 ? phone : null;
+}
+
 function safeGoogleResult(value: unknown): GooglePlacesSearchResult | null {
   if (!recordValue(value) || typeof value.id !== 'string') return null;
   const displayName = recordValue(value.displayName)
@@ -130,7 +137,9 @@ function safeGoogleResult(value: unknown): GooglePlacesSearchResult | null {
       /^https?:\/\/\S+$/i.test(value.websiteUri)
         ? value.websiteUri.slice(0, 500)
         : null,
-    phone: null,
+    phone:
+      safePhone(value.internationalPhoneNumber) ??
+      safePhone(value.nationalPhoneNumber),
     email: null,
     linkedinUrl: null,
     instagramHandle: null,
@@ -224,7 +233,7 @@ export async function searchGooglePlacesAction(value: {
           'Content-Type': 'application/json',
           'X-Goog-Api-Key': apiKey,
           'X-Goog-FieldMask':
-            'places.id,places.displayName,places.formattedAddress,places.googleMapsUri,places.websiteUri',
+            'places.id,places.displayName,places.formattedAddress,places.googleMapsUri,places.websiteUri,places.internationalPhoneNumber,places.nationalPhoneNumber',
         },
         body: JSON.stringify({
           textQuery: value.query.trim(),

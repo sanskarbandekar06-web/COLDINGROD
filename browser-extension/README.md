@@ -17,7 +17,8 @@ A Chrome/Edge Manifest V3 side-panel extension for page-aware lead context and h
 - Refreshes independently verified website/contact-page channels before presenting Email, WhatsApp, SMS, LinkedIn, or Instagram.
 - Lets an authorized human approve or reject a message from the side panel.
 - Adds a secure bridge to the Coldingrod message page for one-click approved delivery handoff.
-- Prefills email, WhatsApp, and SMS; copies approved text before opening LinkedIn or Instagram.
+- Prefills email, WhatsApp, and SMS; copies approved text before opening LinkedIn, Instagram, or Facebook.
+- Opens the verified provider immediately after approval so the reviewed message can be sent without hunting for another control.
 - Records a message as sent only after the user confirms the real send happened.
 - Keeps the original Lead Discovery capture workflow for unmatched pages.
 

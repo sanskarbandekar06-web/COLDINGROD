@@ -241,4 +241,14 @@ The project keeps TypeScript where it protects database, authorization, and UI c
 - Copy the Places key into local `.env.local` only when local provider-search testing is required.
 - Enable leaked-password protection if the Supabase project is on a plan that includes it.
 
+## Contact export and outreach delivery repair
+
+- Lead dossier exports now recover missing phone numbers, emails, and social channels from stored discovery candidates, verified public website data, and linked Google Place details before generating the document.
+- Every dossier has dedicated Phone numbers and Email addresses sections with clickable telephone, WhatsApp, and email links, while preserving the existing evidence, summary, analysis, map, website, and social sections.
+- Newly discovered Google Places leads retain available phone numbers from the provider response instead of discarding them during intake.
+- Pending AI messages can now be approved directly from the message detail page; the approval refreshes the message into its delivery-ready state.
+- Migration `20260904045407_repair_outreach_approval_delivery.sql` restores the approval-to-message status trigger and repairs previously approved messages that remained pending.
+- Browser Companion `0.7.0` opens the appropriate WhatsApp, Instagram, LinkedIn, email, SMS, or existing Facebook destination immediately after approval and keeps a retry control when a provider cannot be opened.
+- The web-to-extension delivery bridge now opens the provider visibly in the active tab.
+
 No remaining application or database implementation is required for the agreed plan.

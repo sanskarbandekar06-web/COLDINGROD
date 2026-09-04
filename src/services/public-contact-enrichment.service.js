@@ -103,7 +103,7 @@ export async function discoverLeadPublicContactProfile(supabase, lead) {
       'website_url, source_url, business_email, business_phone, linkedin_url, instagram_handle, facebook_url, created_at',
     )
     .eq('workspace_id', lead.workspace_id)
-    .eq('imported_lead_id', lead.id)
+    .or(`imported_lead_id.eq.${lead.id},matched_lead_id.eq.${lead.id}`)
     .order('created_at', { ascending: false })
     .limit(5);
   if (error) console.error('Discovery source lookup failed:', error.message);

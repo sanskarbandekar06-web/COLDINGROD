@@ -45,6 +45,9 @@ function validDestination(platform, value) {
     if (platform === 'instagram') {
       return url.hostname === 'instagram.com' || url.hostname.endsWith('.instagram.com');
     }
+    if (platform === 'facebook') {
+      return url.hostname === 'facebook.com' || url.hostname.endsWith('.facebook.com');
+    }
   } catch {
     return false;
   }
@@ -71,7 +74,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       if (!validDestination(platform, destination)) {
         throw new Error('The delivery destination was rejected.');
       }
-      const tab = await chrome.tabs.create({ url: destination, active: false });
+      const tab = await chrome.tabs.create({ url: destination, active: true });
       return { opened: true, tabId: tab.id ?? null };
     }
 

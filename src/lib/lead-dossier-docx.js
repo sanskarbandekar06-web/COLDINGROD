@@ -192,6 +192,83 @@ function contactChildren(contact, index) {
   return children;
 }
 
+function discoveryContactChildren(contact, businessPhone) {
+  if (!contact || typeof contact !== 'object') return [];
+  const phone = contact.business_phone || businessPhone;
+  const hasDiscoveryContact = Boolean(
+    contact.business_email || phone || contact.linkedin_url ||
+      contact.instagram_handle || contact.facebook_url,
+  );
+  if (!hasDiscoveryContact) return [];
+
+  const children = [heading('Verified business channels', HeadingLevel.HEADING_3)];
+  if (contact.business_email) {
+    children.push(definitionLine('Email', contact.business_email, `mailto:${contact.business_email}`));
+  }
+  if (phone) {
+    children.push(definitionLine('Phone', phone, `tel:${phoneDigits(phone)}`));
+    children.push(definitionLine('WhatsApp', 'Open WhatsApp chat', whatsappUrl(phone)));
+  }
+  if (contact.linkedin_url) children.push(definitionLine('LinkedIn', 'Open LinkedIn profile', contact.linkedin_url));
+  if (contact.instagram_handle) children.push(definitionLine('Instagram', `@${String(contact.instagram_handle).replace(/^@/, '')}`, instagramUrl(contact.instagram_handle)));
+  if (contact.facebook_url) children.push(definitionLine('Facebook', 'Open Facebook profile', contact.facebook_url));
+  return children;
+}
+
+function phoneNumberChildren(lead) {
+  const entries = [];
+  const seen = new Set();
+  const addPhone = (label, value) => {
+    const rendered = text(value, '');
+    const key = phoneDigits(rendered);
+    if (!key || seen.has(key)) return;
+    seen.add(key);
+    entries.push({ label, value: rendered });
+  };
+
+  addPhone('Business phone', lead.business_phone);
+  for (const [contactIndex, contact] of lead.contacts.entries()) {
+    const name = [contact.first_name, contact.last_name].filter(Boolean).join(' ') ||
+      `Contact ${contactIndex + 1}`;
+    addPhone(`${name} phone`, contact.phone);
+  }
+  addPhone('Discovery phone', lead.discovery_contact?.business_phone);
+
+  if (!entries.length) {
+    return [emptyNote('No verified phone number is available for this lead yet.')];
+  }
+  return entries.flatMap((entry) => [
+    definitionLine(entry.label, entry.value, `tel:${phoneDigits(entry.value)}`),
+    definitionLine(`${entry.label} WhatsApp`, 'Open WhatsApp chat', whatsappUrl(entry.value)),
+  ]);
+}
+
+function emailAddressChildren(lead) {
+  const entries = [];
+  const seen = new Set();
+  const addEmail = (label, value) => {
+    const rendered = text(value, '').toLowerCase();
+    if (!rendered || seen.has(rendered)) return;
+    seen.add(rendered);
+    entries.push({ label, value: rendered });
+  };
+
+  addEmail('Business email', lead.business_email);
+  for (const [contactIndex, contact] of lead.contacts.entries()) {
+    const name = [contact.first_name, contact.last_name].filter(Boolean).join(' ') ||
+      `Contact ${contactIndex + 1}`;
+    addEmail(`${name} email`, contact.email);
+  }
+  addEmail('Discovery email', lead.discovery_contact?.business_email);
+
+  if (!entries.length) {
+    return [emptyNote('No verified email address is available for this lead yet.')];
+  }
+  return entries.map((entry) =>
+    definitionLine(entry.label, entry.value, `mailto:${entry.value}`),
+  );
+}
+
 function leadChildren(lead, index, total) {
   const report = lead.report;
   const summary = report?.research_summary && typeof report.research_summary === 'object'
@@ -228,12 +305,25 @@ function leadChildren(lead, index, total) {
   children.push(definitionLine('Google Maps', lead.location || `Find ${lead.company_name} on Google Maps`, mapsUrl(lead)));
   if (lead.google_place_id) children.push(definitionLine('Google Place ID', lead.google_place_id));
 
+  children.push(heading('Phone numbers', HeadingLevel.HEADING_2));
+  children.push(...phoneNumberChildren(lead));
+
+  children.push(heading('Email addresses', HeadingLevel.HEADING_2));
+  children.push(...emailAddressChildren(lead));
+
   children.push(heading('Contacts and social channels', HeadingLevel.HEADING_2));
   if (lead.contacts.length) {
     for (const [contactIndex, contact] of lead.contacts.entries()) {
       children.push(...contactChildren(contact, contactIndex));
     }
-  } else {
+  }
+  const discoveryChildren = discoveryContactChildren(
+    lead.discovery_contact,
+    lead.contacts.some((contact) => contact.phone) ? null : lead.business_phone,
+  );
+  if (discoveryChildren.length) {
+    children.push(...discoveryChildren);
+  } else if (!lead.contacts.length) {
     children.push(emptyNote('No verified contact or social channel is stored for this lead yet.'));
   }
 
