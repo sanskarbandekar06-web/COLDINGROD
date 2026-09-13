@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { enrichLeadPublicContact } from '@/services/public-contact-enrichment.service';
 
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
   const leadId = searchParams.get('leadId')?.trim();
   const workspaceId = searchParams.get('workspaceId')?.trim();
 
-  if (!leadId || !workspaceId) {
+  if (!isUuid(leadId) || !isUuid(workspaceId)) {
     return NextResponse.json({ error: 'Missing parameters' }, { status: 400 });
   }
 
@@ -56,6 +57,7 @@ export async function GET(request: NextRequest) {
     .select('id')
     .eq('workspace_id', workspaceId)
     .eq('user_id', user.id)
+    .is('deleted_at', null)
     .maybeSingle();
 
   if (!member) {
@@ -67,7 +69,7 @@ export async function GET(request: NextRequest) {
       supabase
         .from('lead_contacts')
         .select(
-          'id, first_name, last_name, email, phone, linkedin_url, instagram_handle, facebook_url',
+          'id, first_name, last_name, email, phone, phone_type, whatsapp_number, whatsapp_status, whatsapp_source_url, contact_kind, source_url, linkedin_url, instagram_handle, facebook_url',
         )
         .eq('lead_id', leadId)
         .order('is_primary', { ascending: false }),
@@ -150,7 +152,7 @@ export async function POST(request: NextRequest) {
     supabase
       .from('leads')
       .select(
-        'id, workspace_id, company_name, website_url, business_email, business_phone',
+        'id, workspace_id, company_name, location, website_url, business_email, business_phone',
       )
       .eq('id', leadId)
       .eq('workspace_id', workspaceId)
@@ -165,6 +167,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Lead not found' }, { status: 404 });
   }
 
-  const contacts = await enrichLeadPublicContact(supabase, lead);
-  return NextResponse.json(contacts);
+  try {
+    const contacts = await enrichLeadPublicContact(supabase, lead);
+    revalidatePath('/dashboard/[workspaceSlug]/leads/[leadId]', 'page');
+    return NextResponse.json(contacts);
+  } catch (error) {
+    console.error('Contact research failed:', error instanceof Error ? error.message : 'Unknown error');
+    return NextResponse.json({ error: 'Public contact research could not be saved. Please try again.' }, { status: 502 });
+  }
 }

@@ -4,6 +4,12 @@ A Chrome/Edge Manifest V3 side-panel extension for page-aware lead context and h
 
 ## Features
 
+Version 0.8.0 repairs message identity during contact enrichment, so approval
+uses the saved message ID. Telephone and WhatsApp destinations are separate.
+Only a business-published or user-confirmed WhatsApp number is offered. Publication
+is not a guarantee the account remains active; correct unavailable destinations
+from the lead's Contacts section. Owner contacts require a named public source.
+
 - Reads the active tab title and URL only after the user opens the companion.
 - Matches an existing Coldingrod lead by website or supported social profile.
 - Shows contacts and recent cross-workspace outreach history.

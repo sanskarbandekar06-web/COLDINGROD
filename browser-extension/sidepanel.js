@@ -1,3 +1,5 @@
+import { supportsContactChannel, contactDestination } from './contact-channels.js';
+
 const elements = {
   setupView: document.querySelector('#setup-view'),
   companionView: document.querySelector('#companion-view'),
@@ -172,10 +174,9 @@ function reachableChannels(contact) {
   if (contact.linkedin_url) {
     channels.push({ value: 'linkedin', label: 'LinkedIn' });
   }
-  if (contact.phone) {
-    channels.push({ value: 'whatsapp', label: 'WhatsApp' });
-    channels.push({ value: 'sms', label: 'SMS' });
-  }
+  if (supportsContactChannel(contact, 'whatsapp')) channels.push({ value: 'whatsapp', label: 'WhatsApp' });
+  if (supportsContactChannel(contact, 'sms')) channels.push({ value: 'sms', label: 'SMS' });
+  if (supportsContactChannel(contact, 'facebook')) channels.push({ value: 'facebook', label: 'Facebook' });
   if (contact.instagram_handle) {
     channels.push({ value: 'instagram', label: 'Instagram' });
   }
@@ -321,36 +322,7 @@ async function decideMessage(message, decision) {
 }
 
 function deliveryUrl(message) {
-  const body = encodeURIComponent(message.content || '');
-  const subject = encodeURIComponent(message.subject || '');
-  switch (message.platform) {
-    case 'email':
-      return message.email
-        ? `mailto:${encodeURIComponent(message.email)}?subject=${subject}&body=${body}`
-        : null;
-    case 'whatsapp': {
-      const phone = String(message.phone || '').replace(/\D/g, '');
-      return phone ? `https://wa.me/${phone}?text=${body}` : null;
-    }
-    case 'linkedin':
-      return message.linkedin_url || null;
-    case 'instagram': {
-      const handle = String(message.instagram_handle || '')
-        .replace(/^@/, '')
-        .trim();
-      return handle
-        ? `https://www.instagram.com/${encodeURIComponent(handle)}/`
-        : null;
-    }
-    case 'facebook':
-      return message.facebook_url || null;
-    case 'sms':
-      return message.phone
-        ? `sms:${encodeURIComponent(message.phone)}?body=${body}`
-        : null;
-    default:
-      return null;
-  }
+  return contactDestination(message, message);
 }
 
 async function openApprovedDestination(message) {
@@ -358,7 +330,6 @@ async function openApprovedDestination(message) {
   if (!destination) {
     throw new Error('The approved contact has no usable destination for this channel.');
   }
-  await chrome.tabs.create({ url: destination, active: true });
   let copied = false;
   try {
     await navigator.clipboard.writeText(message.content || '');
@@ -367,6 +338,7 @@ async function openApprovedDestination(message) {
     // Prefilled providers still work. Social destinations remain open so the
     // visible message can be copied manually if clipboard access is blocked.
   }
+  await chrome.tabs.create({ url: destination, active: true });
   state.preparedMessageIds.add(message.id);
   return { copied };
 }
@@ -382,10 +354,10 @@ async function prepareDelivery(message, markButton) {
   }
 
   try {
-    await openApprovedDestination(message);
+    const prepared = await openApprovedDestination(message);
     markButton.disabled = false;
     setLiveMessage(
-      'Approved text copied and the channel opened. Send it there, then return and confirm below.',
+      prepared.copied ? 'Approved text copied and the channel opened. Send it there, then return and confirm below.' : 'Channel opened. Copy the visible approved message, send it there, then confirm below.',
       'success',
     );
   } catch {

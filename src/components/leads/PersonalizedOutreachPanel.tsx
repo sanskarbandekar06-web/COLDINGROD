@@ -3,6 +3,7 @@
 import { useMemo, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { Bot, Loader2, MessageSquareText, ShieldCheck } from 'lucide-react';
+import { supportsContactChannel } from '@/lib/contact-channels';
 import { toast } from 'sonner';
 import { generatePersonalizedOutreachAction } from '@/actions/personalized-outreach';
 import { Button } from '@/components/ui/button';
@@ -30,6 +31,7 @@ const CHANNELS = [
   { value: 'linkedin', label: 'LinkedIn' },
   { value: 'whatsapp', label: 'WhatsApp' },
   { value: 'instagram', label: 'Instagram' },
+  { value: 'facebook', label: 'Facebook' },
   { value: 'sms', label: 'SMS' },
 ] as const;
 
@@ -45,18 +47,14 @@ const GOALS = [
   { value: 'book_call', label: 'Book a 15-minute call' },
 ] as const;
 
-function supportsChannel(contact: LeadContact, platform: string) {
-  if (platform === 'email') return Boolean(contact.email);
-  if (platform === 'linkedin') return Boolean(contact.linkedin_url);
-  if (platform === 'instagram') return Boolean(contact.instagram_handle);
-  if (platform === 'whatsapp' || platform === 'sms') return Boolean(contact.phone);
-  return false;
-}
+const supportsChannel = supportsContactChannel;
 
 function contactChannel(contact: LeadContact, platform: string) {
   if (platform === 'email') return contact.email;
   if (platform === 'linkedin') return contact.linkedin_url;
   if (platform === 'instagram') return contact.instagram_handle;
+  if (platform === 'whatsapp') return contact.whatsapp_number;
+  if (platform === 'facebook') return contact.facebook_url;
   return contact.phone;
 }
 

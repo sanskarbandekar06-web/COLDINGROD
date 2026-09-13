@@ -1,3 +1,4 @@
+import { whatsappDestination } from './contact-channels.js';
 import {
   AlignmentType,
   BorderStyle,
@@ -183,9 +184,16 @@ function contactChildren(contact, index) {
   if (contact.is_primary) children.push(definitionLine('Contact type', 'Primary contact'));
   if (contact.email) children.push(definitionLine('Email', contact.email, `mailto:${contact.email}`));
   if (contact.phone) {
-    children.push(definitionLine('Phone', contact.phone, `tel:${phoneDigits(contact.phone)}`));
-    children.push(definitionLine('WhatsApp', 'Open WhatsApp chat', whatsappUrl(contact.phone)));
+    children.push(definitionLine('Phone', contact.phone, `tel:${String(contact.phone).replace(/[^+\d]/g, '')}`));
+
   }
+  if (whatsappDestination(contact)) {
+    children.push(definitionLine('WhatsApp', contact.whatsapp_number, whatsappUrl(contact.whatsapp_number)));
+    children.push(definitionLine('WhatsApp evidence', contact.whatsapp_status === 'confirmed' ? 'Confirmed by user' : 'Published by business'));
+    if (contact.whatsapp_source_url) children.push(definitionLine('WhatsApp source', contact.whatsapp_source_url, contact.whatsapp_source_url));
+  }
+  if (contact.source_url) children.push(definitionLine('Contact source', contact.source_url, contact.source_url));
+  if (contact.checked_at) children.push(definitionLine('Last checked', new Date(contact.checked_at).toLocaleDateString('en-GB')));
   if (contact.linkedin_url) children.push(definitionLine('LinkedIn', 'Open LinkedIn profile', contact.linkedin_url));
   if (contact.instagram_handle) children.push(definitionLine('Instagram', `@${String(contact.instagram_handle).replace(/^@/, '')}`, instagramUrl(contact.instagram_handle)));
   if (contact.facebook_url) children.push(definitionLine('Facebook', 'Open Facebook profile', contact.facebook_url));
@@ -201,13 +209,13 @@ function discoveryContactChildren(contact, businessPhone) {
   );
   if (!hasDiscoveryContact) return [];
 
-  const children = [heading('Verified business channels', HeadingLevel.HEADING_3)];
+  const children = [heading('Business channels', HeadingLevel.HEADING_3)];
   if (contact.business_email) {
     children.push(definitionLine('Email', contact.business_email, `mailto:${contact.business_email}`));
   }
   if (phone) {
     children.push(definitionLine('Phone', phone, `tel:${phoneDigits(phone)}`));
-    children.push(definitionLine('WhatsApp', 'Open WhatsApp chat', whatsappUrl(phone)));
+
   }
   if (contact.linkedin_url) children.push(definitionLine('LinkedIn', 'Open LinkedIn profile', contact.linkedin_url));
   if (contact.instagram_handle) children.push(definitionLine('Instagram', `@${String(contact.instagram_handle).replace(/^@/, '')}`, instagramUrl(contact.instagram_handle)));
@@ -237,10 +245,7 @@ function phoneNumberChildren(lead) {
   if (!entries.length) {
     return [emptyNote('No verified phone number is available for this lead yet.')];
   }
-  return entries.flatMap((entry) => [
-    definitionLine(entry.label, entry.value, `tel:${phoneDigits(entry.value)}`),
-    definitionLine(`${entry.label} WhatsApp`, 'Open WhatsApp chat', whatsappUrl(entry.value)),
-  ]);
+  return entries.map((entry) => definitionLine(entry.label, entry.value, `tel:${entry.value.replace(/[^+\d]/g, '')}`));
 }
 
 function emailAddressChildren(lead) {
@@ -299,22 +304,29 @@ function leadChildren(lead, index, total) {
   if (lead.website_url) children.push(definitionLine('Website', lead.website_url, lead.website_url));
   if (lead.business_email) children.push(definitionLine('Business email', lead.business_email, `mailto:${lead.business_email}`));
   if (lead.business_phone) {
-    children.push(definitionLine('Business phone', lead.business_phone, `tel:${phoneDigits(lead.business_phone)}`));
-    children.push(definitionLine('Business WhatsApp', 'Open WhatsApp chat', whatsappUrl(lead.business_phone)));
+    children.push(definitionLine('Business phone', lead.business_phone, `tel:${String(lead.business_phone).replace(/[^+\d]/g, '')}`));
   }
   children.push(definitionLine('Google Maps', lead.location || `Find ${lead.company_name} on Google Maps`, mapsUrl(lead)));
   if (lead.google_place_id) children.push(definitionLine('Google Place ID', lead.google_place_id));
 
+  const owners = lead.contacts.filter((contact) => contact.contact_kind === 'owner');
+  children.push(heading('Owner contacts', HeadingLevel.HEADING_2));
+  if (owners.length) {
+    for (const [ownerIndex, owner] of owners.entries()) children.push(...contactChildren(owner, ownerIndex));
+  } else {
+    children.push(emptyNote('No publicly listed owner contact was verified. Business reception numbers are not owner numbers.'));
+  }
   children.push(heading('Phone numbers', HeadingLevel.HEADING_2));
   children.push(...phoneNumberChildren(lead));
 
   children.push(heading('Email addresses', HeadingLevel.HEADING_2));
   children.push(...emailAddressChildren(lead));
 
+  children.push(emptyNote('Telephone links place calls. WhatsApp links appear only for a published or user-confirmed WhatsApp number; current account availability is confirmed when WhatsApp opens.'));
   children.push(heading('Contacts and social channels', HeadingLevel.HEADING_2));
   if (lead.contacts.length) {
     for (const [contactIndex, contact] of lead.contacts.entries()) {
-      children.push(...contactChildren(contact, contactIndex));
+      if (contact.contact_kind !== 'owner') children.push(...contactChildren(contact, contactIndex));
     }
   }
   const discoveryChildren = discoveryContactChildren(

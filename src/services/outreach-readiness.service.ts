@@ -21,6 +21,7 @@
  * We do NOT claim an integration is operational based solely on an integrations row.
  */
 
+import { supportsContactChannel } from '@/lib/contact-channels';
 import { OutreachMessageDetail } from './outreach.service';
 
 export interface ReadinessCheck {
@@ -32,47 +33,6 @@ export interface ReadinessCheck {
 export interface ReadinessSummary {
   isReady: boolean;
   checks: ReadinessCheck[];
-}
-
-type ContactData = {
-  email: string | null;
-  phone: string | null;
-  linkedin_url: string | null;
-  instagram_handle: string | null;
-  facebook_url: string | null;
-} | null;
-
-function contactSupportsChannel(
-  channel: string,
-  contact: ContactData
-): { supported: boolean; missing: string } {
-  if (!contact) return { supported: false, missing: 'No contact selected' };
-
-  switch (channel) {
-    case 'email':
-      return contact.email
-        ? { supported: true, missing: '' }
-        : { supported: false, missing: 'Contact has no email address' };
-    case 'sms':
-    case 'whatsapp':
-      return contact.phone
-        ? { supported: true, missing: '' }
-        : { supported: false, missing: 'Contact has no phone number' };
-    case 'linkedin':
-      return contact.linkedin_url
-        ? { supported: true, missing: '' }
-        : { supported: false, missing: 'Contact has no LinkedIn URL' };
-    case 'instagram':
-      return contact.instagram_handle
-        ? { supported: true, missing: '' }
-        : { supported: false, missing: 'Contact has no Instagram handle' };
-    case 'facebook':
-      return contact.facebook_url
-        ? { supported: true, missing: '' }
-        : { supported: false, missing: 'Contact has no Facebook page URL' };
-    default:
-      return { supported: false, missing: `Unknown channel: ${channel}` };
-  }
 }
 
 export function computeReadiness(
@@ -114,21 +74,21 @@ export function computeReadiness(
 
   // 4. Contact supports channel
   if (hasContact && hasValidChannel) {
-    const { supported, missing } = contactSupportsChannel(
-      message.platform,
-      message.contact as ContactData
-    );
+    const supported = supportsContactChannel(message.contact, message.platform);
+    const missing = message.platform === 'whatsapp'
+      ? 'No published or confirmed WhatsApp number is available for this contact'
+      : `No valid ${message.platform} destination is available for this contact`;
     checks.push({
       label: `Contact reachable via ${message.platform}`,
       passed: supported,
-      detail: missing || undefined,
+      detail: supported ? undefined : missing,
     });
   }
 
   // 5. Lead belongs to workspace
   const leadInWorkspace =
     Boolean(message.lead) &&
-    message.lead?.workspace_id === message.workspace_id;
+    message.lead?.workspace_id === message.workspace_id && !message.lead?.deleted_at;
   checks.push({
     label: 'Lead verified in workspace',
     passed: Boolean(leadInWorkspace),
@@ -162,7 +122,7 @@ export function computeReadiness(
 
   if (aiAction?.id) {
     const actionStatus = aiAction.status;
-    const hasApprovalRecord = Boolean(message.ai_approval);
+    const hasApprovalRecord = message.ai_approval?.decision === 'approved';
     const isApproved =
       actionStatus === 'approved' && hasApprovalRecord;
     const isPending = actionStatus === 'pending_approval';

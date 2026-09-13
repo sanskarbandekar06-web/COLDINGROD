@@ -26,6 +26,9 @@ export interface OutreachMessageRow extends OutreachMessage {
     last_name: string | null;
     email: string | null;
     phone: string | null;
+    phone_type?: string;
+    whatsapp_number?: string | null;
+    whatsapp_status?: string;
     linkedin_url: string | null;
     instagram_handle: string | null;
     facebook_url: string | null;
@@ -78,7 +81,7 @@ export const getOutreachMessages = cache(
         content,
         lead:leads!outreach_messages_lead_id_fkey(id, company_name),
         contact:lead_contacts!outreach_messages_contact_id_fkey(
-          id, first_name, last_name, email, phone, linkedin_url, instagram_handle, facebook_url
+          id, first_name, last_name, email, phone, phone_type, whatsapp_number, whatsapp_status, whatsapp_source_url, linkedin_url, instagram_handle, facebook_url
         ),
         ai_action:ai_actions!outreach_messages_ai_action_id_fkey(
           id, action_type, status,
@@ -141,6 +144,7 @@ export interface OutreachMessageDetailLead {
   company_name: string;
   status: string;
   workspace_id: string;
+  deleted_at: string | null;
 }
 
 export interface OutreachMessageDetail extends Omit<OutreachMessageRow, 'lead'> {
@@ -169,9 +173,9 @@ export const getOutreachMessageDetail = cache(
       .select(
         `
         *,
-        lead:leads!outreach_messages_lead_id_fkey(id, company_name, status, workspace_id),
+        lead:leads!outreach_messages_lead_id_fkey(id, company_name, status, workspace_id, deleted_at),
         contact:lead_contacts!outreach_messages_contact_id_fkey(
-          id, first_name, last_name, email, phone, linkedin_url, instagram_handle, facebook_url,
+          id, first_name, last_name, email, phone, phone_type, whatsapp_number, whatsapp_status, whatsapp_source_url, linkedin_url, instagram_handle, facebook_url,
           job_title, is_primary
         ),
         ai_action:ai_actions!outreach_messages_ai_action_id_fkey(
@@ -348,7 +352,7 @@ export const getContactsForLead = cache(
     const { data } = await supabase
       .from('lead_contacts')
       .select(
-        'id, first_name, last_name, email, phone, linkedin_url, instagram_handle, facebook_url'
+        'id, first_name, last_name, email, phone, phone_type, whatsapp_number, whatsapp_status, whatsapp_source_url, linkedin_url, instagram_handle, facebook_url'
       )
       .eq('lead_id', leadId)
       .order('is_primary', { ascending: false });

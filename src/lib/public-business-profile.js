@@ -2,15 +2,19 @@ import 'server-only';
 
 import { lookup } from 'node:dns/promises';
 import { isIP } from 'node:net';
+import { extractPublicContacts, publicCountry, publicProfileLinks } from './public-contact-extractor.js';
 
 const MAX_HTML_BYTES = 600_000;
-const MAX_SUPPORTING_PAGES = 5;
+const MAX_SUPPORTING_PAGES = 8;
 const COMMON_SUPPORTING_PATHS = [
   '/contact',
   '/contact-us',
   '/about',
   '/about-us',
   '/connect',
+  '/team',
+  '/our-team',
+  '/founder',
 ];
 const SOCIAL_HOSTS = {
   linkedin: new Set(['linkedin.com', 'www.linkedin.com']),
@@ -188,60 +192,6 @@ async function fetchPublicHtml(value) {
   throw new Error('TOO_MANY_REDIRECTS');
 }
 
-function contactHref(value) {
-  const normalized = decodeHtml(value);
-  if (normalized.toLowerCase().startsWith('tel:')) {
-    return { phone: normalized.slice(4).split(/[?;]/, 1)[0].trim().slice(0, 80) };
-  }
-  if (normalized.toLowerCase().startsWith('mailto:')) {
-    return { email: normalized.slice(7).split('?', 1)[0].trim().toLowerCase().slice(0, 320) };
-  }
-  return {};
-}
-
-function normalizedPhone(value) {
-  const phone = decodeHtml(value).replace(/\s+/g, ' ').trim();
-  const digits = phone.replace(/\D/g, '');
-  if (digits.length < 7 || digits.length > 15) return '';
-  return phone.slice(0, 80);
-}
-
-function publicUrlContact(value, baseUrl) {
-  try {
-    const url = new URL(decodeHtml(value).replaceAll('\\/', '/'), baseUrl);
-    const host = url.hostname.toLowerCase();
-    if (host === 'wa.me' || host.endsWith('.wa.me')) {
-      return { phone: normalizedPhone(url.pathname.split('/').filter(Boolean)[0] ?? '') };
-    }
-    if (host === 'api.whatsapp.com' || host === 'web.whatsapp.com') {
-      return { phone: normalizedPhone(url.searchParams.get('phone') ?? '') };
-    }
-  } catch {
-    return {};
-  }
-  return {};
-}
-
-function visibleContactDetails(html) {
-  const text = compactText(html, 50_000);
-  const emailCandidates = text.match(
-    /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,
-  ) ?? [];
-  const email = emailCandidates.find((candidate) =>
-    !/(example\.(?:com|org)|domain\.com|email\.com)$/i.test(candidate),
-  );
-  const phoneCandidates = text.match(
-    /(?:\+?\d[\d\s().-]{5,}\d)/g,
-  ) ?? [];
-  const phone = phoneCandidates
-    .map(normalizedPhone)
-    .find(Boolean);
-  return {
-    email: email?.toLowerCase().slice(0, 320),
-    phone: phone || undefined,
-  };
-}
-
 function metaContent(html, key, attribute = 'name') {
   const tags = html.match(/<meta\b[^>]*>/gi) ?? [];
   for (const tag of tags) {
@@ -273,76 +223,23 @@ function pageFacts(html) {
   };
 }
 
-function mergePageDetails(target, html, finalUrl) {
-  const hrefPattern = /\bhref\s*=\s*["']([^"']+)["']/gi;
-  let match;
-  while ((match = hrefPattern.exec(html)) !== null) {
-    const rawHref = decodeHtml(match[1]);
-    const contact = contactHref(rawHref);
-    if (!target.phone && contact.phone) target.phone = contact.phone;
-    if (!target.email && contact.email) target.email = contact.email;
-    const publicContact = publicUrlContact(rawHref, finalUrl);
-    if (!target.phone && publicContact.phone) target.phone = publicContact.phone;
-    try {
-      const profile = profileFromUrl(new URL(rawHref, finalUrl).toString());
-      if (!target.linkedinUrl && profile.linkedinUrl) target.linkedinUrl = profile.linkedinUrl;
-      if (!target.instagramHandle && profile.instagramHandle) target.instagramHandle = profile.instagramHandle;
-      if (!target.facebookUrl && profile.facebookUrl) target.facebookUrl = profile.facebookUrl;
-    } catch {
-      // Ignore malformed or non-HTTP links from the public page.
-    }
+function mergePageDetails(target, html, finalUrl, country) {
+  const details = extractPublicContacts(html, finalUrl.toString(), country);
+  for (const field of ['phone', 'email', 'whatsappNumber', 'whatsappSourceUrl']) {
+    if (!target[field] && details[field]) target[field] = details[field];
   }
-
-  const visible = visibleContactDetails(html);
-  if (!target.phone && visible.phone) target.phone = visible.phone;
-  if (!target.email && visible.email) target.email = visible.email;
-
-  const embeddedUrls = decodeHtml(html)
-    .replaceAll('\\/', '/')
-    .match(/https?:\/\/[^\s"'<>]+/gi) ?? [];
-  for (const rawUrl of embeddedUrls) {
-    const normalizedUrl = rawUrl.replace(/[),.;]+$/, '');
-    const profile = profileFromUrl(normalizedUrl);
-    const publicContact = publicUrlContact(normalizedUrl, finalUrl);
-    if (!target.linkedinUrl && profile.linkedinUrl) target.linkedinUrl = profile.linkedinUrl;
-    if (!target.instagramHandle && profile.instagramHandle) target.instagramHandle = profile.instagramHandle;
-    if (!target.facebookUrl && profile.facebookUrl) target.facebookUrl = profile.facebookUrl;
-    if (!target.phone && publicContact.phone) target.phone = publicContact.phone;
-  }
-
-  const jsonLdPattern = /<script\b[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
-  while ((match = jsonLdPattern.exec(html)) !== null) {
+  if (target.phone === details.phone) target.phoneType = details.phoneType;
+  target.owners = [...(target.owners ?? []), ...details.owners]
+    .filter((owner, index, all) => all.findIndex((item) => item.name.toLowerCase() === owner.name.toLowerCase()) === index);
+  target.contactEvidence = [...(target.contactEvidence ?? []), ...details.contactEvidence].slice(0, 80);
+  const hrefs = publicProfileLinks(html);
+  for (const href of hrefs) {
     try {
-      const parsed = JSON.parse(decodeHtml(match[1]));
-      const queue = [parsed];
-      while (queue.length) {
-        const item = queue.shift();
-        if (Array.isArray(item)) {
-          queue.push(...item);
-          continue;
-        }
-        if (!item || typeof item !== 'object') continue;
-        if (!target.phone && typeof item.telephone === 'string') target.phone = item.telephone.trim().slice(0, 80);
-        if (!target.email && typeof item.email === 'string') target.email = item.email.replace(/^mailto:/i, '').trim().toLowerCase().slice(0, 320);
-        const socialUrls = Array.isArray(item.sameAs)
-          ? item.sameAs
-          : typeof item.sameAs === 'string'
-            ? [item.sameAs]
-            : [];
-        for (const socialUrl of socialUrls) {
-          if (typeof socialUrl !== 'string') continue;
-          const profile = profileFromUrl(socialUrl);
-          if (!target.linkedinUrl && profile.linkedinUrl) target.linkedinUrl = profile.linkedinUrl;
-          if (!target.instagramHandle && profile.instagramHandle) target.instagramHandle = profile.instagramHandle;
-          if (!target.facebookUrl && profile.facebookUrl) target.facebookUrl = profile.facebookUrl;
-        }
-        for (const value of Object.values(item)) {
-          if (value && typeof value === 'object') queue.push(value);
-        }
+      const social = profileFromUrl(new URL(href, finalUrl).toString());
+      for (const field of ['linkedinUrl', 'instagramHandle', 'facebookUrl']) {
+        if (!target[field] && social[field]) target[field] = social[field];
       }
-    } catch {
-      // Invalid JSON-LD should not block the rest of the verified page.
-    }
+    } catch { /* invalid link */ }
   }
 }
 
@@ -355,7 +252,7 @@ function supportingPageUrls(html, finalUrl) {
     try {
       const candidate = new URL(decodeHtml(match[1]), base);
       if (candidate.origin !== base.origin) continue;
-      if (!/\b(contact|about|connect|reach-us|get-in-touch)\b/i.test(candidate.pathname)) continue;
+      if (!/\b(contact|about|connect|reach-us|get-in-touch|team|founder|owner|leadership)\b/i.test(candidate.pathname)) continue;
       candidate.hash = '';
       const normalized = candidate.toString();
       if (normalized !== base.toString() && !urls.includes(normalized)) urls.push(normalized);
@@ -379,11 +276,11 @@ function businessIdentityMatched(expectedBusinessName, facts, finalUrl) {
   const host = new URL(finalUrl).hostname.replace(/^www\./i, '').toLowerCase();
   const significantWords = expected.split(' ')
     .filter((word) => word.length >= 3 && !GENERIC_NAME_WORDS.has(word));
-  return significantWords.some((word) => host.includes(word));
+  return significantWords.length > 0 && significantWords.every((word) => host.includes(word));
 }
 
 /** @returns {Promise<PublicBusinessProfile>} */
-export async function discoverPublicBusinessProfile(websiteUrl, expectedBusinessName = '') {
+export async function discoverPublicBusinessProfile(websiteUrl, expectedBusinessName = '', location = '') {
   /** @type {PublicBusinessProfile} */
   const discovered = {
     ...profileFromUrl(websiteUrl),
@@ -394,6 +291,8 @@ export async function discoverPublicBusinessProfile(websiteUrl, expectedBusiness
     hasOnlineBooking: null,
     seoStatus: 'unknown',
     sourceUrls: [],
+    owners: [],
+    contactEvidence: [],
   };
   if (discovered.linkedinUrl || discovered.instagramHandle || discovered.facebookUrl) {
     discovered.businessNameMatched = true;
@@ -416,7 +315,8 @@ export async function discoverPublicBusinessProfile(websiteUrl, expectedBusiness
     discovered.hasClearCta = facts.hasClearCta;
     discovered.hasOnlineBooking = facts.hasOnlineBooking;
     discovered.seoStatus = facts.seoStatus;
-    mergePageDetails(discovered, html, finalUrl);
+    const country = publicCountry(location, finalUrl);
+    mergePageDetails(discovered, html, finalUrl, country);
     const supportingPages = await Promise.allSettled(
       supportingPageUrls(html, finalUrl).map((url) => fetchPublicHtml(url)),
     );
@@ -424,7 +324,8 @@ export async function discoverPublicBusinessProfile(websiteUrl, expectedBusiness
       if (page.status !== 'fulfilled') continue;
       const supportingUrl = page.value.finalUrl.toString();
       if (!discovered.sourceUrls.includes(supportingUrl)) discovered.sourceUrls.push(supportingUrl);
-      mergePageDetails(discovered, page.value.html, page.value.finalUrl);
+      if (page.value.finalUrl.origin !== finalUrl.origin) continue;
+      mergePageDetails(discovered, page.value.html, page.value.finalUrl, country);
       const supportingFacts = pageFacts(page.value.html);
       discovered.hasClearCta = Boolean(discovered.hasClearCta || supportingFacts.hasClearCta);
       discovered.hasOnlineBooking = Boolean(discovered.hasOnlineBooking || supportingFacts.hasOnlineBooking);

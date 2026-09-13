@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Bot,
@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   Sparkles,
 } from 'lucide-react';
+import { supportsContactChannel } from '@/lib/contact-channels';
 import { toast } from 'sonner';
 import { createOutreachDraftAction } from '@/actions/outreach';
 import { generatePersonalizedOutreachAction } from '@/actions/personalized-outreach';
@@ -46,6 +47,9 @@ interface ContactOption {
   last_name: string | null;
   email: string | null;
   phone: string | null;
+  phone_type?: string;
+  whatsapp_number?: string | null;
+  whatsapp_status?: string;
   linkedin_url: string | null;
   instagram_handle: string | null;
   facebook_url: string | null;
@@ -78,7 +82,7 @@ const labels: Record<OutreachPlatform, string> = {
   sms: 'SMS',
 };
 
-const AI_CHANNELS = ['email', 'linkedin', 'whatsapp', 'instagram', 'sms'] as const;
+const AI_CHANNELS = ['email', 'linkedin', 'whatsapp', 'instagram', 'facebook', 'sms'] as const;
 const TONES = [
   { value: 'consultative', label: 'Consultative' },
   { value: 'concise', label: 'Concise' },
@@ -90,14 +94,7 @@ const GOALS = [
   { value: 'book_call', label: 'Book a 15-minute call' },
 ] as const;
 
-function supportsChannel(contact: ContactOption, platform: string) {
-  if (platform === 'email') return Boolean(contact.email);
-  if (platform === 'linkedin') return Boolean(contact.linkedin_url);
-  if (platform === 'instagram') return Boolean(contact.instagram_handle);
-  if (platform === 'facebook') return Boolean(contact.facebook_url);
-  if (platform === 'whatsapp' || platform === 'sms') return Boolean(contact.phone);
-  return true;
-}
+const supportsChannel = supportsContactChannel;
 
 function channelsForContacts(contacts: ContactOption[]) {
   return AI_CHANNELS.filter((channel) =>
@@ -116,6 +113,7 @@ export function CreateMessageDialog({
   const [pending, startTransition] = useTransition();
   const [mode, setMode] = useState<'ai' | 'manual'>(canGenerate ? 'ai' : 'manual');
   const [leadId, setLeadId] = useState('');
+  const contactRequest = useRef(0);
   const [contacts, setContacts] = useState<ContactOption[]>([]);
   const [contactId, setContactId] = useState('');
   const [loadingContacts, setLoadingContacts] = useState(false);
@@ -145,6 +143,7 @@ export function CreateMessageDialog({
   }
 
   async function changeLead(nextLeadId: string | null) {
+    const requestId = ++contactRequest.current;
     const selected = nextLeadId ?? '';
     setLeadId(selected);
     setContacts([]);
@@ -169,6 +168,7 @@ export function CreateMessageDialog({
         body: JSON.stringify({ leadId: selected, workspaceId }),
       });
       if (enrichment.ok) loaded = await enrichment.json() as ContactOption[];
+      if (requestId !== contactRequest.current) return;
       setContacts(loaded);
       const foundChannels = channelsForContacts(loaded);
       const nextPlatform = foundChannels.includes(platform as typeof AI_CHANNELS[number])
@@ -182,7 +182,7 @@ export function CreateMessageDialog({
     } catch {
       toast.error('Contacts could not be loaded.');
     } finally {
-      setLoadingContacts(false);
+      if (requestId === contactRequest.current) setLoadingContacts(false);
     }
   }
 

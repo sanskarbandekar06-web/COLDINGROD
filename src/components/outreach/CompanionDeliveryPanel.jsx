@@ -7,6 +7,7 @@ import { CheckCircle2, CopyCheck, ExternalLink, Loader2, PlugZap, Send } from 'l
 import { toast } from 'sonner';
 import { confirmOutreachSentAction } from '@/actions/outreach';
 import { Button } from '@/components/ui/button';
+import { contactDestination } from '@/lib/contact-channels';
 import {
   Dialog,
   DialogContent,
@@ -19,10 +20,6 @@ import {
 const REQUEST_EVENT = 'coldingrod:companion-request';
 const RESPONSE_EVENT = 'coldingrod:companion-response';
 
-function cleanPhone(value) {
-  return String(value || '').replace(/\D/g, '');
-}
-
 function openProviderLabel(platform) {
   const labels = {
     email: 'Open Email',
@@ -33,35 +30,6 @@ function openProviderLabel(platform) {
     sms: 'Open Messages',
   };
   return labels[platform] || 'Open provider';
-}
-
-function destinationFor(message, contact) {
-  const body = encodeURIComponent(message.content || '');
-  const subject = encodeURIComponent(message.subject || '');
-  switch (message.platform) {
-    case 'email':
-      return contact?.email
-        ? `mailto:${encodeURIComponent(contact.email)}?subject=${subject}&body=${body}`
-        : null;
-    case 'whatsapp': {
-      const phone = cleanPhone(contact?.phone);
-      return phone ? `https://wa.me/${phone}?text=${body}` : null;
-    }
-    case 'linkedin':
-      return contact?.linkedin_url || null;
-    case 'instagram': {
-      const handle = String(contact?.instagram_handle || '').replace(/^@/, '').trim();
-      return handle ? `https://www.instagram.com/${encodeURIComponent(handle)}/` : null;
-    }
-    case 'facebook':
-      return contact?.facebook_url || null;
-    case 'sms':
-      return contact?.phone
-        ? `sms:${encodeURIComponent(contact.phone)}?body=${body}`
-        : null;
-    default:
-      return null;
-  }
 }
 
 function bridgeRequest(action, payload = {}, timeoutMs = 1200) {
@@ -114,7 +82,7 @@ export function CompanionDeliveryPanel({
   const [prepared, setPrepared] = useState(false);
   const [companionPending, setCompanionPending] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const destination = useMemo(() => destinationFor(message, contact), [message, contact]);
+  const destination = useMemo(() => contactDestination(message, contact), [message, contact]);
   const providerLabel = openProviderLabel(message.platform);
   const terminal = ['sent', 'delivered', 'replied'].includes(message.status);
 
@@ -157,13 +125,13 @@ export function CompanionDeliveryPanel({
     if (!destination || !extension.paired) return;
     setCompanionPending(true);
     try {
-      await copyText(message.content);
+      const copied = await copyText(message.content).then(() => true).catch(() => false);
       await bridgeRequest('open_delivery', {
         platform: message.platform,
         destination,
       });
       setPrepared(true);
-      toast.success('Browser Companion opened the provider and copied the approved text.');
+      toast.success(copied ? 'Browser Companion opened the provider and copied the approved text.' : 'Provider opened. Copy the approved message manually.');
     } catch {
       setExtension((current) => ({ ...current, paired: false }));
       toast.error('The Companion did not respond. Use the web-app button or reconnect the extension.');

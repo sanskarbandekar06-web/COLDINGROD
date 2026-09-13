@@ -3,6 +3,8 @@ import { createClient } from '@supabase/supabase-js';
 import { getSupabasePublicEnv } from '@/lib/supabase/env';
 import { discoverPublicBusinessProfile } from '@/lib/public-business-profile';
 import { generateGroundedOutreachDraft } from '@/lib/outreach-message-generator';
+import { mergeBasisIntoContext } from '@/lib/browser-extension-context';
+import { supportsContactChannel } from '@/lib/contact-channels';
 import {
   buildAutomaticEvidence,
   opportunityFromAutomaticProfile,
@@ -16,7 +18,7 @@ const EXTENSION_ORIGIN_PATTERN = /^chrome-extension:\/\/[a-p]{32}$/;
 const MAX_BODY_BYTES = 30_000;
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const AI_PLATFORMS = new Set(['email', 'linkedin', 'whatsapp', 'instagram', 'sms']);
+const AI_PLATFORMS = new Set(['email', 'linkedin', 'whatsapp', 'instagram', 'facebook', 'sms']);
 const AI_TONES = new Set(['concise', 'consultative', 'warm']);
 const AI_GOALS = new Set(['book_call', 'offer_audit', 'share_idea']);
 
@@ -77,10 +79,8 @@ function contactChannelCount(contacts) {
   const channels = new Set();
   for (const contact of contacts ?? []) {
     if (contact.email) channels.add('email');
-    if (contact.phone) {
-      channels.add('whatsapp');
-      channels.add('sms');
-    }
+    if (supportsContactChannel(contact, 'whatsapp')) channels.add('whatsapp');
+    if (supportsContactChannel(contact, 'sms')) channels.add('sms');
     if (contact.linkedin_url) channels.add('linkedin');
     if (contact.instagram_handle) channels.add('instagram');
     if (contact.facebook_url) channels.add('facebook');
@@ -102,9 +102,9 @@ async function ensureExtensionBasis(supabase, hashedToken, leadId) {
   const lead = basis?.lead;
   if (!lead) throw new Error('Lead outreach basis is unavailable.');
   const shouldInspectWebsite = Boolean(lead.website_url) &&
-    (!basis.report || contactChannelCount(basis.contacts) < 2);
+    (!basis.report || contactChannelCount(basis.contacts) < 3 || !(basis.contacts ?? []).some((contact) => contact.contact_kind === 'owner'));
   const profile = shouldInspectWebsite
-    ? await discoverPublicBusinessProfile(lead.website_url, lead.company_name)
+    ? await discoverPublicBusinessProfile(lead.website_url, lead.company_name, lead.location)
     : {
         websiteAnalyzed: false,
         officialWebsite: false,
@@ -124,38 +124,17 @@ async function ensureExtensionBasis(supabase, hashedToken, leadId) {
         check_lead_id: leadId,
         input_signals: evidence.signals,
         research_input: evidence.research,
-        contact_input: {
-          email: profile.email ?? null,
-          phone: profile.phone ?? null,
-          linkedin_url: profile.linkedinUrl ?? null,
-          instagram_handle: profile.instagramHandle ?? null,
-          facebook_url: profile.facebookUrl ?? null,
-        },
+        contact_input: {},
       },
     );
     if (error) throw error;
+    const { error: contactError } = await supabase.rpc('browser_extension_save_contact_research', {
+      check_token_hash: hashedToken, check_lead_id: leadId, profile_input: profile,
+    });
+    if (contactError) throw contactError;
     basis = await getExtensionBasis(supabase, hashedToken, leadId);
   }
   return { basis, profile };
-}
-
-function mergeBasisIntoContext(context, basis) {
-  if (!context?.selected_lead || !basis?.lead) return context;
-  const contacts = basis.contacts ?? [];
-  const contactsById = new Map(contacts.map((contact) => [contact.id, contact]));
-  return {
-    ...context,
-    selected_lead: {
-      ...context.selected_lead,
-      ...basis.lead,
-      contacts,
-      report: basis.report,
-    },
-    messages: (context.messages ?? []).map((message) => ({
-      ...message,
-      ...(contactsById.get(message.contact_id) ?? {}),
-    })),
-  };
 }
 
 function mapDatabaseError(error) {
@@ -330,11 +309,7 @@ export async function POST(request) {
         400,
       );
     }
-    const reachable =
-      (platform === 'email' && contact.email) ||
-      (platform === 'linkedin' && contact.linkedin_url) ||
-      (platform === 'instagram' && contact.instagram_handle) ||
-      ((platform === 'whatsapp' || platform === 'sms') && contact.phone);
+    const reachable = supportsContactChannel(contact, platform);
     if (!reachable) {
       return json(
         request,

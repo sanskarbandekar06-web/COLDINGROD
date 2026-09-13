@@ -1,4 +1,5 @@
 import 'server-only';
+import { supportsContactChannel } from '@/lib/contact-channels';
 
 import {
   discoverLeadPublicContactProfile,
@@ -28,10 +29,8 @@ function socialPresent(contacts, profile) {
 function availableChannels(contacts, profile) {
   const channels = new Set();
   if (profile.email || contacts.some((contact) => contact.email)) channels.add('Email');
-  if (profile.phone || contacts.some((contact) => contact.phone)) {
-    channels.add('WhatsApp');
-    channels.add('SMS');
-  }
+  if (profile.whatsappNumber || contacts.some((contact) => supportsContactChannel(contact, 'whatsapp'))) channels.add('WhatsApp');
+  if (contacts.some((contact) => supportsContactChannel(contact, 'sms'))) channels.add('SMS');
   if (profile.linkedinUrl || contacts.some((contact) => contact.linkedin_url)) {
     channels.add('LinkedIn');
   }
@@ -49,17 +48,18 @@ export function buildAutomaticEvidence(lead, profile, contacts) {
   const verifiedWebsite = Boolean(profile.officialWebsite);
   const hasSocial = socialPresent(contacts, profile);
   const channels = availableChannels(contacts, profile);
-  const websiteStatus = !hasWebsite
-    ? 'none'
-    : verifiedWebsite && (profile.seoStatus !== 'weak' || profile.hasClearCta)
+  const websiteStatus = !verifiedWebsite
+    ? 'unknown'
+    : (profile.seoStatus !== 'weak' || profile.hasClearCta)
       ? 'good'
       : 'poor';
-  const socialStatus = hasSocial ? 'active' : 'missing';
-  const seoStatus = verifiedWebsite ? profile.seoStatus : 'weak';
-  const hasClearCta = verifiedWebsite ? Boolean(profile.hasClearCta) : false;
+  // A profile link does not prove recent activity; a failed fetch proves no defect.
+  const socialStatus = 'unknown';
+  const seoStatus = verifiedWebsite ? profile.seoStatus : 'unknown';
+  const hasClearCta = verifiedWebsite ? Boolean(profile.hasClearCta) : undefined;
   const hasOnlineBooking = verifiedWebsite
     ? Boolean(profile.hasOnlineBooking)
-    : false;
+    : undefined;
 
   const observations = [];
   if (!hasWebsite) {
@@ -83,18 +83,18 @@ export function buildAutomaticEvidence(lead, profile, contacts) {
       : 'No public social destination was found in the stored profile or verified website.',
   );
   observations.push(
-    hasClearCta
+    !verifiedWebsite ? 'Website calls to action could not be assessed.' : hasClearCta
       ? 'A clear customer call to action was observed.'
       : 'No clear customer call to action was observed on the verified public website.',
   );
   observations.push(
-    hasOnlineBooking
+    !verifiedWebsite ? 'Online booking could not be assessed.' : hasOnlineBooking
       ? 'An online booking or scheduling path was observed.'
       : 'No online booking or scheduling path was observed.',
   );
   observations.push(
     channels.length
-      ? `Verified outreach channels: ${channels.join(', ')}.`
+      ? `Published or user-confirmed outreach destinations: ${channels.join(', ')}. Account availability must be checked on the platform.`
       : 'No direct outreach channel could be independently verified.',
   );
   observations.push('Google rating and review totals remain unknown and are not treated as claims.');
@@ -104,8 +104,8 @@ export function buildAutomaticEvidence(lead, profile, contacts) {
   if (websiteStatus === 'poor') challenges.push('The stored website is unavailable, weak, or not verified as owned.');
   if (socialStatus === 'missing') challenges.push('No verified social destination is available in the lead profile.');
   if (seoStatus === 'weak') challenges.push('The verified website has weak or unavailable basic search metadata.');
-  if (!hasClearCta) challenges.push('No clear website call to action was observed.');
-  if (!hasOnlineBooking) challenges.push('No public online booking or scheduling path was observed.');
+  if (verifiedWebsite && !hasClearCta) challenges.push('No clear website call to action was observed on the pages checked.');
+  if (verifiedWebsite && !hasOnlineBooking) challenges.push('No online booking path was observed on the pages checked.');
 
   const offerings = profile.description
     ? `Public website description: ${profile.description}`
@@ -123,8 +123,7 @@ export function buildAutomaticEvidence(lead, profile, contacts) {
       website_status: websiteStatus,
       social_status: socialStatus,
       seo_status: seoStatus,
-      has_clear_cta: hasClearCta,
-      has_online_booking: hasOnlineBooking,
+      ...(verifiedWebsite ? { has_clear_cta: hasClearCta, has_online_booking: hasOnlineBooking } : {}),
       evidence_notes: evidenceNotes,
     },
     research: {

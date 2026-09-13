@@ -1,33 +1,33 @@
 # Coldingrod Project Status
 
-Last verified: 2026-09-03
+Last verification run: 2026-09-14
 
 Primary implementation workspace: `C:\Users\SANSKAR\COLDINGROD IMPLEMENTATION\coldingrod`
 
-## Current phase
+## Current status
 
-Phases 1–5 of the agreed roadmap are complete. The linked Supabase database is current through migration `20260815185515_report_grounded_outreach_channels.sql`, 20 rollback-only hosted acceptance suites are present, and the report-grounded outreach/channel-enrichment release is implemented and verified.
+The previous blanket 100% completion estimates were not supported by end-to-end evidence and are withdrawn. The historical sections below describe earlier implementation work, not a guarantee that every planned feature or external integration is fully operational.
 
-All eight Phase 3 production agents are transparent and deterministic. Lead import and outreach can now collect public business evidence, enrich available contact channels, qualify the lead, produce both reports, and suggest channel-native copy without asking the user to complete a manual qualification form. The agents preserve unknowns, require human selection before lead creation, and do not require an external AI-provider key.
+The contact and Browser Companion repair release passed local build and targeted database verification. See `REPAIR_AUDIT.md` for tested changes and remaining limits. The applied database migration is `20260911051753_verified_contact_channels.sql`.
 
-## Progress estimate
+## Verified repair scope
 
-| Scope | Complete | Remaining |
-| --- | ---: | ---: |
-| Phase 1 | 100% | 0% |
-| Phase 2 overall | 100% | 0% |
-| Phase 3.1 Lead Qualification Agent | 100% | 0% |
-| Phase 3.2 Lead Discovery Intake | 100% | 0% |
-| Phase 3.3 Research & Pain Points | 100% | 0% |
-| Phase 3.4 Personalization & Compliance | 100% | 0% |
-| Phase 3.5 Follow-Up Automation | 100% | 0% |
-| Phase 3.6 Analytics & Optimization | 100% | 0% |
-| Phase 3 overall | 100% | 0% |
-| Phase 4 Provider Integrations | 100% | 0% |
-| Phase 5 Production Hardening | 100% | 0% |
-| Full currently discussed product plan | 100% | 0% |
+- Separate telephone and WhatsApp destinations with publication or user-confirmation evidence.
+- Named public owner contacts kept separate from business reception details, with source links.
+- Extension enrichment preserves the saved message ID and approval state.
+- App and extension share destination validation, including Facebook.
+- Contact correction UI preserves user-marked unavailable WhatsApp numbers during research.
+- Failed website retrieval and unobserved social activity remain unknown in automatic qualification.
+- Lead dossier contains phone, email, owner details and source hyperlinks without inventing WhatsApp links from telephone numbers.
+- Eight JavaScript regression tests and three targeted rollback-only database suites pass. Type checking, lint and the final production rebuild pass.
 
-GitHub, Vercel, and Supabase are connected. Google email/password and Google OAuth are active, and the production OAuth chain reaches Google successfully. `GOOGLE_PLACES_API_KEY` is configured in Vercel for Production and Preview; it is intentionally absent from the local `.env.local` unless local Places testing is needed.
+## Limits requiring explicit verification or configuration
+
+- Public-web search beyond known business websites requires server-side `BRAVE_SEARCH_API_KEY`; no claim is made that it is configured in production.
+- Model-generated rather than rule-based fallback outreach requires a valid server-side OpenAI key and supported model configuration. Existing live configuration has not been verified in this repair.
+- Publication of a WhatsApp URL cannot guarantee the account remains active. The final platform send is user-controlled; opening a destination is not proof of delivery.
+- The bundled DOCX renderer is unavailable (`soffice.exe` missing). Contents and links pass structural checks; page-layout visual verification remains pending.
+- Live signed-in browser acceptance across the user's real platform accounts and a complete reconciliation of all aspirational roadmap features remain pending.
 
 ## 2026-09-03 web delivery, non-repeating drafts, and lead dossier export
 

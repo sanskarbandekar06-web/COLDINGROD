@@ -6,6 +6,7 @@ import { getWorkspaceContext } from '@/services/workspace.service';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const maxDuration = 120;
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -23,10 +24,6 @@ function firstPresent(...values) {
 
 function contactPhone(contacts) {
   return firstPresent(...(contacts ?? []).map((contact) => contact.phone));
-}
-
-function contactEmail(contacts) {
-  return firstPresent(...(contacts ?? []).map((contact) => contact.email));
 }
 
 async function mapWithConcurrency(items, concurrency, mapper) {
@@ -90,7 +87,7 @@ export async function GET(request, { params }) {
   ] = await Promise.all([
     supabase
       .from('lead_contacts')
-      .select('id, lead_id, first_name, last_name, job_title, is_primary, email, phone, linkedin_url, instagram_handle, facebook_url, created_at')
+      .select('id, lead_id, first_name, last_name, job_title, is_primary, email, phone, linkedin_url, instagram_handle, facebook_url, phone_type, whatsapp_number, whatsapp_status, whatsapp_source_url, contact_kind, source_url, checked_at, contact_evidence, created_at')
       .in('lead_id', availableIds)
       .order('is_primary', { ascending: false })
       .order('created_at', { ascending: true }),
@@ -178,11 +175,10 @@ export async function GET(request, { params }) {
     });
 
   const profilesByLead = new Map();
-  const missingContactLeads = storedLeads.filter((lead) =>
-    (!lead.business_phone && !contactPhone(lead.contacts)) ||
-    (!lead.business_email && !contactEmail(lead.contacts)),
-  );
+  const researchDeadline = Date.now() + 45000;
+  const missingContactLeads = storedLeads.filter((lead) => !lead.contacts.some((contact) => contact.checked_at && Date.now() - new Date(contact.checked_at).getTime() < 86400000));
   await mapWithConcurrency(missingContactLeads, 6, async (lead) => {
+    if (Date.now() >= researchDeadline) return;
     try {
       const profile = await discoverLeadPublicContactProfile(supabase, {
         ...lead,
@@ -205,6 +201,20 @@ export async function GET(request, { params }) {
     const profile = profilesByLead.get(lead.id) ?? {};
     return {
       ...lead,
+      contacts: [
+        ...lead.contacts.map((contact) => contact.contact_kind === 'business' && profile.whatsappNumber && !['confirmed', 'unavailable'].includes(contact.whatsapp_status)
+          ? { ...contact, whatsapp_number: profile.whatsappNumber, whatsapp_status: 'published', whatsapp_source_url: profile.whatsappSourceUrl } : contact),
+        ...(!lead.contacts.some((contact) => contact.contact_kind === 'business') && profile.whatsappNumber ? [{
+          first_name: lead.company_name, contact_kind: 'business', job_title: 'Business contact',
+          phone: profile.phone, email: profile.email, whatsapp_number: profile.whatsappNumber,
+          whatsapp_status: 'published', whatsapp_source_url: profile.whatsappSourceUrl,
+          source_url: profile.whatsappSourceUrl, checked_at: new Date().toISOString(),
+        }] : []),
+        ...(profile.owners ?? []).filter((owner) => !lead.contacts.some((contact) => contact.contact_kind === 'owner' && contact.first_name.toLowerCase() === owner.name.toLowerCase()))
+          .map((owner) => ({ first_name: owner.name, job_title: owner.role, contact_kind: 'owner', phone: owner.phone, email: owner.email,
+            source_url: owner.sourceUrl, checked_at: new Date().toISOString(), whatsapp_number: owner.whatsappNumber,
+            whatsapp_status: owner.whatsappNumber ? 'published' : 'unknown', whatsapp_source_url: owner.sourceUrl })),
+      ],
       business_email: firstPresent(lead.business_email, profile.email),
       business_phone: firstPresent(
         lead.business_phone,

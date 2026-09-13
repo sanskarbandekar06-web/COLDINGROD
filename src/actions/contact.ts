@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { parsePhoneNumberFromString } from 'libphonenumber-js/max';
 
 type ContactActionResult = { success?: boolean; error?: string };
 
@@ -176,4 +177,31 @@ export async function deleteContact(
     console.error('Delete contact error:', error);
     return { error: errorMessage(error, 'Failed to delete contact.') };
   }
+}
+
+export async function updateContactWhatsapp(workspaceId: string, leadId: string, contactId: string, formData: FormData): Promise<ContactActionResult> {
+  try {
+    const { supabase } = await requireLeadInWorkspace(workspaceId, leadId);
+    const { data: allowed, error: permissionError } = await supabase.rpc('has_workspace_permission', {
+      check_workspace_id: workspaceId, req_permission: 'manage_leads',
+    });
+    if (permissionError || !allowed) throw new Error('Lead management permission required.');
+    const status = formData.get('status');
+    if (status !== 'confirmed' && status !== 'unavailable') throw new Error('Choose a WhatsApp status.');
+    const raw = formString(formData, 'whatsappNumber', 40);
+    const parsed = raw?.startsWith('+') ? parsePhoneNumberFromString(raw, { extract: false }) : null;
+    if (status === 'confirmed' && (!parsed?.isValid() || formData.get('verified') !== 'on')) {
+      throw new Error('Enter the number with its country code and confirm that you checked it in WhatsApp.');
+    }
+    const { data, error } = await supabase.from('lead_contacts').update({
+      whatsapp_number: status === 'confirmed' ? parsed!.number : null,
+      whatsapp_status: status,
+      whatsapp_source_url: null,
+      checked_at: new Date().toISOString(),
+    }).eq('id', contactId).eq('lead_id', leadId).select('id').single();
+    if (error || !data) throw new Error(error?.message || 'Contact could not be updated.');
+    revalidatePath('/dashboard/[workspaceSlug]/leads/[leadId]', 'page');
+    revalidatePath('/dashboard/[workspaceSlug]/outreach', 'page');
+    return { success: true };
+  } catch (error) { return { error: errorMessage(error, 'WhatsApp status could not be updated.') }; }
 }

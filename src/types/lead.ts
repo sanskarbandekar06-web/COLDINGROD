@@ -26,6 +26,14 @@ export interface LeadContact {
   is_primary: boolean;
   email: string | null;
   phone: string | null;
+  phone_type?: 'mobile' | 'landline' | 'unknown';
+  whatsapp_number?: string | null;
+  whatsapp_status?: 'unknown' | 'published' | 'confirmed' | 'unavailable';
+  whatsapp_source_url?: string | null;
+  contact_kind?: 'business' | 'owner' | 'person';
+  source_url?: string | null;
+  checked_at?: string | null;
+  contact_evidence?: { field: string; value: string; source_url: string; excerpt?: string }[];
   linkedin_url: string | null;
   instagram_handle: string | null;
   facebook_url: string | null;

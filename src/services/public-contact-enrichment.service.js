@@ -1,20 +1,10 @@
 import 'server-only';
 
 import { discoverPublicBusinessProfile } from '@/lib/public-business-profile';
+import { normalizePublicPhone, publicCountry } from '@/lib/public-contact-extractor';
+import { searchPublicBusinessSources } from '@/lib/public-business-search';
 
-const CONTACT_FIELDS =
-  'id, first_name, last_name, email, phone, linkedin_url, instagram_handle, facebook_url';
 const MAX_PROFILE_SOURCES = 5;
-
-async function readContacts(supabase, leadId) {
-  const { data, error } = await supabase
-    .from('lead_contacts')
-    .select(CONTACT_FIELDS)
-    .eq('lead_id', leadId)
-    .order('is_primary', { ascending: false });
-  if (error) throw new Error(`Contact read failed: ${error.message}`);
-  return data ?? [];
-}
 
 function httpUrl(value) {
   return typeof value === 'string' && /^https?:\/\/\S+$/i.test(value)
@@ -48,6 +38,9 @@ function mergeProfile(target, source) {
   if (!source || typeof source !== 'object') return target;
   for (const field of [
     'phone',
+    'phoneType',
+    'whatsappNumber',
+    'whatsappSourceUrl',
     'email',
     'linkedinUrl',
     'instagramHandle',
@@ -86,6 +79,9 @@ function mergeProfile(target, source) {
     ...(target.sourceUrls ?? []),
     ...(source.sourceUrls ?? []),
   ])].slice(0, 10);
+  target.owners = [...(target.owners ?? []), ...(source.owners ?? [])]
+    .filter((owner, index, all) => all.findIndex((other) => other.name.toLowerCase() === owner.name.toLowerCase()) === index).slice(0,5);
+  target.contactEvidence = [...(target.contactEvidence ?? []), ...(source.contactEvidence ?? [])].slice(0,80);
   return target;
 }
 
@@ -134,11 +130,21 @@ export async function discoverLeadPublicContactProfile(supabase, lead) {
   ].filter((url) => url && !isGoogleMapsUrl(url)))].slice(0, MAX_PROFILE_SOURCES);
 
   const profiles = await Promise.allSettled(
-    urls.map((url) => discoverPublicBusinessProfile(url, lead.company_name)),
+    urls.map((url) => discoverPublicBusinessProfile(url, lead.company_name, lead.location)),
   );
   for (const result of profiles) {
     if (result.status === 'fulfilled') mergeProfile(aggregate, result.value);
   }
+  if (!aggregate.whatsappNumber || !aggregate.owners?.length) {
+    const search = await searchPublicBusinessSources(lead);
+    aggregate.searchStatus = search.status;
+    const extra = await Promise.allSettled(search.urls.filter((url) => !urls.includes(url) && !isGoogleMapsUrl(url))
+      .slice(0,4).map((url) => discoverPublicBusinessProfile(url, lead.company_name, lead.location)));
+    for (const item of extra) if (item.status === 'fulfilled' && item.value.officialWebsite) mergeProfile(aggregate, item.value);
+  }
+  const parsed = normalizePublicPhone(aggregate.phone, publicCountry(lead.location, lead.website_url));
+  aggregate.phone = parsed?.number ?? aggregate.phone;
+  aggregate.phoneType = parsed?.type ?? 'unknown';
   return aggregate;
 }
 
@@ -147,68 +153,12 @@ export async function discoverLeadPublicContactProfile(supabase, lead) {
  * were carried into lead_contacts. RLS remains the final authorization layer.
  */
 export async function enrichLeadPublicContact(supabase, lead, observedProfile = null) {
-  const existing = await readContacts(supabase, lead.id);
-  const profile = observedProfile ??
-    await discoverLeadPublicContactProfile(supabase, lead);
-  const details = {
-    phone: lead.business_phone ?? profile.phone ?? null,
-    email: lead.business_email ?? profile.email ?? null,
-    linkedinUrl: profile.linkedinUrl ?? null,
-    instagramHandle: profile.instagramHandle ?? null,
-    facebookUrl: profile.facebookUrl ?? null,
-  };
-  const hasReachableDetail = Boolean(
-    details.phone || details.email || details.linkedinUrl ||
-      details.instagramHandle || details.facebookUrl,
-  );
-  if (!hasReachableDetail) return existing;
-
-  if ((!lead.business_phone && profile.phone) || (!lead.business_email && profile.email)) {
-    const { error: leadError } = await supabase
-      .from('leads')
-      .update({
-        business_phone: lead.business_phone ?? profile.phone ?? null,
-        business_email: lead.business_email ?? profile.email ?? null,
-      })
-      .eq('id', lead.id)
-      .eq('workspace_id', lead.workspace_id)
-      .is('deleted_at', null);
-    if (leadError) throw new Error(`Lead contact update failed: ${leadError.message}`);
-  }
-
-  let contact = existing[0];
-  if (!contact) {
-    const { data, error: insertError } = await supabase
-      .from('lead_contacts')
-      .insert({
-        lead_id: lead.id,
-        first_name: lead.company_name,
-        job_title: 'Business contact',
-        is_primary: true,
-        email: details.email,
-        phone: details.phone,
-        linkedin_url: details.linkedinUrl,
-        instagram_handle: details.instagramHandle,
-        facebook_url: details.facebookUrl,
-      })
-      .select(CONTACT_FIELDS)
-      .single();
-    if (insertError) throw new Error(`Contact enrichment failed: ${insertError.message}`);
-    contact = data ?? null;
-  } else {
-    const { error: updateError } = await supabase
-      .from('lead_contacts')
-      .update({
-        email: contact.email ?? details.email,
-        phone: contact.phone ?? details.phone,
-        linkedin_url: contact.linkedin_url ?? details.linkedinUrl,
-        instagram_handle: contact.instagram_handle ?? details.instagramHandle,
-        facebook_url: contact.facebook_url ?? details.facebookUrl,
-      })
-      .eq('id', contact.id)
-      .eq('lead_id', lead.id);
-    if (updateError) throw new Error(`Contact enrichment failed: ${updateError.message}`);
-  }
-
-  return readContacts(supabase, lead.id);
+  const profile = observedProfile ?? await discoverLeadPublicContactProfile(supabase, lead);
+  const { data, error } = await supabase.rpc('save_public_contact_research', {
+    check_workspace_id: lead.workspace_id,
+    check_lead_id: lead.id,
+    profile_input: profile,
+  });
+  if (error) throw new Error(`Contact research could not be saved: ${error.message}`);
+  return data ?? [];
 }

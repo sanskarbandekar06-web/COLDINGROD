@@ -1,5 +1,6 @@
 'use server';
 
+import { supportsContactChannel } from '@/lib/contact-channels';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { getWorkspaceContext } from '@/services/workspace.service';
@@ -8,7 +9,7 @@ import { ensureAutomaticLeadIntelligence } from '@/services/automatic-lead-intel
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const PLATFORMS = ['email', 'linkedin', 'whatsapp', 'instagram', 'sms'];
+const PLATFORMS = ['email', 'linkedin', 'whatsapp', 'instagram', 'facebook', 'sms'];
 const TONES = ['concise', 'consultative', 'warm'];
 const GOALS = ['book_call', 'offer_audit', 'share_idea'];
 
@@ -82,7 +83,7 @@ export async function generatePersonalizedOutreachAction(
       .maybeSingle(),
     supabase
       .from('lead_contacts')
-      .select('id, lead_id, first_name, job_title, email, phone, linkedin_url, instagram_handle, facebook_url')
+      .select('id, lead_id, first_name, job_title, email, phone, phone_type, whatsapp_number, whatsapp_status, linkedin_url, instagram_handle, facebook_url')
       .eq('id', value.contactId)
       .eq('lead_id', value.leadId)
       .maybeSingle(),
@@ -109,7 +110,7 @@ export async function generatePersonalizedOutreachAction(
     const [{ data: refreshedContact }, { data: previousMessages }] = await Promise.all([
       supabase
         .from('lead_contacts')
-        .select('id, lead_id, first_name, job_title, email, phone, linkedin_url, instagram_handle, facebook_url')
+        .select('id, lead_id, first_name, job_title, email, phone, phone_type, whatsapp_number, whatsapp_status, linkedin_url, instagram_handle, facebook_url')
         .eq('id', value.contactId)
         .eq('lead_id', value.leadId)
         .maybeSingle(),
@@ -149,11 +150,7 @@ export async function generatePersonalizedOutreachAction(
     };
   }
 
-  const reachable =
-    (value.platform === 'email' && Boolean(contact.email)) ||
-    (value.platform === 'linkedin' && Boolean(contact.linkedin_url)) ||
-    (value.platform === 'instagram' && Boolean(contact.instagram_handle)) ||
-    ((value.platform === 'whatsapp' || value.platform === 'sms') && Boolean(contact.phone));
+  const reachable = supportsContactChannel(contact, value.platform);
   if (!reachable) {
     return {
       success: false,
