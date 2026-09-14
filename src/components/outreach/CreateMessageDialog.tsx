@@ -151,6 +151,7 @@ export function CreateMessageDialog({
     setReadiness(null);
     if (!selected) return;
     setLoadingContacts(true);
+    let storedContactsLoaded = false;
     try {
       const response = await fetch(
         `/api/outreach/contacts?leadId=${encodeURIComponent(selected)}&workspaceId=${encodeURIComponent(workspaceId)}`,
@@ -162,28 +163,43 @@ export function CreateMessageDialog({
       const result = await response.json() as ContactResponse;
       let loaded = result.contacts;
       setReadiness(result.readiness);
+      if (requestId !== contactRequest.current) return;
+      applyLoadedContacts(loaded);
+      storedContactsLoaded = true;
+      // Stored contacts should be usable immediately. Live research is a
+      // best-effort enhancement and must never erase a successful first load.
+      setLoadingContacts(false);
       const enrichment = await fetch('/api/outreach/contacts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ leadId: selected, workspaceId }),
       });
-      if (enrichment.ok) loaded = await enrichment.json() as ContactOption[];
+      if (enrichment.ok) {
+        const enriched = await enrichment.json() as unknown;
+        if (Array.isArray(enriched)) loaded = enriched as ContactOption[];
+      }
       if (requestId !== contactRequest.current) return;
-      setContacts(loaded);
-      const foundChannels = channelsForContacts(loaded);
-      const nextPlatform = foundChannels.includes(platform as typeof AI_CHANNELS[number])
-        ? platform
-        : foundChannels[0] ?? platform;
-      setPlatform(nextPlatform as OutreachPlatform);
-      const firstReachable = loaded.find((contact) =>
-        supportsChannel(contact, nextPlatform),
-      );
-      setContactId(firstReachable?.id ?? '');
+      applyLoadedContacts(loaded);
     } catch {
-      toast.error('Contacts could not be loaded.');
+      if (requestId === contactRequest.current && !storedContactsLoaded) {
+        toast.error('Contacts could not be loaded.');
+      }
     } finally {
       if (requestId === contactRequest.current) setLoadingContacts(false);
     }
+  }
+
+  function applyLoadedContacts(loaded: ContactOption[]) {
+    setContacts(loaded);
+    const foundChannels = channelsForContacts(loaded);
+    const nextPlatform = foundChannels.includes(platform as typeof AI_CHANNELS[number])
+      ? platform
+      : foundChannels[0] ?? platform;
+    setPlatform(nextPlatform as OutreachPlatform);
+    const firstReachable = loaded.find((contact) =>
+      supportsChannel(contact, nextPlatform),
+    );
+    setContactId(firstReachable?.id ?? '');
   }
 
   function changePlatform(value: string | null) {

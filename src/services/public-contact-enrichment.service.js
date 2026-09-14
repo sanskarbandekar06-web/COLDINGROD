@@ -3,6 +3,7 @@ import 'server-only';
 import { discoverPublicBusinessProfile } from '@/lib/public-business-profile';
 import { normalizePublicPhone, publicCountry } from '@/lib/public-contact-extractor';
 import { searchPublicBusinessSources } from '@/lib/public-business-search';
+import { getGooglePlaceContact } from '@/lib/google-places-contact';
 
 const MAX_PROFILE_SOURCES = 5;
 
@@ -93,31 +94,48 @@ function mergeProfile(target, source) {
  */
 export async function discoverLeadPublicContactProfile(supabase, lead) {
   const aggregate = emptyProfile();
-  const { data: candidates, error } = await supabase
-    .from('lead_discovery_candidates')
-    .select(
-      'website_url, source_url, business_email, business_phone, linkedin_url, instagram_handle, facebook_url, created_at',
-    )
-    .eq('workspace_id', lead.workspace_id)
-    .or(`imported_lead_id.eq.${lead.id},matched_lead_id.eq.${lead.id}`)
-    .order('created_at', { ascending: false })
-    .limit(5);
+  const [{ data: candidates, error }, { data: placeReference, error: referenceError }] = await Promise.all([
+    supabase.from('lead_discovery_candidates')
+      .select('website_url, source_url, business_email, business_phone, linkedin_url, instagram_handle, facebook_url, created_at')
+      .eq('workspace_id', lead.workspace_id)
+      .or(`imported_lead_id.eq.${lead.id},matched_lead_id.eq.${lead.id}`)
+      .order('created_at', { ascending: false }).limit(5),
+    supabase.from('lead_external_references').select('external_id')
+      .eq('workspace_id', lead.workspace_id).eq('lead_id', lead.id)
+      .eq('provider', 'google_places').maybeSingle(),
+  ]);
   if (error) console.error('Discovery source lookup failed:', error.message);
+  if (referenceError) console.error('Google Place reference lookup failed:', referenceError.message);
 
   const sourceCandidates = candidates ?? [];
+  const googlePlace = placeReference?.external_id
+    ? await getGooglePlaceContact(placeReference.external_id)
+    : null;
+  const googleSource = googlePlace?.googleMapsUrl ??
+    sourceCandidates.find((item) => isGoogleMapsUrl(item.source_url))?.source_url;
+  const selectedPhone = lead.business_phone ||
+    sourceCandidates.find((item) => item.business_phone)?.business_phone ||
+    googlePlace?.phone;
   mergeProfile(aggregate, {
-    phone: lead.business_phone || sourceCandidates.find((item) => item.business_phone)?.business_phone,
+    phone: selectedPhone,
     email: lead.business_email || sourceCandidates.find((item) => item.business_email)?.business_email,
     linkedinUrl: sourceCandidates.find((item) => item.linkedin_url)?.linkedin_url,
     instagramHandle: sourceCandidates.find((item) => item.instagram_handle)?.instagram_handle,
     facebookUrl: sourceCandidates.find((item) => item.facebook_url)?.facebook_url,
     sourceUrls: sourceCandidates
       .flatMap((item) => [httpUrl(item.website_url), httpUrl(item.source_url)])
+      .concat([httpUrl(googlePlace?.websiteUrl), httpUrl(googleSource)])
       .filter(Boolean),
+    finalUrl: httpUrl(googleSource),
+    contactEvidence: googlePlace?.phone === selectedPhone && googleSource ? [{
+      field: 'business_phone', value: googlePlace.phone,
+      source_url: googleSource, excerpt: 'Publicly listed Google Place phone',
+    }] : [],
   });
 
   const urls = [...new Set([
     httpUrl(lead.website_url),
+    httpUrl(googlePlace?.websiteUrl),
     ...sourceCandidates.flatMap((item) => [
       httpUrl(item.website_url),
       httpUrl(item.source_url),

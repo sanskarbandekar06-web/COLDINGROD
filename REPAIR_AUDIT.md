@@ -17,10 +17,12 @@ Date: 2026-09-14
 11. Preserved telephone country prefixes and removed guessed WhatsApp hyperlinks from all dossier sections. Emails and source hyperlinks are included.
 12. Added regression tests to CI and installed compatible dependency security patches.
 13. Added a dedicated WhatsApp direct links section with source evidence or explicit Not available, preserving Coldingrod styling.
+14. Fixed outreach contact loading so a failed or slow live-research request cannot hide already stored email and social channels.
+15. Added Google Place Details recovery for publicly listed phone numbers and authoritative websites, with the Google Maps evidence URL retained.
 
 ## Verification
 
-- Eleven JavaScript regression tests pass, including unavailable WhatsApp and direct-link export coverage.
+- Twelve JavaScript regression tests pass, including unavailable WhatsApp, direct-link export, and Google Place contact-field coverage.
 - Supabase rollback-only contact evidence, report-grounded outreach and Browser Companion acceptance suites pass.
 - New migration passes trial execution and was applied to the linked Supabase project.
 - Type checking, lint and the final production rebuild pass, including the export correction.

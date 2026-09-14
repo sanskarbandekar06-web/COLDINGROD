@@ -4,6 +4,7 @@ import { extractPublicContacts, normalizePublicPhone, publishedWhatsapp, publicP
 import { readFile } from 'node:fs/promises';
 import { supportsContactChannel, contactDestination } from '../src/lib/contact-channels.js';
 import { mergeBasisIntoContext } from '../src/lib/browser-extension-context.js';
+import { contactFromGooglePlace } from '../src/lib/google-places-contact-data.js';
 
 test('business landline never becomes a WhatsApp destination', () => {
   const profile = extractPublicContacts('<p>Telephone: +91 22 2345 6789</p>', 'https://business.example/contact', 'IN');
@@ -70,4 +71,17 @@ test('extension contact enrichment cannot replace message identity or approval s
   assert.equal(result.messages[0].status, 'pending_approval');
   assert.equal(result.messages[0].created_at, 'message-date');
   assert.equal(result.messages[0].whatsapp_number, '+919876543210');
+});
+
+test('Google Place details preserve public phone, website, and evidence URL', () => {
+  assert.deepEqual(contactFromGooglePlace({
+    internationalPhoneNumber: '+91 98765 43210',
+    nationalPhoneNumber: '098765 43210',
+    websiteUri: 'https://business.example/contact',
+    googleMapsUri: 'https://maps.google.com/?cid=123',
+  }), {
+    phone: '+91 98765 43210',
+    websiteUrl: 'https://business.example/contact',
+    googleMapsUrl: 'https://maps.google.com/?cid=123',
+  });
 });
