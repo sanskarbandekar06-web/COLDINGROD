@@ -5,6 +5,7 @@ import { readFile } from 'node:fs/promises';
 import { supportsContactChannel, contactDestination } from '../src/lib/contact-channels.js';
 import { mergeBasisIntoContext } from '../src/lib/browser-extension-context.js';
 import { contactFromGooglePlace } from '../src/lib/google-places-contact-data.js';
+import { searchResultMatchesBusiness, socialProfileFromSearchResult } from '../src/lib/public-business-search-data.js';
 
 test('business landline never becomes a WhatsApp destination', () => {
   const profile = extractPublicContacts('<p>Telephone: +91 22 2345 6789</p>', 'https://business.example/contact', 'IN');
@@ -84,4 +85,14 @@ test('Google Place details preserve public phone, website, and evidence URL', ()
     websiteUrl: 'https://business.example/contact',
     googleMapsUrl: 'https://maps.google.com/?cid=123',
   });
+});
+
+test('public search accepts location-matched social profiles and rejects namesakes', () => {
+  const lead = { company_name: 'Body Power Gym', location: 'Sector 9 Kamothe Navi Mumbai India' };
+  const matching = { title: 'Body Power Gym Kamothe', description: 'Sector 9 Navi Mumbai', url: 'https://www.instagram.com/bodypowerkamothe/' };
+  const namesake = { title: 'Body Power Gym', description: 'Jeddah Saudi Arabia', url: 'https://www.instagram.com/body_power_gym/' };
+  assert.equal(searchResultMatchesBusiness(matching, lead), true);
+  assert.deepEqual(socialProfileFromSearchResult(matching, lead), { instagramHandle: 'bodypowerkamothe' });
+  assert.equal(searchResultMatchesBusiness(namesake, lead), false);
+  assert.deepEqual(socialProfileFromSearchResult(namesake, lead), {});
 });

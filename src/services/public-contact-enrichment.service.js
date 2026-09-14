@@ -1,8 +1,9 @@
 import 'server-only';
 
 import { discoverPublicBusinessProfile } from '@/lib/public-business-profile';
-import { normalizePublicPhone, publicCountry } from '@/lib/public-contact-extractor';
+import { extractPublicContacts, normalizePublicPhone, publishedWhatsapp, publicCountry } from '@/lib/public-contact-extractor';
 import { searchPublicBusinessSources } from '@/lib/public-business-search';
+import { socialProfileFromSearchResult } from '@/lib/public-business-search-data';
 import { getGooglePlaceContact } from '@/lib/google-places-contact';
 
 const MAX_PROFILE_SOURCES = 5;
@@ -33,6 +34,11 @@ function emptyProfile() {
     seoStatus: 'unknown',
     sourceUrls: [],
   };
+}
+
+function escapeHtml(value) {
+  return String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 }
 
 function mergeProfile(target, source) {
@@ -153,12 +159,33 @@ export async function discoverLeadPublicContactProfile(supabase, lead) {
   for (const result of profiles) {
     if (result.status === 'fulfilled') mergeProfile(aggregate, result.value);
   }
-  if (!aggregate.whatsappNumber || !aggregate.owners?.length) {
+  if (!aggregate.email || !aggregate.whatsappNumber || !aggregate.linkedinUrl ||
+      !aggregate.instagramHandle || !aggregate.facebookUrl || !aggregate.owners?.length) {
     const search = await searchPublicBusinessSources(lead);
     aggregate.searchStatus = search.status;
-    const extra = await Promise.allSettled(search.urls.filter((url) => !urls.includes(url) && !isGoogleMapsUrl(url))
-      .slice(0,4).map((url) => discoverPublicBusinessProfile(url, lead.company_name, lead.location)));
-    for (const item of extra) if (item.status === 'fulfilled' && item.value.officialWebsite) mergeProfile(aggregate, item.value);
+    const country = publicCountry(lead.location, lead.website_url);
+    for (const candidate of search.candidates ?? []) {
+      const excerpt = `${candidate.title} ${candidate.description}`.trim();
+      const snippetContacts = extractPublicContacts(
+        `<p>Business contact ${escapeHtml(excerpt)}</p>`, candidate.url, country,
+      );
+      const social = socialProfileFromSearchResult(candidate, lead);
+      const directWhatsapp = publishedWhatsapp(candidate.url);
+      mergeProfile(aggregate, {
+        ...snippetContacts,
+        ...social,
+        whatsappNumber: snippetContacts.whatsappNumber ?? directWhatsapp,
+        whatsappSourceUrl: snippetContacts.whatsappSourceUrl ?? (directWhatsapp ? candidate.url : null),
+        sourceUrls: [candidate.url],
+        contactEvidence: [
+          ...(snippetContacts.contactEvidence ?? []),
+          ...Object.entries(social).map(([field, value]) => ({
+            field, value, source_url: candidate.url,
+            excerpt: excerpt.slice(0, 280),
+          })),
+        ],
+      });
+    }
   }
   const parsed = normalizePublicPhone(aggregate.phone, publicCountry(lead.location, lead.website_url));
   aggregate.phone = parsed?.number ?? aggregate.phone;

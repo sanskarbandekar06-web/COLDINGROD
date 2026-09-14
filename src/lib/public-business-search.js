@@ -1,4 +1,5 @@
 import 'server-only';
+import { searchResultMatchesBusiness } from './public-business-search-data.js';
 
 /** Search yields candidate pages, never verified contact facts by itself. */
 export async function searchPublicBusinessSources(lead) {
@@ -6,8 +7,13 @@ export async function searchPublicBusinessSources(lead) {
   if (!key) return { urls: [], status: 'not_configured' };
   const name = String(lead.company_name ?? '').replace(/["\r\n]/g, ' ').slice(0,150);
   const location = String(lead.location ?? '').slice(0,150);
-  const queries = [`"${name}" ${location} official contact WhatsApp`, `"${name}" ${location} owner founder contact`];
+  const queries = [
+    `"${name}" ${location} contact phone email website`,
+    `"${name}" ${location} WhatsApp Instagram Facebook LinkedIn`,
+    `"${name}" ${location} owner founder proprietor contact`,
+  ];
   const urls = new Set();
+  const candidates = [];
   let succeeded = false;
   for (const q of queries) {
     try {
@@ -22,10 +28,18 @@ export async function searchPublicBusinessSources(lead) {
       for (const item of result.web?.results ?? []) {
         try {
           const candidate = new URL(item.url);
-          if (candidate.protocol === 'https:' && !candidate.username && !candidate.password) urls.add(candidate.toString());
+          if (candidate.protocol !== 'https:' || candidate.username || candidate.password) continue;
+          const normalized = {
+            url: candidate.toString(),
+            title: String(item.title ?? '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 300),
+            description: String(item.description ?? '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 700),
+          };
+          if (!searchResultMatchesBusiness(normalized, lead)) continue;
+          urls.add(normalized.url);
+          if (!candidates.some((existing) => existing.url === normalized.url)) candidates.push(normalized);
         } catch { /* ignore invalid search results */ }
       }
     } catch { /* website research continues when search is unavailable */ }
   }
-  return { urls: [...urls].slice(0,6), status: succeeded ? 'completed' : 'unavailable' };
+  return { urls: [...urls].slice(0,10), candidates: candidates.slice(0,10), status: succeeded ? 'completed' : 'unavailable' };
 }

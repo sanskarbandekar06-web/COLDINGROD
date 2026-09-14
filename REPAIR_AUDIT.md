@@ -19,10 +19,11 @@ Date: 2026-09-14
 13. Added a dedicated WhatsApp direct links section with source evidence or explicit Not available, preserving Coldingrod styling.
 14. Fixed outreach contact loading so a failed or slow live-research request cannot hide already stored email and social channels.
 15. Added Google Place Details recovery for publicly listed phone numbers and authoritative websites, with the Google Maps evidence URL retained.
+16. Expanded broader public search to phone/email, social-platform, and owner queries. Search-result contacts are accepted only after business-name and location matching, with source evidence retained.
 
 ## Verification
 
-- Twelve JavaScript regression tests pass, including unavailable WhatsApp, direct-link export, and Google Place contact-field coverage.
+- Thirteen JavaScript regression tests pass, including unavailable WhatsApp, direct-link export, Google Place contact fields, and namesake rejection.
 - Supabase rollback-only contact evidence, report-grounded outreach and Browser Companion acceptance suites pass.
 - New migration passes trial execution and was applied to the linked Supabase project.
 - Type checking, lint and the final production rebuild pass, including the export correction.
