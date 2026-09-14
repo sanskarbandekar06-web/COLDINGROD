@@ -191,6 +191,8 @@ function contactChildren(contact, index) {
     children.push(definitionLine('WhatsApp', contact.whatsapp_number, whatsappUrl(contact.whatsapp_number)));
     children.push(definitionLine('WhatsApp evidence', contact.whatsapp_status === 'confirmed' ? 'Confirmed by user' : 'Published by business'));
     if (contact.whatsapp_source_url) children.push(definitionLine('WhatsApp source', contact.whatsapp_source_url, contact.whatsapp_source_url));
+  } else {
+    children.push(definitionLine('WhatsApp', 'Not available'));
   }
   if (contact.source_url) children.push(definitionLine('Contact source', contact.source_url, contact.source_url));
   if (contact.checked_at) children.push(definitionLine('Last checked', new Date(contact.checked_at).toLocaleDateString('en-GB')));
@@ -214,7 +216,7 @@ function discoveryContactChildren(contact, businessPhone) {
     children.push(definitionLine('Email', contact.business_email, `mailto:${contact.business_email}`));
   }
   if (phone) {
-    children.push(definitionLine('Phone', phone, `tel:${phoneDigits(phone)}`));
+    children.push(definitionLine('Phone', phone, `tel:${String(phone).replace(/[^+\d]/g, '')}`));
 
   }
   if (contact.linkedin_url) children.push(definitionLine('LinkedIn', 'Open LinkedIn profile', contact.linkedin_url));
@@ -298,7 +300,7 @@ function leadChildren(lead, index, total) {
       ['Research confidence', report?.confidence == null ? 'Not available' : `${report.confidence}%`],
     ]),
     new Paragraph({ spacing: { after: 80 } }),
-    heading('Verified destinations', HeadingLevel.HEADING_2),
+    heading('Contact destinations and evidence', HeadingLevel.HEADING_2),
   ];
 
   if (lead.website_url) children.push(definitionLine('Website', lead.website_url, lead.website_url));
@@ -308,6 +310,24 @@ function leadChildren(lead, index, total) {
   }
   children.push(definitionLine('Google Maps', lead.location || `Find ${lead.company_name} on Google Maps`, mapsUrl(lead)));
   if (lead.google_place_id) children.push(definitionLine('Google Place ID', lead.google_place_id));
+
+  children.push(heading('WhatsApp direct links', HeadingLevel.HEADING_2));
+  const whatsappContacts = lead.contacts.filter((contact) => whatsappDestination(contact));
+  if (whatsappContacts.length) {
+    const seenWhatsapp = new Set();
+    for (const contact of whatsappContacts) {
+      const number = whatsappDestination(contact);
+      if (seenWhatsapp.has(number)) continue;
+      seenWhatsapp.add(number);
+      const name = [contact.first_name, contact.last_name].filter(Boolean).join(' ') || lead.company_name;
+      children.push(definitionLine(name, `Open WhatsApp chat ${number}`, whatsappUrl(number)));
+      children.push(definitionLine('Evidence status', contact.whatsapp_status === 'confirmed' ? 'Confirmed by user' : 'Published by business'));
+      if (contact.whatsapp_source_url) children.push(definitionLine('Source', contact.whatsapp_source_url, contact.whatsapp_source_url));
+    }
+  } else {
+    children.push(definitionLine('WhatsApp', 'Not available'));
+    children.push(emptyNote('No published or user-confirmed WhatsApp destination was found. A listed telephone number is not automatically a WhatsApp account.'));
+  }
 
   const owners = lead.contacts.filter((contact) => contact.contact_kind === 'owner');
   children.push(heading('Owner contacts', HeadingLevel.HEADING_2));

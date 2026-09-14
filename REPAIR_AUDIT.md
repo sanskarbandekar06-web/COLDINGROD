@@ -16,10 +16,11 @@ Date: 2026-09-14
 10. Corrected automatic qualification so failed website checks and unobserved social activity stay unknown.
 11. Preserved telephone country prefixes and removed guessed WhatsApp hyperlinks from all dossier sections. Emails and source hyperlinks are included.
 12. Added regression tests to CI and installed compatible dependency security patches.
+13. Added a dedicated WhatsApp direct links section with source evidence or explicit Not available, preserving Coldingrod styling.
 
 ## Verification
 
-- Eight JavaScript regression tests pass.
+- Eleven JavaScript regression tests pass, including unavailable WhatsApp and direct-link export coverage.
 - Supabase rollback-only contact evidence, report-grounded outreach and Browser Companion acceptance suites pass.
 - New migration passes trial execution and was applied to the linked Supabase project.
 - Type checking, lint and the final production rebuild pass, including the export correction.

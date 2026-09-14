@@ -251,4 +251,6 @@ The project keeps TypeScript where it protects database, authorization, and UI c
 - Browser Companion `0.7.0` opens the appropriate WhatsApp, Instagram, LinkedIn, email, SMS, or existing Facebook destination immediately after approval and keeps a retry control when a provider cannot be opened.
 - The web-to-extension delivery bridge now opens the provider visibly in the active tab.
 
-No remaining application or database implementation is required for the agreed plan.
+The earlier completion statement was too broad. See REPAIR_AUDIT.md for verified repairs and remaining limitations, including live provider validation, automatic sending, and full roadmap acceptance.
+
+Latest dossier repair: every lead has a WhatsApp direct links section with published/user-confirmed destinations and supporting sources, or explicit Not available. Ordinary telephone numbers are not treated as WhatsApp accounts. Browser Companion 0.8.0 includes the message-identity preservation repair.
